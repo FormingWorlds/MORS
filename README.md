@@ -1,12 +1,15 @@
-**MODEL FOR ROTATION OF STARS (MORS)**
+# MODEL FOR ROTATION OF STARS (MORS)
 
-**Author:** Colin P. Johnstone 
+**This code is distributed as a python package for the purpose of the [PROTEUS framework](https://github.com/FormingWorlds/PROTEUS), a coupled simulation tool for the long-term evolution of atmospheres and interiors of rocky planets.
+The MORS package solves specifically the stellar rotation and evolution. It is based on the original code and model developed by Colin P. Johnstone. Below is the original README.**
+
+**Original Author:** Colin P. Johnstone
 
 This code solves the stellar rotation and XUV evolution model presented in Johnstone et al. (2021). The package can be used to calculate evolutionary tracks for stellar rotaton and X-ray, EUV, and Ly-alpha emission for stars with masses between 0.1 and 1.25 Msun and has additional functionality such as allowing the user to get basic stellar parameters such as stellar radius and luminosity as functions of mass and age using the stellar evolution models of Spada et al. (2013). When publishing results that were calculated using this code, both the Johnstone et al. (2020) paper and Spada et al. (2013) should be cited.
 
 **NOTE:** This version contains the fix for the error in the equation converting EUV1 to EUV2.
 
-# CONTENTS
+## CONTENTS
 1. INSTALLATION
 2. EVOLUTIONARY CALCULATIONS 
 3. PERCENTILES AND MODEL DISTRIBUTION
@@ -17,7 +20,7 @@ This code solves the stellar rotation and XUV evolution model presented in Johns
 8. HABITABLE ZONE BOUNDARIES
 9. ACTIVITY LIFETIMES
 
-# 1. INSTALLATION
+## 1. INSTALLATION
 
 Prerequisites: The code requires only that an up-to-date version of Python is installed with numpy and matplotlib included. 
 
@@ -64,7 +67,7 @@ myStar = mors.StarEvo(starEvoDir=...)
 
 where ... can be given as the path relative to the current directory. When this is done, no environmental variable needs to be set. 
 
-# 2. EVOLUTIONARY CALCULATIONS
+## 2. EVOLUTIONARY CALCULATIONS
 
 The main way that the user is meant to interact with the code is through the Star class. The user can create an instance of the star class, specifying only the mass and star's initial (1 Myr) rotation rate using the Mstar and Omega0 keyword arguments. This can be done for a star with a mass of 1 Msun and an initial rotation of 10x the modern Sun using
 
@@ -142,7 +145,7 @@ By default, the data will be saved into a file called 'star.pickle' but using th
 star = mors.Load("star.pickle")
 ```
 
-# 3. MODEL DISTRIBUTION AND PERCENTILES
+## 3. MODEL DISTRIBUTION AND PERCENTILES
 
 It is possible when creating an instance of the Star class to specify the initial rotation as a percentile of the model distribution from Johnstone et al. (2020). This model distribution is composed of measured rotation distributions from several clusters with ages of ~150 Myr evolved back to 1 Myr. To get the masses and initial rotation rates of the model cluster, use the function ModelCluster().
 
@@ -192,7 +195,7 @@ print(mors.Percentile(Mstar=1.0, percentile=10.0))
 
 This prints the rotation rate of the 10th percentile for solar mass stars in OmegaSun. If the user wants to use a different cluster distribution, instead of the 1 Myr model distribution used in Johnstone et al. (2020), the masses and rotation rates of the stars in this distribution can be input. The masses are input as an array of masses in Msun using the MstarDist keyword argument, and the rotation rates can be input either as an array of surface angular velocities in OmegaSun using the OmegaDist keyword argument or as an array of rotation periods in days using the ProtDist keyword argument.
 
-# 4. SETTING SIMULATION PARAMETERS
+## 4. SETTING SIMULATION PARAMETERS
 
 In addition to just the masses and initial rotation rates, the basic behavior of the code depends on a large number of parameters all of which have default values and do not need to be changed by the user. These default values cause the code to run the evolutionary model for rotation and XUV emission described in Johnstone et al. (2020) and generally do not need to be changed by the user. However, if the user wishes, these parameters can be changed.
 
@@ -244,7 +247,7 @@ star = mors.Star(Mstar=1.0, Omega=10.0, AgesOut=np.array([100.0,200.0,300.0,400.
 
 will cause the evolutionary tracks to contain 1 Myr, and the specified 100, 200, 300, and 400 Myr ages. The simulations will also end at the oldest year in the array. This array should be in ascending order. This is not recommended if the user wants to extract quantities at arbitrary ages along evolutionary tracks, for example using star.Lx(Age), since these functions interpolate between the values and if there are not enough age bins in the evolutionary tracks then these results can be inaccurate. Note that having two many age bins in the AgesOut array, e.g. with AgesOut=np.linspace(1.0,5000.0,10000), will cause the calculations of the evolutionary tracks to be very slow.
 
-# 5. ROTATION AND ACTIVITY QUANTITES
+## 5. ROTATION AND ACTIVITY QUANTITES
 
 The code gives the user the ability to use the basic functions for calculating many activity related quantities as functions os stellar properties. For example, the user can calculate XUV luminosities from stellar mass, age, and rotation rates using the Lxuv function. For example, 
 
@@ -315,7 +318,7 @@ This returns a larger dictionary with many other quantities, including some basi
 list(quantities)
 ```
 
-# 6. STELLAR EVOLUTION QUANTITIES
+## 6. STELLAR EVOLUTION QUANTITIES
 
 The rotation and activity evolution model requires that various basic stellar properties such as bolometric luminosity, radius, and convective turnover time, can be accessed at all ages for for all masses within the mass range considered (0.1 to 1.25 Msun). These are calculated using the evolutionary tracks fronm Spada et al. (2013) and the functions that do this are available to the user. First import the Mors package
 
@@ -365,7 +368,7 @@ mors.LoadTrack(1.02)
 
 If a track for that specific mass is already loaded, this will do nothing. 
 
-# 7. CLUSTER EVOLUTION CALCULATIONS
+## 7. CLUSTER EVOLUTION CALCULATIONS
 
 The code allows the user to calculate the evolution of stellar clusters in addition to single stars. This is done using the Cluster class. An instance of the Cluster class can be created in much the same way as an instance of the Star class using the same input keyword arguments. The only difference is that the masses and rotation rates of the stars should be given as arrays or lists
 
@@ -447,7 +450,7 @@ cluster = mors.Cluster(Mstar=Mstar, Omega=Omega)
 
 The Cluster class also has a function that allows the user to find where in the distribution a star with a given mass and surface rotation rate rate is at a given age. This uses the Percentile function discussed above applied to the rotation distribution of this cluster at the specified age.
 
-# 8. HABITABLE ZONE BOUNDARIES
+## 8. HABITABLE ZONE BOUNDARIES
 
 Using the formulae of Kopparapu et al. (2013) and the luminosities and effective temperatures from the stellar models of Spada et al. (2013), the user can calculate the orbital distances of the habitable zone boundaries as a function of stellar mass and age. Please cite these two papers if using the output of this function. The HZ boundaries are calculated using the aOrbHZ function.
 
@@ -472,7 +475,7 @@ Mstar can be input as a numpy array in which case the dictionary will contain ar
 aOrbHZ = mors.aOrbHZ(Mstar=1.0, Age=1000.0)
 ```
 
-# 9. ACTIVITY LIFETIMES
+## 9. ACTIVITY LIFETIMES
 
 The code contains functions that calculate how long stars remain above certain acitivty thresholds. Firstly, the function ActivityLifetime() takes an evolutionary track and returns when the value of the track goes below a certain threshold. For example
 
