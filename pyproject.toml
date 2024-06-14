@@ -30,8 +30,26 @@ dependencies = [
 [project.urls]
 homepage = "https://github.com/FormingWorlds/MORS"
 
+[project.optional-dependencies]
+develop = [
+  "bump-my-version",
+  "pytest"
+]
+publishing = [
+  "wheel",
+  "build"
+]
+
 [tool.setuptools]
 package-dir = {"mors" = "src/mors"}
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+
+[tool.bumpversion]
+current_version = "24.06.06"
+
+[[tool.bumpversion.files]]
+filename = "pyproject.toml"
+search = "version = \"{current_version}\""
+replace = "version = \"{new_version}\""
