@@ -49,4 +49,9 @@ coverage.xml
 # Sphinx documentation
 docs/_build/
 
+# Data files 
+fs255_grid*
+
+# Debug 
 *.png
+nogit*

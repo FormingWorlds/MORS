@@ -22,5 +22,11 @@ from .physicalmodel import ( dOmegadt , RotationQuantities , ExtendedQuantities 
 # Rotational evolution stuff
 from .rotevo import EvolveRotation , EvolveRotationStep
 
+# Spectral synthesis 
+from .synthesis import *
+
+# Spectrum stuff 
+from .spectrum import *
+
 # Some other stuff
 from .miscellaneous import Load , ModelCluster , ActivityLifetime , IntegrateEmission
