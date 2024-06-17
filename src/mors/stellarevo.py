@@ -10,8 +10,8 @@ import sys
 import copy
 import inspect
 
-# Imports for Mors modules
-import Mors.miscellaneous as misc
+# Imports for mors modules
+import mors.miscellaneous as misc
 
 #----------------------------------------------------------
 # Parameters for stellar evolution models

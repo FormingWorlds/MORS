@@ -61,7 +61,7 @@ gedit ~/.profile
 and add the export command to the bottom of the file. You will probably have to logout and login again for this to work. Alternatively, when creating a star object in your Python script, you can specify the path to this directory using the starEvoDir keyword
 
 ```python
-import Mors as mors 
+import mors
 myStar = mors.StarEvo(starEvoDir=...)
 ```
 
@@ -323,7 +323,7 @@ list(quantities)
 The rotation and activity evolution model requires that various basic stellar properties such as bolometric luminosity, radius, and convective turnover time, can be accessed at all ages for for all masses within the mass range considered (0.1 to 1.25 Msun). These are calculated using the evolutionary tracks fronm Spada et al. (2013) and the functions that do this are available to the user. First import the Mors package
 
 ```python
-import Mors as mors
+import mors
 ```
 
 The stellar mass for a 1.0 Msun star with an age of 1000 Myr can be calculated using

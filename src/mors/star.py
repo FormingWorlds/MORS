@@ -7,12 +7,12 @@ import inspect
 import numpy as np
 import pickle
 
-# Imports for Mors modules
-import Mors.miscellaneous as misc
-import Mors.stellarevo as SE
-import Mors.parameters as params
-import Mors.rotevo as RE
-import Mors.physicalmodel as phys
+# Imports for nors modules
+import mors.miscellaneous as misc
+import mors.stellarevo as SE
+import mors.parameters as params
+import mors.rotevo as RE
+import mors.physicalmodel as phys
 
 # Limits on various input values
 MstarMin = 0.1

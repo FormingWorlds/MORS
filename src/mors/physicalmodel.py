@@ -6,11 +6,11 @@ import numpy as np
 import sys as sys
 import copy as copy
 
-# Imports for Mors modules
-import Mors.miscellaneous as misc
-import Mors.stellarevo as SE
-import Mors.constants as const
-import Mors.parameters as params
+# Imports for mors modules
+import mors.miscellaneous as misc
+import mors.stellarevo as SE
+import mors.constants as const
+import mors.parameters as params
 
 def dOmegadt(Mstar=None,Age=None,OmegaEnv=None,OmegaCore=None,params=params.paramsDefault,StarEvo=None):
     """Takes basic stellar parameters, returns rates of change of rotation.
@@ -32,7 +32,7 @@ def dOmegadt(Mstar=None,Age=None,OmegaEnv=None,OmegaCore=None,params=params.para
         Core rotation rate in OmegaSun (=2.67e-6 rad/s).
     params : dict , optional
         Dictionary holding model parameters. 
-    StarEvo : Mors.stellarevo.StarEvo , optional
+    StarEvo : mors.stellarevo.StarEvo , optional
         Instance of StarEvo class holding stellar evolution model data.
     
     Returns
@@ -83,7 +83,7 @@ def RotationQuantities(Mstar=None,Age=None,OmegaEnv=None,OmegaCore=None,params=p
         Core rotation rate in OmegaSun (=2.67e-6 rad/s).
     params : dict , optional
         Dictionary holding model parameters. 
-    StarEvo : Mors.stellarevo.StarEvo , optional
+    StarEvo : mors.stellarevo.StarEvo , optional
         Instance of StarEvo class holding stellar evolution model data.
     
     Returns
@@ -255,7 +255,7 @@ def ExtendedQuantities(StarState=None,Mstar=None,Age=None,OmegaEnv=None,OmegaCor
         Core rotation rate in OmegaSun (=2.67e-6 rad/s).
     params : dict , optional
         Dictionary holding model parameters. 
-    StarEvo : Mors.stellarevo.StarEvo , optional
+    StarEvo : mors.stellarevo.StarEvo , optional
         Instance of StarEvo class holding stellar evolution model data.
     
     Returns
@@ -447,7 +447,7 @@ def Lxuv(Mstar=None,Age=None,Omega=None,OmegaEnv=None,Prot=None,params=params.pa
         Surface rotation period in days.
     params : dict , optional
         Dictionary holding model parameters.
-    StarEvo : Mors.stellarevo.StarEvo , optional
+    StarEvo : mors.stellarevo.StarEvo , optional
         Instance of StarEvo class holding stellar evolution model data.
     
     Returns
@@ -556,7 +556,7 @@ def Lx(Mstar=None,Age=None,Omega=None,OmegaEnv=None,Prot=None,params=params.para
         Surface rotation period in days.
     params : dict , optional
         Dictionary holding model parameters.
-    StarEvo : Mors.stellarevo.StarEvo , optional
+    StarEvo : mors.stellarevo.StarEvo , optional
         Instance of StarEvo class holding stellar evolution model data.
     
     Returns
@@ -750,7 +750,7 @@ def Leuv(Mstar=None,Age=None,Omega=None,OmegaEnv=None,Prot=None,band=0,params=pa
         Which wavelength band to return (=0 for 10-92 nm; =1 for 10-32 nm; =2 for 32-92 nm).
     params : dict , optional
         Dictionary holding model parameters.
-    StarEvo : Mors.stellarevo.StarEvo , optional
+    StarEvo : mors.stellarevo.StarEvo , optional
         Instance of StarEvo class holding stellar evolution model data.
     
     Returns
@@ -836,7 +836,7 @@ def Lly(Mstar=None,Age=None,Omega=None,OmegaEnv=None,Prot=None,params=params.par
         Surface rotation period in days.
     params : dict , optional
         Dictionary holding model parameters.
-    StarEvo : Mors.stellarevo.StarEvo , optional
+    StarEvo : mors.stellarevo.StarEvo , optional
         Instance of StarEvo class holding stellar evolution model data.
     
     Returns
@@ -1104,7 +1104,7 @@ def OmegaSat(Mstar=None,Age=None,param='XUV',params=params.paramsDefault,StarEvo
         String specifying which quantity the saturation threshold is needed for (default='XUV', options: 'XUV', 'Bdip', 'Mdot').
     params : dict , optional
         Dictionary holding model parameters.
-    StarEvo : Mors.stellarevo.StarEvo , optional
+    StarEvo : mors.stellarevo.StarEvo , optional
         Instance of StarEvo class holding stellar evolution model data.
     
     Returns
@@ -1147,7 +1147,7 @@ def ProtSat(Mstar=None,Age=None,param='XUV',params=params.paramsDefault,StarEvo=
         String specifying which quantity the saturation threshold is needed for (default='XUV', options: 'XUV', 'Bdip', 'Mdot').
     params : dict , optional
         Dictionary holding model parameters.
-    StarEvo : Mors.stellarevo.StarEvo , optional
+    StarEvo : mors.stellarevo.StarEvo , optional
         Instance of StarEvo class holding stellar evolution model data.
     
     Returns

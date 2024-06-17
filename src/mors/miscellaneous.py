@@ -8,8 +8,8 @@ import numpy as np
 import pickle
 import copy
 
-# Imports for Mors modules
-import Mors.constants as const
+# Imports for mors modules
+import mors.constants as const
 
 def _PrintErrorKill(errorString):
     """Takes string with error message, prints message to screen and end code execution."""
