@@ -44,6 +44,9 @@ class Spectrum():
         self.fl = []        # Flux bins [erg s-1 cm-2 nm-1]
         self.binwidth = []  # Width of wavelength bins [nm]
 
+        # Extension 
+        self.ext_start = -1 # Index where Planck function extension starts
+
         # Integrated fluxes for each band [erg s-1 cm-2]
         self.fl_integ = {}
         for b in bands_limits.keys():
@@ -58,15 +61,17 @@ class Spectrum():
 
         # For each spectral band 
         idxs = []
+        i_lo = 0
         for b in bands_ascending:
 
             # Get band indicies 
-            for i in range(self.nbins):
+            for i in range(i_lo, self.nbins, 1):
                 if WhichBand(self.wl[i]) == b:
                     # In current band 
                     idxs.append(i)
                 else:
                     # End of band 
+                    i_lo = i
                     break 
             
             # With idxs defined, integrate over band 
@@ -80,35 +85,21 @@ class Spectrum():
         # For bolometric "band"
         self.fl_integ["bo"] = np.trapz(self.fl,self.wl)
 
+        return self.fl_integ
 
-    def LoadTSV(self, fp:str):
-        """Load stellar spectrum from TSV file into memory.
+    def LoadDirectly(self, spec_wl:np.ndarray, spec_fl:np.ndarray):
+        """Store spectral data in object.
 
-        Scaled to 1 AU. File should be whitespace delimited with 
-        units of [nm] and [erg s-1 cm-2 nm-1].
+        Scaled to 1 AU. 
 
         Parameters
         ----------
-            fp : str
-                Path to file 
+            spec_wl : np.ndarray
+                Array of wavelengths [nm] 
+            spec_fl : np.ndarray
+                Array of fluxes [erg s-1 cm-2 nm-1]
         """
 
-        if self.loaded:
-            misc._PrintErrorKill("Cannot load spectrum TSV into Spectrum object, because it is already initialised")
-
-        # Check path
-        fp = os.path.abspath(fp)
-        if not os.path.isfile(fp):
-            misc._PrintErrorKill("Cannot find TSV file at '%s'"%fp)
-
-        # Load file
-        spec_data = np.loadtxt(fp,delimiter=r'\s+').T
-        spec_wl = spec_data[0]
-        spec_fl = spec_data[1]
-
-        # Process data 
-        spec_wl = np.array(spec_wl, dtype=float)
-        spec_fl = np.array(spec_fl, dtype=float)
 
         # Check length 
         if len(spec_wl) != len(spec_fl):
@@ -130,7 +121,44 @@ class Spectrum():
         self.fl = spec_fl 
         self.binwidth = np.array(binwidth_wl, dtype=float)
 
+        self.loaded = True
+
+        return self 
+
+
+    def LoadTSV(self, fp:str):
+        """Load stellar spectrum from TSV file into memory.
+
+        Scaled to 1 AU. File should be whitespace delimited with 
+        units of [nm] and [erg s-1 cm-2 nm-1].
+
+        Parameters
+        ----------
+            fp : str
+                Path to file 
+        """
+
+        # Check path
+        fp = os.path.abspath(fp)
+        if not os.path.isfile(fp):
+            misc._PrintErrorKill("Cannot find TSV file at '%s'"%fp)
+
+        # Load file
+        spec_data = np.loadtxt(fp).T
+        spec_wl = spec_data[0]
+        spec_fl = spec_data[1]
+
+        # Process data 
+        spec_wl = np.array(spec_wl, dtype=float)
+        spec_fl = np.array(spec_fl, dtype=float)
+
+        # Store 
+        self.LoadDirectly(spec_wl, spec_fl)
+
         self.loaded = True 
+
+        return self 
+
 
     def ExtendPlanck(self, Teff:float, R_star:float, wl_max:float):
         """Extend spectrum to longer wavelengths using planck function.
@@ -160,10 +188,12 @@ class Spectrum():
         fl_ext = ScaleTo1AU(fl_ext, R_star)
 
         # Update Spectrum object data 
-        self.wl = np.concatenate((self.wl, wl_ext))
-        self.fl = np.concatenate((self.fl, fl_ext))
-        self.binwidth = self.wl[1:] - self.wl[0:-1]
-        self.nbins = len(self.wl)
+        self.ext_start = len(self.wl)
+        spec_wl = np.concatenate((self.wl, wl_ext))
+        spec_fl = np.concatenate((self.fl, fl_ext))
+
+        # Store 
+        self.LoadDirectly(spec_wl, spec_fl)
 
     
     def WriteTSV(self, fp:str):

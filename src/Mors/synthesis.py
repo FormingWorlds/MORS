@@ -2,6 +2,7 @@
 
 # Import system libraries 
 import numpy as np
+from copy import deepcopy
 
 # Import MORS files 
 import Mors.spectrum as spec
@@ -74,6 +75,17 @@ def GetProperties(Mstar:float, pctle:float, age:float):
 def CalcBandScales(modern_dict:dict, historical_age:float):
     """Get band scale factors for historical spectrum
 
+    Parameters 
+    ----------
+        modern_dict : dict 
+            Dictionary output of `GetProperties` call for modern spectrum
+        historical_age : float 
+            Stellar age at which to get corresponding scale factors
+
+    Returns 
+    ----------
+        Q_dict : dict
+            Dictionary of band scale factors
     """
 
     # Get properties 
@@ -85,4 +97,40 @@ def CalcBandScales(modern_dict:dict, historical_age:float):
         Q_dict["Q_"+key] = historical["F_"+key]/modern_dict["F_"+key]
 
     return Q_dict
+
+def GetScaledSpectrum(modern_spec:spec.Spectrum, Q_dict:dict):
+    """Scale a stellar spectrum according to band scale factors.
+
+    Returns a new Spectrum object containing the historical fluxes.
+
+    Parameters 
+    ----------
+        modern_spec : Spectrum object
+            Spectrum object containing data for a modern fluxes
+        Q_dict : float 
+            Dictionary of band scale factors
+
+    Returns 
+    ----------
+        historical_spec : Spectrum object 
+            Spectrum object containing data for historical fluxes
+    """
+
+    # Get modern wl, fl
+    spec_fl = deepcopy(modern_spec.fl)
+    spec_wl = deepcopy(modern_spec.wl)
+
+    # Get band indicies 
+    for i in range(len(spec_wl)):
+        b = spec.WhichBand(spec_wl[i])
+        spec_fl[i] *= Q_dict["Q_"+b]
+
+    # Make new spectrum object
+    historical_spec = spec.Spectrum()
+    historical_spec.LoadDirectly(spec_wl, spec_fl)
+
+    return historical_spec
+
+    
+
 
