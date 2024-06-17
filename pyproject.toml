@@ -11,7 +11,6 @@ authors = [
     {name = "Colin P. Johnstone", email = "colinjohnstone@gmail.com" }
 ]
 license = {text = "MIT License"}
-requires-python = ">=3.10"
 classifiers = [
     "Intended Audience :: Science/Research",
     "License :: OSI Approved :: MIT License",
