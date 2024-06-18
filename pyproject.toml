@@ -42,6 +42,7 @@ publishing = [
 
 [tool.setuptools]
 package-dir = {"mors" = "src/mors"}
+include-package-data = true
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
