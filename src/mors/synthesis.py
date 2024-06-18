@@ -3,17 +3,19 @@
 # Import system libraries 
 import numpy as np
 from copy import deepcopy
+from scipy.optimize import minimize
 
 # Import MORS files 
 import mors.spectrum as spec
 import mors.constants as const
+import mors.miscellaneous as misc
 from mors.star import  Percentile
 from mors.stellarevo import Value, Lbol
 from mors.physicalmodel import Lxuv
 
 
 def GetProperties(Mstar:float, pctle:float, age:float):
-    """Calculate properties of star at a given age
+    """Calculate properties of star for a given rotation percentile and  age
     
     Parameters 
     ----------
@@ -102,8 +104,8 @@ def CalcBandScales(modern_dict:dict, historical_age:float):
 
     return Q_dict
 
-def GetScaledSpectrum(modern_spec:spec.Spectrum, Q_dict:dict):
-    """Scale a stellar spectrum according to band scale factors.
+def CalcScaledSpectrumFromProps(modern_spec:spec.Spectrum, modern_dict:dict, historical_age:float):
+    """Scale a stellar spectrum according to stellar properties.
 
     Returns a new Spectrum object containing the historical fluxes.
 
@@ -111,14 +113,19 @@ def GetScaledSpectrum(modern_spec:spec.Spectrum, Q_dict:dict):
     ----------
         modern_spec : Spectrum object
             Spectrum object containing data for a modern fluxes
-        Q_dict : float 
-            Dictionary of band scale factors
+        modern_dict : dict 
+            Dictionary output of `GetProperties` call for modern spectrum
+        historical_age : float 
+            Stellar age at which to get corresponding scale factors
 
     Returns 
     ----------
         historical_spec : Spectrum object 
             Spectrum object containing data for historical fluxes
     """
+
+    # Get scale factors relative to modern spectrum
+    Q_dict = CalcBandScales(modern_dict, historical_age)
 
     # Get modern wl, fl
     spec_fl = deepcopy(modern_spec.fl)
@@ -138,5 +145,73 @@ def GetScaledSpectrum(modern_spec:spec.Spectrum, Q_dict:dict):
     return historical_spec
 
     
+def FitModernProperties(modern_spec:spec.Spectrum, Mstar:float, age:float=-1):
+    """Estimate rotation percentile and (optionally) age from modern spectrum.
 
+    Parameters 
+    ----------
+        modern_spec : Spectrum object
+            Spectrum object containing data for a modern fluxes
+        Mstar : float 
+            Stellar mass [M_sun]
+        age : float 
+            Optional guess for current age. Will be estimated if not provided.
+
+    Returns 
+    ----------
+        best_pctle : float 
+            Best estimate of rotation percentile 
+        best_age : float 
+            Best estimate of star's age (equal to `age` if `age` is provided)
+    """
+
+    # Integrated fluxes
+    modern_spec.CalcBandFluxes()
+
+    fit_age = bool(age>0)
+
+    # Objective function
+    def _fev(x_arr:tuple):
+
+        this_pctle = x_arr[0]
+        if fit_age:
+            this_age = x_arr[1]
+        else:
+            this_age = age
+
+        this_age = max(min(this_age, 11000), 0.4)
+
+        props = GetProperties(Mstar, this_pctle, this_age)
+
+        resid = 0.0
+        for k in ["xr","e1","e2","uv"]:
+            lim = spec.bands_limits[k]
+            wid = lim[1]-lim[0]
+            resid += (props["F_"+k]/wid - modern_spec.fl_integ[k]/wid)**2
+        
+        return np.sqrt(resid)
+    
+    # Initial guess 
+    if fit_age:
+        x0 = [1.0, 1000.0]
+    else:
+        x0 = [1.0]
+
+    # Find best params
+    result = minimize(_fev, x0, method='Nelder-Mead')
+
+    # Check 
+    if not result.success:
+        misc._PrintError("Could not fit stellar properties to modern spectrum")
+
+    # Result 
+    best_pctle = result.x[0]
+    if fit_age:
+        best_age = result.x[1]
+    else:
+        best_age = age
+
+    # Return
+    return best_pctle, best_age
+    
 
