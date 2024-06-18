@@ -10,12 +10,12 @@ import Mors.miscellaneous as misc
 
 # Spectral bands for stellar fluxes, in nm
 bands_limits = {
-    "xr" : [0.1 , 10.0],        # X-ray,      defined by Mors
+    "xr" : [0.517 , 10.0],      # X-ray,      defined by Mors
     "e1" : [10.0  , 32.0],      # EUV1,       defined by Mors
     "e2" : [32.0  , 92.0],      # EUV2,       defined by Mors
     "uv" : [92.0  , 400.0],     # UV,         defined by Harrison
-    "pl" : [400.0 , 1.0e9],    # planckian,  defined by Harrison
-    'bo' : [1.e-3 , 1.0e9]     # bolometric, all wavelengths
+    "pl" : [400.0 , 1.0e9],     # planckian,  defined by Harrison
+    'bo' : [1.e-3 , 1.0e9]      # bolometric, all wavelengths
 }
 
 bands_ascending = ["xr","e1","e2","uv","pl"]
@@ -29,7 +29,7 @@ def WhichBand(wl:float):
             return b
     
     # Not found...
-    misc._PrintErrorKill("Cannot map wavelength to band")
+    return None
 
 class Spectrum():
 
@@ -44,8 +44,9 @@ class Spectrum():
         self.fl = []        # Flux bins [erg s-1 cm-2 nm-1]
         self.binwidth = []  # Width of wavelength bins [nm]
 
-        # Extension 
-        self.ext_start = -1 # Index where Planck function extension starts
+        # Extensions
+        self.ext_long   = -1 # Index where Planck function extension starts
+        self.ext_short  = -1 # Index where shortwave extension starts
 
         # Integrated fluxes for each band [erg s-1 cm-2]
         self.fl_integ = {}
@@ -66,7 +67,13 @@ class Spectrum():
 
             # Get band indicies 
             for i in range(i_lo, self.nbins, 1):
-                if WhichBand(self.wl[i]) == b:
+                wb = WhichBand(self.wl[i])
+
+                # Out of range
+                if wb == None:
+                    continue 
+
+                if wb == b:
                     # In current band 
                     idxs.append(i)
                 else:
@@ -80,6 +87,7 @@ class Spectrum():
             self.fl_integ[b] = np.trapz(band_fl,band_wl)
 
             # Reset idxs 
+            # print("%s band between in interval [%.2f, %.2f] nm"%(b,self.wl[idxs[0]],self.wl[idxs[-1]]))
             idxs = []
 
         # For bolometric "band"
@@ -111,6 +119,12 @@ class Spectrum():
         if spec_wl[4] < spec_wl[0]:
             spec_wl = spec_wl[::-1]
             spec_fl = spec_fl[::-1]
+
+        # Replace NaN and zero values 
+        for i in range(len(spec_fl)):
+            if not np.isfinite(spec_fl[i]):
+                spec_fl[i] = 0.0
+            spec_fl[i] = max(spec_fl[i], 1e-20)
 
         # Calculate bin width
         binwidth_wl = spec_wl[1:] - spec_wl[0:-1]
@@ -160,6 +174,34 @@ class Spectrum():
         return self 
 
 
+    def ExtendShortwave(self, wl_min:float):
+        """Extend spectrum to shorter wavelengths using constant value.
+
+        Parameters
+        ----------
+            wl_min : float 
+                New minimum wavelength [nm]
+        """
+
+        # Already extended
+        if wl_min > self.wl[0]:
+            return 
+        
+        # Calc wavelength extension
+        wl_ext = np.logspace(np.log10(wl_min), np.log10(self.wl[0]), 200)[:-1]
+
+        # Evalulate planck function
+        fl_ext = np.ones(np.shape(wl_ext)) * self.fl[0]
+
+        # Update Spectrum object data 
+        self.ext_short = len(wl_ext)
+        spec_wl = np.concatenate((wl_ext,self.wl))
+        spec_fl = np.concatenate((fl_ext,self.fl))
+
+        # Store 
+        self.LoadDirectly(spec_wl, spec_fl)
+
+
     def ExtendPlanck(self, Teff:float, R_star:float, wl_max:float):
         """Extend spectrum to longer wavelengths using planck function.
 
@@ -179,7 +221,7 @@ class Spectrum():
             return 
         
         # Calc wavelength extension
-        wl_ext = np.linspace(self.wl[-1], wl_max, 300)[1:]
+        wl_ext = np.logspace(np.log10(self.wl[-1]), np.log10(wl_max), 300)[1:]
 
         # Evalulate planck function
         fl_ext = PlanckFunction_surf(wl_ext, Teff)
@@ -188,7 +230,7 @@ class Spectrum():
         fl_ext = ScaleTo1AU(fl_ext, R_star)
 
         # Update Spectrum object data 
-        self.ext_start = len(self.wl)
+        self.ext_long = len(self.wl)
         spec_wl = np.concatenate((self.wl, wl_ext))
         spec_fl = np.concatenate((self.fl, fl_ext))
 
