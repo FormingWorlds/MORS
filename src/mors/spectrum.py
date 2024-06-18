@@ -10,7 +10,7 @@ import mors.miscellaneous as misc
 
 # Spectral bands for stellar fluxes, in nm
 bands_limits = {
-    "xr" : [0.517 , 10.0],      # X-ray,      defined by Mors
+    "xr" : [0.517 , 12.5],      # X-ray,      defined by Mors
     "e1" : [10.0  , 32.0],      # EUV1,       defined by Mors
     "e2" : [32.0  , 92.0],      # EUV2,       defined by Mors
     "uv" : [92.0  , 400.0],     # UV,         defined by Harrison
@@ -21,15 +21,34 @@ bands_limits = {
 bands_ascending = ["xr","e1","e2","uv","pl"]
 
 def WhichBand(wl:float):
-    """Determine which band this wavelength is inside of"""
+    """Determine which band(s) this wavelength is inside of
+    
+    Parameters
+    ----------
+        wl : float
+            Wavelength to query [nm]
+    
+    Returns 
+    ----------
+        bands : list | None
+            List of band names (strings) which this band is inside of. Bands 
+            can overlap, so this list may have a length greater than one.     
+            If `wl` is outside all bandpasses, then this value is None.   
+    
+    """
 
     # Find band, returning when found 
+    bands = []
     for b in bands_ascending:
         if bands_limits[b][0] <= wl < bands_limits[b][1]:
-            return b
+            bands.append(b)
     
     # Not found...
-    return None
+    if len(bands) == 0:
+        return None 
+    
+    # Else...
+    return bands
 
 class Spectrum():
 
@@ -73,7 +92,7 @@ class Spectrum():
                 if wb == None:
                     continue 
 
-                if wb == b:
+                if b in wb:
                     # In current band 
                     idxs.append(i)
                 else:

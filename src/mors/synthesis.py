@@ -136,7 +136,7 @@ def CalcScaledSpectrumFromProps(modern_spec:spec.Spectrum, modern_dict:dict, his
         b = spec.WhichBand(spec_wl[i])
         if b == None:
             continue 
-        spec_fl[i] *= Q_dict["Q_"+b]
+        spec_fl[i] *= Q_dict["Q_"+b[0]]
 
     # Make new spectrum object
     historical_spec = spec.Spectrum()
