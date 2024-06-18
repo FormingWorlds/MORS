@@ -7,9 +7,10 @@ import sys
 import numpy as np
 import pickle
 import copy
+import pathlib
 
-# Imports for Mors modules
-import Mors.constants as const
+# Imports for mors modules
+import mors.constants as const
 
 def _PrintErrorKill(errorString):
     """Takes string with error message, prints message to screen and end code execution."""
@@ -52,19 +53,7 @@ def _PrintError(errorString):
 def _GetPackageDirectory():
     """Gets path to main directory where the code is installed."""
     
-    # Get information about function
-    frame = inspect.stack()[0]
-    
-    # Get name of this file
-    filename = frame.filename
-    
-    # Split by / and then reconstruct string removing anything after last /
-    temp = filename.split("/")
-    path = ''
-    for item in temp[0:-1]:
-        path += item + '/'
-    
-    return path
+    return str(pathlib.Path(__file__).parent.absolute())+"/data/"
 
 def _convertFloatArray(Xin):
     """Takes a value and returns either as float or numpy.ndarray of floats."""

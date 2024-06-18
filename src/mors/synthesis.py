@@ -5,11 +5,11 @@ import numpy as np
 from copy import deepcopy
 
 # Import MORS files 
-import Mors.spectrum as spec
-import Mors.constants as const
-from Mors.star import  Percentile
-from Mors.stellarevo import Value, Lbol
-from Mors.physicalmodel import Lxuv
+import mors.spectrum as spec
+import mors.constants as const
+from mors.star import  Percentile
+from mors.stellarevo import Value, Lbol
+from mors.physicalmodel import Lxuv
 
 
 def GetProperties(Mstar:float, pctle:float, age:float):

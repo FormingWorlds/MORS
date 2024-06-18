@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "fwl-mors"
-version = "24.06.06"
+version = "24.6.17"
 description = "Stellar rotation and activity evolution model"
 readme = "README.md"
 authors = [
@@ -41,13 +41,14 @@ publishing = [
 ]
 
 [tool.setuptools]
-package-dir = {"mors" = "src/Mors"}
+package-dir = {"mors" = "src/mors"}
+include-package-data = true
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 
 [tool.bumpversion]
-current_version = "24.06.06"
+current_version = "24.6.17"
 
 [[tool.bumpversion.files]]
 filename = "pyproject.toml"

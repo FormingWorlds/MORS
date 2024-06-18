@@ -5,8 +5,8 @@ import numpy as np
 import os 
 
 # Import MORS files 
-import Mors.constants as const
-import Mors.miscellaneous as misc
+import mors.constants as const
+import mors.miscellaneous as misc
 
 # Spectral bands for stellar fluxes, in nm
 bands_limits = {

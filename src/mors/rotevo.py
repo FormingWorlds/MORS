@@ -6,11 +6,11 @@ import numpy as np
 import math
 import copy
 
-# Imports for Mors modules
-import Mors.miscellaneous as misc
-import Mors.physicalmodel as phys
-import Mors.parameters as params
-import Mors.stellarevo as SE
+# Imports for mors modules
+import mors.miscellaneous as misc
+import mors.physicalmodel as phys
+import mors.parameters as params
+import mors.stellarevo as SE
 import sys
 
 AgeMinDefault = 1.0       # when to start evolution (Myr)
@@ -39,7 +39,7 @@ def FitRotation(Mstar=None,Age=None,Omega=None,AgeMin=None,params=params.paramsD
         Starting age (default = 1 Myr).
     params : dict , optional
         Parameters to determine behavior of code (default given in parameters.py).
-    StarEvo : Mors.stellarevo.StarEvo
+    StarEvo : mors.stellarevo.StarEvo
         Instance of StarEvo class holding stellar evolution models to use.
     
     Returns
@@ -161,7 +161,7 @@ def EvolveRotation(Mstar=None,Omega0=None,OmegaEnv0=None,OmegaCore0=None,AgeMin=
         Ages to output data for in Myr.
     params : dict , optional
         Parameters to determine behavior of code (default given in parameters.py).
-    StarEvo : Mors.stellarevo.StarEvo
+    StarEvo : mors.stellarevo.StarEvo
         Instance of StarEvo class holding stellar evolution models to use.
     
     Returns

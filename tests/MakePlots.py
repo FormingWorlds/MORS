@@ -18,8 +18,8 @@ $ python MakePlots.py All
 
 """
 
-import Mors as mors
-import Mors.constants as const
+import mors
+import mors.constants as const
 
 import matplotlib
 import matplotlib.pyplot as plt

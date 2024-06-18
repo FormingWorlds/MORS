@@ -7,13 +7,13 @@ import numpy as np
 import os
 import pickle
 
-# Imports for Mors modules
-import Mors.miscellaneous as misc
-import Mors.stellarevo as SE
-import Mors.parameters as params
-import Mors.rotevo as RE
-import Mors.physicalmodel as phys
-import Mors.star as star
+# Imports for mors modules
+import mors.miscellaneous as misc
+import mors.stellarevo as SE
+import mors.parameters as params
+import mors.rotevo as RE
+import mors.physicalmodel as phys
+import mors.star as star
 
 class Cluster:
     """A class for star objects that hold all information about a star. 
