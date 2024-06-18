@@ -51,24 +51,27 @@ def GetProperties(Mstar:float, pctle:float, age:float):
         "Teff"   : Tstar,
     }
 
-    # Fluxes scaled to 1 AU (erg s-1 cm-2)
-    area = (4.0 * const.Pi * const.AU * const.AU)
+    # Luminosities (erg s-1)
+    out["L_bo"] = Lbol(Mstar,age) * const.LbolSun   
+    out["L_xr"] = Ldict["Lx"] 
+    out["L_e1"] = Ldict["Leuv1"] 
+    out["L_e2"] = Ldict["Leuv2"] 
 
-    out["F_bo"] = Lbol(Mstar,age) * const.LbolSun / area  
-    out["F_xr"] = Ldict["Lx"] / area 
-    out["F_e1"] = Ldict["Leuv1"] / area 
-    out["F_e2"] = Ldict["Leuv2"] / area 
+    # Fluxes at 1 AU
+    area = (4.0 * const.Pi * const.AU * const.AU)
+    for k in ["bo","xr","e1","e2"]:
+        out["F_"+k] = out["L_"+k]/area
 
     # Get flux from Planckian band 
     wl_pl = np.logspace(np.log10(spec.bands_limits["pl"][0]), np.log10(spec.bands_limits["pl"][1]), 1000)
     fl_pl = spec.PlanckFunction_surf(wl_pl, Tstar)
     fl_pl = spec.ScaleTo1AU(fl_pl, Rstar)
     out["F_pl"] = np.trapz(fl_pl, wl_pl)
+    out["L_pl"] = out["F_pl"] * area
 
     # Get flux of UV band from remainder 
     out["F_uv"] = out["F_bo"] - out["F_xr"] - out["F_e1"] - out["F_e2"] - out["F_pl"]
-
-    print(out)
+    out["L_uv"] = out["F_uv"] * area
 
     return out 
 
