@@ -1,7 +1,7 @@
 # MODEL FOR ROTATION OF STARS (MORS)
 
 **This code is distributed as a python package for the purpose of the [PROTEUS framework](https://github.com/FormingWorlds/PROTEUS), a coupled simulation tool for the long-term evolution of atmospheres and interiors of rocky planets.
-The MORS package solves specifically the stellar rotation and evolution. It is based on the original code and model developed by Colin P. Johnstone. Below is the original README.**
+The MORS package solves specifically the stellar rotation and evolution. It is based on the [original code](https://www.aanda.org/articles/aa/pdf/2021/05/aa38407-20.pdf) and model developed by Colin P. Johnstone. Below is the original README.**
 
 **Original Author:** Colin P. Johnstone
 

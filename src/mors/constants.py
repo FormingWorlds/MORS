@@ -64,3 +64,8 @@ RoSun = ProtSun / tauConvSun                    # Sun's current Rossby number us
 GravConstant = 6.674e-8   # cm^3 g^-1 s^-2
 kB = 1.38064852e-16       # erg K^-1
 Pi = 3.14159265359        # you know what this is
+
+h_SI  = 6.626075540e-34      # J s
+c_SI  = 2.99792458e8         # m s^-1
+k_SI  = 1.38065812e-23       # J K^-1
+AU_SI = 1.495979e+11         # m

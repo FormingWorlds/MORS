@@ -4,11 +4,13 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "fwl-mors"
-version = "24.6.17"
+version = "24.6.18"
 description = "Stellar rotation and activity evolution model"
 readme = "README.md"
 authors = [
-    {name = "Colin P. Johnstone", email = "colinjohnstone@gmail.com" }
+    {name = "Colin P. Johnstone", email = "colinjohnstone@gmail.com" },
+    {name = "Harrison Nicholls" , email = "harrison.nicholls@physics.ox.ac.uk"},
+    {name = "Laurent Soucasse"  , email = "l.soucasse@esciencecenter.nl"}
 ]
 license = {text = "MIT License"}
 classifiers = [
@@ -23,7 +25,8 @@ keywords = ["exoplanet", "stellar evolution"]
 requires-python = '>=3.10'
 dependencies = [
   'matplotlib',
-  'numpy'
+  'numpy',
+  'scipy'
 ]
 
 [project.urls]
@@ -48,7 +51,7 @@ include-package-data = true
 testpaths = ["tests"]
 
 [tool.bumpversion]
-current_version = "24.6.17"
+current_version = "24.6.18"
 
 [[tool.bumpversion.files]]
 filename = "pyproject.toml"
