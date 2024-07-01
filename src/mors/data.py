@@ -6,8 +6,6 @@ from tqdm import tqdm
 #project ID of the stellar evolution tracks folder in the OSF
 project_id = '9u3fb'
 
-# Replace 'LOCAL_DIR' with the local directory where you want to save the folder
-
 def DownloadEvolutionTracks():
 
     #Check if data environment variable is set up
