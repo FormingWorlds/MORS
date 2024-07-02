@@ -1,7 +1,7 @@
 # MODEL FOR ROTATION OF STARS (MORS)
 
 **This code is distributed as a python package for the purpose of the [PROTEUS framework](https://github.com/FormingWorlds/PROTEUS), a coupled simulation tool for the long-term evolution of atmospheres and interiors of rocky planets.
-The MORS package solves specifically the stellar rotation and evolution. It is based on the [original code](https://www.aanda.org/articles/aa/pdf/2021/05/aa38407-20.pdf) and model developed by Colin P. Johnstone. Below is the original README.**
+The MORS package solves specifically the stellar rotation and evolution. It is based on the [original code](https://www.aanda.org/articles/aa/pdf/2021/05/aa38407-20.pdf) and model developed by Colin P. Johnstone.**
 
 **Original Author:** Colin P. Johnstone
 
@@ -22,43 +22,52 @@ This code solves the stellar rotation and XUV evolution model presented in Johns
 
 ## 1. INSTALLATION
 
-Prerequisites: The code requires only that an up-to-date version of Python is installed with numpy and matplotlib included. 
+### 1.1. Basic install
 
-Obtaining and installing the code: Make a clone of the repository on GitHub somewhere on your computer using
-
-```
-git clone https://github.com/ColinPhilipJohnstone/Mors
-```
-
-The code can be installed from the command line inside the main directory, where the setup.py file is kept, using 
+The Forming Worlds Mors package is available on PyPI. Run the following command to install
 
 ```
-pip install . 
+pip install fwl-mors
 ```
+### 1.2. Developper install
 
-For some users, it will be necessary to replace pip with pip3 in the above command. If this does not work, it should be possible to just include the main directory and all its contents in the working directory of your code if you wish to do it that way.
-
-Stellar evolution tracks: The code requires also the set of stellar evolution models from this paper
-
-https://ui.adsabs.harvard.edu/abs/2013ApJ...776...87S/abstract
-
-These models can be downloaded from here
-
-http://www.astro.yale.edu/demarque/yyiso.html
-
-Download and extract their package and put it somewhere safe. After this, it is necessary to tell the code where it can find the stellar evolution tracks. This can be done by setting the environmental variable 'STELLARMODELS', which on Ubuntu can be set using
+You can alternatively download the source code from GitHub somewhere on your computer using
 
 ```
-export STELLARMODELS=...
+git clone git@github.com:FormingWorlds/MORS.git
 ```
 
-Where ... should be replaced with the path to the main directory holding the stellar models (i.e. the directory holding directories with names such as "X0p70952_Z0p01631_A1p875") and should end with a /. To make this permanent on Ubuntu, use
+Then run the following command inside the main directory to install the code (check the pyproject.toml file for dependencies)
+
+```
+pip install -e .
+```
+
+
+### 1.3. Stellar evolution tracks
+
+The code requires also a set of stellar evolution data. For this you need to set up first the environment variable 'FWL_DATA' to indicate in which folder the data need to be stored
+
+```
+export FWL_DATA=...
+```
+Where ... should be replaced with the path to your main data directory. To make this permanent on Ubuntu, use
 
 ```
 gedit ~/.profile
 ```
 
-and add the export command to the bottom of the file. You will probably have to logout and login again for this to work. Alternatively, when creating a star object in your Python script, you can specify the path to this directory using the starEvoDir keyword
+and add the export command to the bottom of the file.
+
+After that, run the following command in a python environment or at the beginning of your python script
+
+```
+from mors.data import DownloadEvolutionTracks
+DownloadEvolutionTracks()
+```
+This will download and extract package stellar evolution tracks data.
+
+Alternatively, when creating a star object in your Python script, you can specify the path to a directory where evolution tracks are stored using the starEvoDir keyword
 
 ```python
 import mors
