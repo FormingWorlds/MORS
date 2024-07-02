@@ -46,8 +46,10 @@ def DownloadEvolutionTracks():
                 pbar.update()
 
     #Unzip Spada evolution tracks
+    wrk_dir = os.getcwd()
     os.chdir(data_dir + '/Spada')
     subprocess.call( ['tar','xvfz', 'fs255_grid.tar.gz'] )
     subprocess.call( ['rm','-f', 'fs255_grid.tar.gz'] )
+    os.chdir(wrk_dir)
 
     return
