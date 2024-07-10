@@ -25,6 +25,12 @@ from .rotevo import EvolveRotation , EvolveRotationStep
 # Spectral synthesis 
 from .synthesis import *
 
+# Data download
+from .data import DownloadEvolutionTracks
+
+# Baraffe trancks
+from .baraffe import *
+
 # Spectrum stuff 
 from .spectrum import *
 

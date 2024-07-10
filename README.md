@@ -62,8 +62,7 @@ and add the export command to the bottom of the file.
 After that, run the following command in a python environment or at the beginning of your python script
 
 ```
-from mors.data import DownloadEvolutionTracks
-DownloadEvolutionTracks()
+mors.DownloadEvolutionTracks()
 ```
 This will download and extract package stellar evolution tracks data.
 
