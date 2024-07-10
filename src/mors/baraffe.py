@@ -5,6 +5,8 @@ import numpy as np
 import os
 from scipy.interpolate import PchipInterpolator
 
+import mors.constants as const
+
 #Short cut to Baraffe tracks mass and temporal range
 MassGrid = [0.010, 0.015, 0.020, 0.030, 0.040, 0.050,
             0.060, 0.070, 0.072, 0.075, 0.080, 0.090,
@@ -74,8 +76,49 @@ class BaraffeTrack:
                     break
 
         self.track = track
+        self.tmin = track['t'][0]
+        self.tmax = track['t'][-1]
 
         return
+
+    def BaraffeSolarConstant(self, tstar, mean_distance):
+        """Calculates the bolometric flux of the star at a given time.
+
+        Uses the Baraffe+15 tracks. Flux is scaled to the star-planet distance.
+
+        Parameters
+        ----------
+            tstar : float
+                Star's age
+            mean_distance : float
+                Star-planet distance
+
+        Returns
+        ----------
+            inst : float
+                Flux at planet's orbital separation (solar constant) in W/m^2
+        """
+
+        # Get time and check that it is in range
+        if (tstar < self.tmin):
+            print("Star age too low! Clipping to %.1g Myr" % int(self.tmin*1.e-6))
+            tstar = self.tmin
+        if (tstar > self.tmax):
+            print("Star age too high! Clipping to %.1g Myr" % int(self.tmax*1.e-6))
+            tstar = self.tmax
+
+        # Find closest row in track
+        iclose = (np.abs(self.track['t'] - tstar)).argmin()
+
+        # Get data from track
+        Lstar = self.track['Lstar'][iclose]
+        Lstar *= const.LbolSun_SI
+        mean_distance *= const.AU_SI
+
+        inst = Lstar /  ( 4. * np.pi * mean_distance * mean_distance )
+
+        return inst
+
 
 def BaraffeLoadTrack(Mstar, pre_interp = True, tmin = None, tmax = None):
     """Load a baraffe track into memory and optionally interpolate it into a fine time-grid
