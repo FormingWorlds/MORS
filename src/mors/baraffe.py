@@ -119,6 +119,37 @@ class BaraffeTrack:
 
         return inst
 
+    def BaraffeStellarRadius(self, tstar):
+        """Calculates the star's radius at a time t.
+
+        Uses the Baraffe+15 tracks.
+
+        Parameters
+        ----------
+            tstar : float
+                Star's age
+
+        Returns
+        ----------
+            Rstar : float
+                Radius of star in units of solar radii
+        """
+
+        # Get time and check that it is in range
+        if (tstar < self.tmin):
+            print("Star age too low! Clipping to %.1g Myr" % int(self.tmin*1.e-6))
+            tstar = self.tmin
+        if (tstar > self.tmax):
+            print("Star age too high! Clipping to %.1g Myr" % int(self.tmax*1.e-6))
+            tstar = self.tmax
+
+        # Find closest row in track
+        iclose = (np.abs(self.track['t'] - tstar)).argmin()
+
+        # Get data from track
+        Rstar = self.track['Rstar'][iclose]
+
+        return Rstar
 
 def BaraffeLoadTrack(Mstar, pre_interp = True, tmin = None, tmax = None):
     """Load a baraffe track into memory and optionally interpolate it into a fine time-grid
