@@ -189,7 +189,14 @@ def BaraffeLoadTrack(Mstar, pre_interp = True, tmin = None, tmax = None):
            "/stellar_evolution_tracks/Baraffe/BHAC15-M" +
            str(formatted_mass).replace('.', 'p') +
            ".txt")
-    
+    if not os.path.isfile(file):
+        raise Exception(
+            "Cannot find Baraffe track file %s. "
+            "Did you set the FWL_DATA environment variable? "
+            "Did you run the DownloadEvolutionTracks function to get access to the Baraffe track data?"
+            % file
+        )
+
     data = np.loadtxt(file,skiprows=1).T
 
     # Parse data
