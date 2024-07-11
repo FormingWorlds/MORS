@@ -50,7 +50,6 @@ class BaraffeTrack:
         #If Mstar matches with 
         elif(Mstar in MassGrid):
             track = BaraffeLoadTrack(Mstar)
-            print(track['Teff'])
 
         #If Mstar is between two points in the mass grid, need mass interpolation
         else:
@@ -63,15 +62,12 @@ class BaraffeTrack:
                     #load neighbouring tracks with time interpolation on the same time grid
                     track  = BaraffeLoadTrack(MassGrid[i  ], tmin=tmin, tmax=tmax)
                     trackp = BaraffeLoadTrack(MassGrid[i+1], tmin=tmin, tmax=tmax)
-                    print(track['Teff'])
-                    print(trackp['Teff'])
                    
                     #perform linear mass interpolation for each array
                     mass_ratio=(Mstar-MassGrid[i])/(MassGrid[i+1]-MassGrid[i])
                     track['Teff' ]=(trackp['Teff' ]-track['Teff' ])*mass_ratio + track['Teff' ]
                     track['Lstar']=(trackp['Lstar']-track['Lstar'])*mass_ratio + track['Lstar']
                     track['Rstar']=(trackp['Rstar']-track['Rstar'])*mass_ratio + track['Rstar']
-                    print(track['Teff'])
 
                     break
 
@@ -131,7 +127,7 @@ class BaraffeTrack:
                 Flux at planet's orbital separation (solar constant) in W/m^2
         """
 
-        Lstar = BaraffeLuminosity(tstar)
+        Lstar = self.BaraffeLuminosity(tstar)
         Lstar *= const.LbolSun_SI
         mean_distance *= const.AU_SI
 
