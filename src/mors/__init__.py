@@ -28,7 +28,7 @@ from .synthesis import *
 # Data download
 from .data import DownloadEvolutionTracks
 
-# Baraffe trancks
+# Baraffe tracks
 from .baraffe import *
 
 # Spectrum stuff 

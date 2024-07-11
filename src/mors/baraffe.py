@@ -47,7 +47,7 @@ class BaraffeTrack:
         elif(Mstar > MassGrid[29]):
             raise Exception("Stellar mass is too high for the Baraffe tracks")
 
-        #If Mstar matches with 
+        #If Mstar matches with values in the mass grid
         elif(Mstar in MassGrid):
             track = BaraffeLoadTrack(Mstar)
 
@@ -80,8 +80,6 @@ class BaraffeTrack:
     def BaraffeLuminosity(self, tstar):
         """Calculates the star luminosity at a given time.
 
-        Uses the Baraffe+15 tracks.
-
         Parameters
         ----------
             tstar : float
@@ -111,8 +109,7 @@ class BaraffeTrack:
 
     def BaraffeSolarConstant(self, tstar, mean_distance):
         """Calculates the bolometric flux of the star at a given time.
-
-        Uses the Baraffe+15 tracks. Flux is scaled to the star-planet distance.
+        Flux is scaled to the star-planet distance.
 
         Parameters
         ----------
@@ -131,14 +128,12 @@ class BaraffeTrack:
         Lstar *= const.LbolSun_SI
         mean_distance *= const.AU_SI
 
-        inst = Lstar /  ( 4. * np.pi * mean_distance * mean_distance )
+        inst = Lstar / ( 4. * np.pi * mean_distance * mean_distance )
 
         return inst
 
     def BaraffeStellarRadius(self, tstar):
         """Calculates the star's radius at a time t.
-
-        Uses the Baraffe+15 tracks.
 
         Parameters
         ----------
