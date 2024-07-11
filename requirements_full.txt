@@ -45,8 +45,6 @@ six==1.16.0
     #   osfclient
     #   python-dateutil
 tqdm==4.66.4
-    # via
-    #   fwl-mors (pyproject.toml)
-    #   osfclient
+    # via osfclient
 urllib3==2.2.2
     # via requests
