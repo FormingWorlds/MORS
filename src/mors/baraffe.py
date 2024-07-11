@@ -81,6 +81,38 @@ class BaraffeTrack:
 
         return
 
+    def BaraffeLuminosity(self, tstar):
+        """Calculates the star luminosity at a given time.
+
+        Uses the Baraffe+15 tracks.
+
+        Parameters
+        ----------
+            tstar : float
+                Star's age
+
+        Returns
+        ----------
+            Lstar : float
+                Luminosity Flux in units of solar luminosity
+        """
+
+        # Get time and check that it is in range
+        if (tstar < self.tmin):
+            print("Star age too low! Clipping to %.1g Myr" % int(self.tmin*1.e-6))
+            tstar = self.tmin
+        if (tstar > self.tmax):
+            print("Star age too high! Clipping to %.1g Myr" % int(self.tmax*1.e-6))
+            tstar = self.tmax
+
+        # Find closest row in track
+        iclose = (np.abs(self.track['t'] - tstar)).argmin()
+
+        # Get data from track
+        Lstar = self.track['Lstar'][iclose]
+
+        return Lstar
+
     def BaraffeSolarConstant(self, tstar, mean_distance):
         """Calculates the bolometric flux of the star at a given time.
 
@@ -99,19 +131,7 @@ class BaraffeTrack:
                 Flux at planet's orbital separation (solar constant) in W/m^2
         """
 
-        # Get time and check that it is in range
-        if (tstar < self.tmin):
-            print("Star age too low! Clipping to %.1g Myr" % int(self.tmin*1.e-6))
-            tstar = self.tmin
-        if (tstar > self.tmax):
-            print("Star age too high! Clipping to %.1g Myr" % int(self.tmax*1.e-6))
-            tstar = self.tmax
-
-        # Find closest row in track
-        iclose = (np.abs(self.track['t'] - tstar)).argmin()
-
-        # Get data from track
-        Lstar = self.track['Lstar'][iclose]
+        Lstar = BaraffeLuminosity(tstar)
         Lstar *= const.LbolSun_SI
         mean_distance *= const.AU_SI
 
@@ -132,7 +152,7 @@ class BaraffeTrack:
         Returns
         ----------
             Rstar : float
-                Radius of star in units of solar radii
+                Radius of star in units of solar radius
         """
 
         # Get time and check that it is in range

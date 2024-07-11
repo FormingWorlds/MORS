@@ -48,16 +48,26 @@ def DownloadEvolutionTracks(fname=""):
     project = osf.project(project_id)
     storage = project.storage('osfstorage')
 
-    #If no folder specified download both Spada and Baraffe
+    #If no folder name specified download both Spada and Baraffe
+    #If local directory exists, assumes the data are already there
+    unzip_spada = False
     if not fname:
-        download_folder(storage,"/Spada",data_dir)
-        download_folder(storage,"/Baraffe",data_dir)
-    elif fname in ["/Spada","/Baraffe"]:
-        download_folder(storage,fname,data_dir)
+        if not os.path.exists(data_dir+"/Spada"):
+            download_folder(storage,"/Spada",data_dir)
+            unzip_spada = True
+        if not os.path.exists(data_dir+"/Baraffe"):
+            download_folder(storage,"/Baraffe",data_dir)
+    elif fname == "/Spada":
+        if not os.path.exists(data_dir+"/Spada"):
+            download_folder(storage,"/Spada",data_dir)
+            unzip_spada = True
+    elif fname == "/Baraffe":
+        if not os.path.exists(data_dir+"/Baraffe"):
+            download_folder(storage,"/Baraffe",data_dir)
     else:
         print("Unrecognised folder name in DownloadEvolutionTrackst st")
 
-    if fname=="/Spada" or fname=="":
+    if unzip_spada:
         #Unzip Spada evolution tracks
         wrk_dir = os.getcwd()
         os.chdir(data_dir + '/Spada')
