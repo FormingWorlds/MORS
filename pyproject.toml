@@ -27,8 +27,7 @@ dependencies = [
   'matplotlib',
   'numpy',
   'osfclient',
-  'scipy',
-  'tqdm'
+  'scipy'
 ]
 
 [project.urls]

@@ -54,6 +54,7 @@ Msunyr_ = Msun / year      # g s^-1
 
 # Other solar quantities
 LbolSun = 3.828e33        # erg s^-1
+LbolSun_SI = 3.828e26     # W
 AgeSun = 4567.0           # Myr
 OmegaSun = 2.67e-6        # rad s^-1 - our assumed solar rotation
 ProtSun = 2.0*3.142 / ( OmegaSun ) / 86400.0    # days - corresponding solar rotation period

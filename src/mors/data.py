@@ -1,12 +1,37 @@
 import os
 import subprocess
 from osfclient.api import OSF
-from tqdm import tqdm
 
 #project ID of the stellar evolution tracks folder in the OSF
 project_id = '9u3fb'
 
-def DownloadEvolutionTracks():
+def download_folder(storage, folder_name, local_path):
+    ''''
+    Download a specific folder in the OSF repository
+
+    Inputs :
+        - storage     : OSF storage name
+        - folder_name : folder name to be downloaded
+        - local_path  : local repository where data are saved
+    '''
+    for file in storage.files:
+        if file.path.startswith(folder_name):
+            local_file_path = local_path + file.path
+            #Create local directory if needed
+            os.makedirs(os.path.dirname(local_file_path), exist_ok=True)
+            #Download the file
+            with open(local_file_path, 'wb') as local_file:
+                file.write_to(local_file)
+    return
+
+def DownloadEvolutionTracks(fname=""):
+    '''
+    Download evolution track data
+
+    Inputs :
+        - fname (optional) :    folder name, "/Spada" or "/Baraffe"
+                                if not provided download both
+    '''
 
     #Check if data environment variable is set up
     fwl_data_dir = os.getenv('FWL_DATA')
@@ -23,33 +48,31 @@ def DownloadEvolutionTracks():
     project = osf.project(project_id)
     storage = project.storage('osfstorage')
 
-    with tqdm(unit='files') as pbar:
-        for store in project.storages:
+    #If no folder name specified download both Spada and Baraffe
+    #If local directory exists, assumes the data are already there
+    unzip_spada = False
+    if not fname:
+        if not os.path.exists(data_dir+"/Spada"):
+            download_folder(storage,"/Spada",data_dir)
+            unzip_spada = True
+        if not os.path.exists(data_dir+"/Baraffe"):
+            download_folder(storage,"/Baraffe",data_dir)
+    elif fname == "/Spada":
+        if not os.path.exists(data_dir+"/Spada"):
+            download_folder(storage,"/Spada",data_dir)
+            unzip_spada = True
+    elif fname == "/Baraffe":
+        if not os.path.exists(data_dir+"/Baraffe"):
+            download_folder(storage,"/Baraffe",data_dir)
+    else:
+        print("Unrecognised folder name in DownloadEvolutionTrackst st")
 
-            #Loop over all the remote files in the OSF project
-            for file_ in store.files:
-
-                #Set up local path for remote file
-                path = file_.path
-                if path.startswith('/'):
-                    path = path[1:]
-                path = os.path.join(data_dir, path)
-
-                #Create local directory if needed
-                directory, _ = os.path.split(path)
-                os.makedirs(directory, exist_ok=True)
-
-                #Download and write remote file to local path
-                with open(path, "wb") as f:
-                    file_.write_to(f)
-
-                pbar.update()
-
-    #Unzip Spada evolution tracks
-    wrk_dir = os.getcwd()
-    os.chdir(data_dir + '/Spada')
-    subprocess.call( ['tar','xvfz', 'fs255_grid.tar.gz'] )
-    subprocess.call( ['rm','-f', 'fs255_grid.tar.gz'] )
-    os.chdir(wrk_dir)
+    if unzip_spada:
+        #Unzip Spada evolution tracks
+        wrk_dir = os.getcwd()
+        os.chdir(data_dir + '/Spada')
+        subprocess.call( ['tar','xvfz', 'fs255_grid.tar.gz'] )
+        subprocess.call( ['rm','-f', 'fs255_grid.tar.gz'] )
+        os.chdir(wrk_dir)
 
     return
