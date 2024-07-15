@@ -32,9 +32,13 @@ class BaraffeTrack:
     Attributes
     ----------
     mstar : float
-        Star mass
+        Star mass in units of solar mass
     track : dict
         Dictionary containing track data
+    tmin : float
+        Shortcut to minimum time of the track [yr]
+    tmax : float
+        Shortcut to maximum time of the track [yr]
     """
 
     def __init__(self, Mstar):
@@ -83,7 +87,7 @@ class BaraffeTrack:
         Parameters
         ----------
             tstar : float
-                Star's age
+                Star's age [yr]
 
         Returns
         ----------
@@ -114,9 +118,9 @@ class BaraffeTrack:
         Parameters
         ----------
             tstar : float
-                Star's age
+                Star's age [yr]
             mean_distance : float
-                Star-planet distance
+                Star-planet distance [AU]
 
         Returns
         ----------
@@ -138,7 +142,7 @@ class BaraffeTrack:
         Parameters
         ----------
             tstar : float
-                Star's age
+                Star's age [yr]
 
         Returns
         ----------
@@ -161,6 +165,33 @@ class BaraffeTrack:
         Rstar = self.track['Rstar'][iclose]
 
         return Rstar
+
+    def BaraffeSpectrumCalc(self, tstar: float, Lstar_modern: float, spec_fl: list):
+        """Determine historical spectrum at time_star, using the baraffe tracks
+
+        Uses a Baraffe evolution track. Calculates the spectrum at 1 AU.
+
+        Parameters
+        ----------
+            tstar : float
+                Star's age [yr]
+            Lstar_modern : float
+                Modern star luminosity in units of solar luminosity
+            spec_fl : list
+                Modern spectrum flux array at 1 AU
+        Returns
+        ----------
+            hspec_fl : np.array(float)
+                Numpy array of flux at 1 AU
+        """
+
+        # Get luminosity data from track
+        Lstar = self.BaraffeLuminosity(tstar)
+
+        # Calculate scaled spectrum
+        hspec_fl = np.array(spec_fl) * Lstar / Lstar_modern
+
+        return hspec_fl
 
 def BaraffeLoadTrack(Mstar, pre_interp = True, tmin = None, tmax = None):
     """Load a baraffe track into memory and optionally interpolate it into a fine time-grid
@@ -239,3 +270,44 @@ def BaraffeLoadTrack(Mstar, pre_interp = True, tmin = None, tmax = None):
         }
         
     return track
+
+def ModernSpectrumLoad(input_spec_file: str, output_spec_file: str):
+    """Copy file and load modern spectrum into memory.
+
+    Scaled to 1 AU from the star.
+
+    Parameters
+    ----------
+        input_spec_file : str
+            Path to input spectral file
+        output_spec_file : str
+            Path to copied spectral file
+
+    Returns
+    ----------
+        spec_wl : np.array[float]
+            Wavelength [nm]
+        spec_fl : np.array[float]
+            Flux [erg s-1 cm-2 nm-1]
+    """
+
+    if os.path.isfile(input_spec_file):
+        # Copy modern spectrum file to output directory as -1.sflux.
+        copy_file = shutil.copyfile(input_spec_file, output_spec_file)
+
+        # Load file
+        spec_data = np.loadtxt(copy_file, skiprows=2,delimiter='\t').T
+        spec_wl = spec_data[0]
+        spec_fl = spec_data[1]
+    else:
+        UpdateStatusfile(dirs, 20)
+        raise Exception("Cannot find stellar spectrum")
+
+    #Old log print in PROTEUS
+    #binwidth_wl = spec_wl[1:] - spec_wl[0:-1]
+    #log.debug("Modern spectrum statistics:")
+    #log.debug("\t Flux \n\t\t (min, max) = (%1.2e, %1.2e) erg s-1 cm-2 nm-1" % (np.amin(spec_fl),np.amax(spec_fl)))
+    #log.debug("\t Wavelength \n\t\t (min, max) = (%1.2e, %1.2e) nm" % (np.amin(spec_wl),np.amax(spec_wl)))
+    #log.debug("\t Bin width \n\t\t (min, median, max) = (%1.2e, %1.2e, %1.2e) nm" % (np.amin(binwidth_wl),np.median(binwidth_wl),np.amax(binwidth_wl)))
+
+    return spec_wl, spec_fl

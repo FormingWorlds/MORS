@@ -343,3 +343,27 @@ def ScaleTo1AU(fl:np.ndarray, R_star:float):
 
     return fl * (R_star/const.AU_SI)**2
 
+def SpectrumWrite(time_dict, wl, sflux, folder):
+    """Write historical spectrum to files.
+
+    Parameters
+    ----------
+        time_dict : dict
+            Time dictionary, including stellar age and planet age
+        wl : np.array(float)
+            Numpy array of wavelengths
+        sflux : np.array(float)
+            Numpy array flux at 1 AU
+        folder : float
+            Path to folder where file is to be written
+
+    """
+
+    tstar = time_dict['star'] * 1.0e-6  # yr -> Myr
+
+    X = np.array([wl,sflux]).T
+    outname1 = folder + "/%d.sflux" % time_dict['planet']
+    header = '# WL(nm)\t Flux(ergs/cm**2/s/nm)          Stellar flux (1 AU) at t_star = %.3f Myr ' % round(tstar,3)
+    np.savetxt(outname1, X, header=header,comments='',fmt='%1.4e',delimiter='\t')
+
+    return outname1
