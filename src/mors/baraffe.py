@@ -2,7 +2,7 @@
 Original tracks data can be found on the website 
 http://perso.ens-lyon.fr/isabelle.baraffe/BHAC15dir/BHAC15_tracks+structure"""
 import numpy as np
-import os
+import os, shutil
 from scipy.interpolate import PchipInterpolator
 
 import mors.constants as const
