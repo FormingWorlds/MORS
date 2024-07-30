@@ -24,6 +24,7 @@ classifiers = [
 keywords = ["exoplanet", "stellar evolution"]
 requires-python = '>=3.10'
 dependencies = [
+  'click',
   'matplotlib',
   'numpy',
   'osfclient',
@@ -49,6 +50,9 @@ publishing = [
   "wheel",
   "build"
 ]
+
+[project.scripts]
+mors = "mors.cli:cli"
 
 [tool.setuptools]
 package-dir = {"mors" = "src/mors"}
