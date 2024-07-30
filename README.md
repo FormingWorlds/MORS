@@ -9,17 +9,6 @@ This code solves the stellar rotation and XUV evolution model presented in Johns
 
 **NOTE:** This version contains the fix for the error in the equation converting EUV1 to EUV2.
 
-## CONTENTS
-1. INSTALLATION
-2. EVOLUTIONARY CALCULATIONS 
-3. PERCENTILES AND MODEL DISTRIBUTION
-4. SETTING SIMULATION PARAMETERS
-5. ROTATION AND ACTIVITY QUANTITES
-6. STELLAR EVOLUTION QUANTITIES
-7. CLUSTER EVOLUTION CALCULATIONS
-8. HABITABLE ZONE BOUNDARIES
-9. ACTIVITY LIFETIMES
-
 ## 1. INSTALLATION
 
 ### 1.1. Basic install
@@ -271,16 +260,16 @@ Lxuv = mors.Lxuv(Mstar=1.0, Age=5000.0, Prot=1.0)
 
 This is similar to above, but for a star with a rotation period of 1 day.
 
-The dictionary returned contains the following luminosities, all in erg s^-1
+The dictionary returned contains the following luminosities, all in erg s<sup>-1</sup>
 
-Lxuv - 0.517 to 92 nm
-Lx - 0.517 to 12.4 nm (0.1 to 24 keV)
-Leuv1 - 10 to 36 nm
-Leuv2 - 36 to 92 nm
-Leuv - 10 to 92 nm
-Lly - Lymann-alpha emission line
+- Lxuv - 0.517 to 92 nm
+- Lx - 0.517 to 12.4 nm (0.1 to 24 keV)
+- Leuv1 - 10 to 36 nm
+- Leuv2 - 36 to 92 nm
+- Leuv - 10 to 92 nm
+- Lly - Lymann-alpha emission line
 
-The dictionary also contains surface fluxes (e.g. Fxuv, Fx, Feuv1,...) in erg s^-1 cm^-2 and luminosities normalised to bolometric luminosities (e.g Rxuv, Rx, Reuv1,...).
+The dictionary also contains surface fluxes (e.g. Fxuv, Fx, Feuv1,...) in erg s<sup>-1</sup> cm<sup>-2</sup> and luminosities normalised to bolometric luminosities (e.g Rxuv, Rx, Reuv1,...).
 
 The user can also just get the X-ray luminosity as a float using Lx()
 
@@ -342,21 +331,21 @@ Rstar = mors.Rstar(1.0, 1000.0)
 
 The functions available are 
 
-Rstar - radius (Rsun)
-Lbol - bolometric luminosity (Lsun)
-Teff - effective temperature (K)
-Itotal - total moment of inertia in (g cm^2)
-Icore - core moment of inertia in (g cm^2)
-Ienv - envelope moment of inertia in (g cm^2)
-Mcore - core mass in (Msun)
-Menv - envelope mass in (Msun)
-Rcore - core radius in (Rsun)
-tau - convective turnover time (days)
-dItotaldt - rate of change of total moment of inertia  (g cm^2 Myr^-1)
-dIcoredt - rate of change of core moment of inertia  (g cm^2 Myr^-1)
-dIenvdt - rate of change of envelope moment of inertia  (g cm^2 Myr^-1)
-dMcoredt - rate of change of core mass (Msun Myr^-1)
-dRcoredt - rate of change of core radius (Rsun Myr^-1)
+- Rstar - radius (Rsun)
+- Lbol - bolometric luminosity (Lsun)
+- Teff - effective temperature (K)
+- Itotal - total moment of inertia in (g cm<sup>2</sup>)
+- Icore - core moment of inertia in (g cm<sup>2</sup>)
+- Ienv - envelope moment of inertia in (g cm<sup>2</sup>)
+- Mcore - core mass in (Msun)
+- Menv - envelope mass in (Msun)
+- Rcore - core radius in (Rsun)
+- tau - convective turnover time (days)
+- dItotaldt - rate of change of total moment of inertia  (g cm<sup>2</sup> Myr<sup>-1</sup>)
+- dIcoredt - rate of change of core moment of inertia  (g cm<sup>2</sup> Myr<sup>-1</sup>)
+- dIenvdt - rate of change of envelope moment of inertia  (g cm<sup>2</sup> Myr<sup>-1</sup>)
+- dMcoredt - rate of change of core mass (Msun Myr<sup>-1</sup>)
+- dRcoredt - rate of change of core radius (Rsun Myr<sup>^-1</sup>)
 
 Note that core and envelope have the definitions from the rotation model, so the 'core' is not the hydrogen burning core as it would typically be defined but everything interior to the outer convective zone, and the envelope is the outer convective zone. All of these functions take stellar mass in Msun and age in Myr. Alternatively, the user can call the function Value which takes the same two inputs and then the parameter name as a string. For example
 
@@ -491,7 +480,7 @@ The code contains functions that calculate how long stars remain above certain a
 AgeThreshold = mors.ActivityLifetime(Age=star.AgeTrack, Track=star.LxTrack, Threshold=1.0e28)
 ```
 
-This will tell us when the star's Lx dropped below 10^28 erg s^-1. If the star crosses this threshold multiple times, only the final time will be returned. If it never goes below this threshold then the final age in the track will be returned and if it is never above this threshold then 0.0 will be returned. If the user wants to set a maximum age so that the code only looks for crossings of the threshold below this age then this can be done using the AgeMax keyword argument
+This will tell us when the star's Lx dropped below 10<sup>28</sup> erg s<sup>-1</sup>. If the star crosses this threshold multiple times, only the final time will be returned. If it never goes below this threshold then the final age in the track will be returned and if it is never above this threshold then 0.0 will be returned. If the user wants to set a maximum age so that the code only looks for crossings of the threshold below this age then this can be done using the AgeMax keyword argument
 
 More recommended though is to use the function of the same name in the Star class, where the quantity of interest should be specified as a string.
 
@@ -511,4 +500,24 @@ The Cluster class also contains this function and is called in the exact same wa
 
 ```python
 AgeThreshold = cluster.ActivityLifetime(Quantity='Lx', Threshold=1.0e28)
+```
+## 10. BARAFFE STELLAR EVOLUTION QUANTITIES
+
+The Forming Worlds MORS package also provides access to stellar evolution quantities according to the Baraffe model (Baraffe et al., 2002). The evolution track for a given star mass Mstar, between 0.01 and 1.4 Msun, can be loaded into memory with the command
+
+```python
+baraffe = mors.BaraffeTrack(Mstar)
+```
+The command performs mass interpolation (if needed) and time interpolation into a fine grid of 5e4 points. For a given time, the user can then access to the luminosity, the solar constant and the stellar radius with the following functions
+
+- Stellar radius in Rsun, time in yr
+```
+Rstar = baraffe.BaraffeStellarRadius(time)
+```
+- Bolometric flux in Lsun, time in yr
+```
+Lbol = baraffe.BaraffeLuminosity(time)
+```
+- Flux scaled by the star-planet distance in W m<sup>-2</sup>, time in yr, distance in AU
+```Flux = baraffe.BaraffeSolarConstant(time, distance)
 ```
