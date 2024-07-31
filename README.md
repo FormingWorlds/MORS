@@ -35,7 +35,7 @@ pip install -e .
 
 ### 1.3. Stellar evolution tracks
 
-The code requires also a set of stellar evolution data. For this you need to set up first the environment variable 'FWL_DATA' to indicate in which folder the data need to be stored
+The code requires also a set of stellar evolution data, stored in the [OSF repository](https://osf.io/9u3fb/). For this you need to set up first the environment variable 'FWL_DATA' to indicate in which folder the data will be stored
 
 ```
 export FWL_DATA=...
@@ -48,10 +48,10 @@ gedit ~/.profile
 
 and add the export command to the bottom of the file.
 
-After that, run the following command in a python environment or at the beginning of your python script
+After that, run the following command in a terminal
 
 ```
-mors.DownloadEvolutionTracks()
+mors download all
 ```
 This will download and extract package stellar evolution tracks data.
 
