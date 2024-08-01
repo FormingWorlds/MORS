@@ -519,5 +519,6 @@ Rstar = baraffe.BaraffeStellarRadius(time)
 Lbol = baraffe.BaraffeLuminosity(time)
 ```
 - Flux scaled by the star-planet distance in W m<sup>-2</sup>, time in yr, distance in AU
-```Flux = baraffe.BaraffeSolarConstant(time, distance)
+```
+Flux = baraffe.BaraffeSolarConstant(time, distance)
 ```
