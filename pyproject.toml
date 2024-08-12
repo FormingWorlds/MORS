@@ -37,7 +37,7 @@ homepage = "https://github.com/FormingWorlds/MORS"
 [project.optional-dependencies]
 develop = [
   "bump-my-version",
-  "pip-compile",
+  "pip-tools",
   "pytest"
 ]
 docs = [
