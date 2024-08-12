@@ -37,13 +37,14 @@ homepage = "https://github.com/FormingWorlds/MORS"
 [project.optional-dependencies]
 develop = [
   "bump-my-version",
+  "pip-compile",
   "pytest"
 ]
 docs = [
-    "markdown-include",
-    "mkdocs",
-    "mkdocs-material",
-    "mkdocstrings[python]",
+  "markdown-include",
+  "mkdocs",
+  "mkdocs-material",
+  "mkdocstrings[python]",
 ]
 publishing = [
   "twine",
