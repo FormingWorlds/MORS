@@ -62,7 +62,20 @@ include-package-data = true
 testpaths = ["tests"]
 
 [tool.bumpversion]
+# https://callowayproject.github.io/bump-my-version/howtos/calver/
 current_version = "24.7.11"
+parse = """(?x)                     # Verbose mode
+    (?P<release>                    # The release part
+        (?:[1-9][0-9])\\.           # YY.
+        (?:1[0-2]|[1-9])\\.         # MM.
+        (?:3[0-1]|[1-2][0-9]|[1-9]) # DD
+    )
+    (?:\\.(?P<patch>\\d+))?         # .patch, optional
+"""
+serialize = ["{release}.{patch}", "{release}"]
+
+[tool.bumpversion.parts.release]
+calver_format = "{YY}.{MM}.{DD}"
 
 [[tool.bumpversion.files]]
 filename = "pyproject.toml"
