@@ -35,25 +35,25 @@ pip install -e .
 
 ### 1.3. Stellar evolution tracks
 
-The code requires also a set of stellar evolution data, stored in the [OSF repository](https://osf.io/9u3fb/). For this you need to set up first the environment variable 'FWL_DATA' to indicate in which folder the data will be stored
+The code requires also a set of stellar evolution data, stored in the [OSF repository](https://osf.io/9u3fb/).
 
-```
+You can use `mors download all` to download the data. This will download and extract package stellar evolution tracks data.
+
+By default, MORS stores the data in based on the [XDG specification](https://specifications.freedesktop.org/basedir-spec/latest/).
+You can check the location by typing `mors env` in your terminal.
+You can override the path using the `FWL_DATA` environment variable, e.g.
+
+```console
 export FWL_DATA=...
 ```
+
 Where ... should be replaced with the path to your main data directory. To make this permanent on Ubuntu, use
 
-```
+```console
 gedit ~/.profile
 ```
 
 and add the export command to the bottom of the file.
-
-After that, run the following command in a terminal
-
-```
-mors download all
-```
-This will download and extract package stellar evolution tracks data.
 
 Alternatively, when creating a star object in your Python script, you can specify the path to a directory where evolution tracks are stored using the starEvoDir keyword
 
@@ -62,7 +62,7 @@ import mors
 myStar = mors.StarEvo(starEvoDir=...)
 ```
 
-where ... can be given as the path relative to the current directory. When this is done, no environmental variable needs to be set. 
+where ... can be given as the path relative to the current directory. When this is done, no environmental variable needs to be set.
 
 ## 2. EVOLUTIONARY CALCULATIONS
 
@@ -246,7 +246,7 @@ will cause the evolutionary tracks to contain 1 Myr, and the specified 100, 200,
 
 ## 5. ROTATION AND ACTIVITY QUANTITES
 
-The code gives the user the ability to use the basic functions for calculating many activity related quantities as functions os stellar properties. For example, the user can calculate XUV luminosities from stellar mass, age, and rotation rates using the Lxuv function. For example, 
+The code gives the user the ability to use the basic functions for calculating many activity related quantities as functions os stellar properties. For example, the user can calculate XUV luminosities from stellar mass, age, and rotation rates using the Lxuv function. For example,
 
 ```python
 Lxuv = mors.Lxuv(Mstar=1.0, Age=5000.0, Omega=10.0)
@@ -329,7 +329,7 @@ The stellar mass for a 1.0 Msun star with an age of 1000 Myr can be calculated u
 Rstar = mors.Rstar(1.0, 1000.0)
 ```
 
-The functions available are 
+The functions available are
 
 - Rstar - radius (Rsun)
 - Lbol - bolometric luminosity (Lsun)
@@ -353,9 +353,9 @@ Note that core and envelope have the definitions from the rotation model, so the
 Rstar = mors.Value(1.0, 1000.0, 'Rstar')
 ```
 
-which is equivalent to the above example. 
+which is equivalent to the above example.
 
-In all cases, multiple values for mass and age can be input using lists or numpy arrays and the functions will return numpy arrays holding the results for each input case. For example, if stellar mass is input as a 1D array or list of length 5, the result will be a length 5 numpy array. If both stellar mass and age are input as arrays, the result will be a 2-dimensional array of length len(Mstar)xlen(Age). Additionally, in the call to Value(), the string holding the parameter to calculate for can also be input as a list of strings, in which case the variable retuned will have an additional dimension with values for each of the input quantities. 
+In all cases, multiple values for mass and age can be input using lists or numpy arrays and the functions will return numpy arrays holding the results for each input case. For example, if stellar mass is input as a 1D array or list of length 5, the result will be a length 5 numpy array. If both stellar mass and age are input as arrays, the result will be a 2-dimensional array of length len(Mstar)xlen(Age). Additionally, in the call to Value(), the string holding the parameter to calculate for can also be input as a list of strings, in which case the variable retuned will have an additional dimension with values for each of the input quantities.
 
 The first time one of these functions is called, the code loads all of the evolutionary tracks from the Spada et al. (2013) model. These will be written to the directors in the file SEmodels.pickle in the main directory of the evolutionary models and this file will be used to load the models in the future. This file can be safely deleted if the user wants since this will just cause the code to remake it next time it is needed. The code then does a linear interpolation between mass and age bins to get values at the input masses and ages. This can be time consuming, especially if an interpolation between mass bins is required, which will be the case if the input age is not an integer multiple of 0.05 Msun. The user can load a full evolutionary track for a specific stellar mass using LoadTrack(). For example, to load a track for a 1.02 Msun star, use
 
@@ -363,7 +363,7 @@ The first time one of these functions is called, the code loads all of the evolu
 mors.LoadTrack(1.02)
 ```
 
-If a track for that specific mass is already loaded, this will do nothing. 
+If a track for that specific mass is already loaded, this will do nothing.
 
 ## 7. CLUSTER EVOLUTION CALCULATIONS
 
@@ -431,7 +431,7 @@ So to plot the Lx distribution for a cluster at 100 Myr, the user can use
 plt.scatter(cluster.Mstar, cluster.Lx(100.0))
 ```
 
-In Johnstone et al. (2020), many of the results are based on a composite cluster that is often referred to in the paper as the model cluster. This is composed of measured rotation distributions from several clusters with ages of ~150 Myr evolved back to 1 Myr. 
+In Johnstone et al. (2020), many of the results are based on a composite cluster that is often referred to in the paper as the model cluster. This is composed of measured rotation distributions from several clusters with ages of ~150 Myr evolved back to 1 Myr.
 To get the masses and initial rotation rates of the model cluster, use the function ModelCluster().
 
 ```python
@@ -465,7 +465,7 @@ print(aOrbHZ['MaximumGreenhouse'])
 print(aOrbHZ['EarlyMars'])
 print(aOrbHZ['HZ'])
 ```
-  
+
 Mstar can be input as a numpy array in which case the dictionary will contain arrays with values for each mass. By default the orbital distances are calculated assuming stellar parameters at 5000 Myr. The user can also set the age in Myr using the Age keyword argument
 
 ```python

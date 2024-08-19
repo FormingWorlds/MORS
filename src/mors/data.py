@@ -1,7 +1,16 @@
+import logging
 import os
 import subprocess
-from osfclient.api import OSF
 from pathlib import Path
+
+import platformdirs
+from osfclient.api import OSF
+
+logger = logging.getLogger(__name__)
+
+FWL_DATA_DIR = Path(os.environ.get('FWL_DATA', platformdirs.user_data_dir('fwl_data')))
+
+logger.info(f'FWL data location: {FWL_DATA_DIR}')
 
 #project ID of the stellar evolution tracks folder in the OSF
 project_id = '9u3fb'
@@ -32,10 +41,7 @@ def GetFWLData() -> Path:
     """
     Get path to FWL data directory on the disk
     """
-    fwl_data_dir = os.getenv('FWL_DATA')
-    if not os.environ.get("FWL_DATA"):
-        raise Exception("The FWL_DATA environment variable where spectral data will be downloaded needs to be set up!")
-    return Path(fwl_data_dir).absolute()
+    return Path(FWL_DATA_DIR).absolute()
 
 def DownloadEvolutionTracks(fname=""):
     """
@@ -61,12 +67,12 @@ def DownloadEvolutionTracks(fname=""):
     elif fname in ("Spada", "Baraffe"):
         folder_list = [fname]
     else:
-        print(f"Unrecognised folder name:  {fname}")
+        raise ValueError(f"Unrecognised folder name: {fname}")
 
     folders = [folder for folder in folder_list if not (data_dir / folder).exists()]
 
     if folders:
-        print("Downloading MORS evolution tracks")
+        print(f"Downloading MORS evolution tracks to {data_dir}")
         download_folder(storage=storage, folders=folders, data_dir=data_dir)
 
     if "Spada" in folders:
