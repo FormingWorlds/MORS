@@ -63,7 +63,7 @@ include-package-data = true
 
 [tool.coverage.run]
 branch = true
-source = ["janus"]
+source = ["mors"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

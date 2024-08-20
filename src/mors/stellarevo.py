@@ -14,7 +14,7 @@ from mors.data import FWL_DATA_DIR
 # Parameters for stellar evolution models
 
 # Directory for stellar evolution models
-starEvoDirDefault = str(FWL_DATA_DIR /'stellar_evolution_tracks'/'Spada'/'fs255_grid')
+starEvoDirDefault = str(FWL_DATA_DIR /'stellar_evolution_tracks'/'Spada'/'fs255_grid'/)
 
 # Set which set of models to use, i.e. which X, Z, and A values (set to X0p70952_Z0p01631_A1p875 for closest to solar)
 evoModelsDefault = "X0p70952_Z0p01631_A1p875"
