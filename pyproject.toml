@@ -38,6 +38,7 @@ homepage = "https://github.com/FormingWorlds/MORS"
 [project.optional-dependencies]
 develop = [
   "bump-my-version",
+  "coverage[toml]",
   "pip-tools",
   "pytest"
 ]
@@ -59,6 +60,10 @@ mors = "mors.cli:cli"
 [tool.setuptools]
 package-dir = {"mors" = "src/mors"}
 include-package-data = true
+
+[tool.coverage.run]
+branch = true
+source = ["janus"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
