@@ -194,7 +194,7 @@ def _shouldCompileNew(starEvoDir,evoModels):
     compileNew = True
 
     # Check if previously compiled models already exist
-    if ( os.path.isfile(starEvoDir+evoModels+".pickle") ):
+    if ( os.path.isfile(starEvoDir+"/"+evoModels+".pickle") ):
         compileNew = False
 
     return compileNew
@@ -223,7 +223,7 @@ def _CompileNewGrid(starEvoDir,evoModels):
         ModelData[MstarAll[iMstar]] = _ReadEvolutionTrack( starEvoDir , evoModels , MstarAll[iMstar] , MstarFilenameMiddle[iMstar] )
 
     # Save compiled models
-    with open(starEvoDir+evoModels+".pickle",'wb') as f:
+    with open(starEvoDir+"/"+evoModels+".pickle",'wb') as f:
         pickle.dump(ModelData,f)
 
 
@@ -233,7 +233,7 @@ def _ReadEvolutionTrack(starEvoDir,evoModels,Mstar,MstarFilenameMiddle):
     """Loads the stellar evolution models from Spada et al. (2013) for a mass bin and puts it into a dictionary."""
 
     # Set strings for starting and ending of filenames
-    filename_prefix = starEvoDir + evoModels + "/M"
+    filename_prefix = starEvoDir + "/" + evoModels + "/M"
     filename_postfix1 = "_" + evoModels + ".track1"
     filename_postfix2 = "_" + evoModels + ".track2"
 
@@ -415,7 +415,7 @@ def _LoadSavedGrid(starEvoDir,evoModels):
     """Takes filename for stellar evo model, returns grid of models."""
 
     # Simply load data
-    with open(starEvoDir+evoModels+".pickle",'rb') as f:
+    with open(starEvoDir+"/"+evoModels+".pickle",'rb') as f:
         ModelData = pickle.load(f)
 
     return ModelData

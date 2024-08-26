@@ -1,3 +1,5 @@
+![Coverage](https://gist.githubusercontent.com/lsoucasse/a25c37a328839edd00bb32d8527aec30/raw/covbadge.svg)
+
 # MODEL FOR ROTATION OF STARS (MORS)
 
 **This code is distributed as a python package for the purpose of the [PROTEUS framework](https://github.com/FormingWorlds/PROTEUS), a coupled simulation tool for the long-term evolution of atmospheres and interiors of rocky planets.
