@@ -1,11 +1,14 @@
 """Module for loading and interpolating Baraffe tracks data.
-Original tracks data can be found on the website 
+Original tracks data can be found on the website
 http://perso.ens-lyon.fr/isabelle.baraffe/BHAC15dir/BHAC15_tracks+structure"""
+import os
+import shutil
+
 import numpy as np
-import os, shutil
 from scipy.interpolate import PchipInterpolator
 
 import mors.constants as const
+from mors.data import FWL_DATA_DIR
 
 #Short cut to Baraffe tracks mass and temporal range
 MassGrid = [0.010, 0.015, 0.020, 0.030, 0.040, 0.050,
@@ -24,7 +27,6 @@ tmaxGrid = [ 7.612341, 8.050550, 8.089757, 8.514580, 8.851534, 9.178493,
             10.000004, 9.999193, 9.999099, 9.999787, 9.999811, 9.998991,
             10.000065, 9.920501, 9.789029, 9.651666, 9.538982, 9.425490 ]
 
-fwl_data_dir = os.getenv('FWL_DATA')
 
 class BaraffeTrack:
     """Class to hold interpolated baraffe tracks data for a given star mass
@@ -62,11 +64,11 @@ class BaraffeTrack:
                     #search for common temporal range
                     tmin = max(tminGrid[i],tminGrid[i+1])
                     tmax = min(tmaxGrid[i],tmaxGrid[i+1])
-                    
+
                     #load neighbouring tracks with time interpolation on the same time grid
                     track  = BaraffeLoadTrack(MassGrid[i  ], tmin=tmin, tmax=tmax)
                     trackp = BaraffeLoadTrack(MassGrid[i+1], tmin=tmin, tmax=tmax)
-                   
+
                     #perform linear mass interpolation for each array
                     mass_ratio=(Mstar-MassGrid[i])/(MassGrid[i+1]-MassGrid[i])
                     track['Teff' ]=(trackp['Teff' ]-track['Teff' ])*mass_ratio + track['Teff' ]
@@ -215,20 +217,17 @@ def BaraffeLoadTrack(Mstar, pre_interp = True, tmin = None, tmax = None):
     """
 
     # Load data
-    formatted_mass = f"{Mstar:.3f}"
-    file = (fwl_data_dir +
-           "/stellar_evolution_tracks/Baraffe/BHAC15-M" +
-           str(formatted_mass).replace('.', 'p') +
-           ".txt")
-    if not os.path.isfile(file):
-        raise Exception(
-            "Cannot find Baraffe track file %s. "
+    formatted_mass = f"{Mstar:.3f}".replace('.', 'p')
+    filename = f'BHAC15-M{formatted_mass}.txt'
+    path = (FWL_DATA_DIR / 'stellar_evolution_tracks' / 'Baraffe' / filename)
+    if not path.exists():
+        raise IOError(
+            "Cannot find Baraffe track file {path}. "
             "Did you set the FWL_DATA environment variable? "
-            "Did you run the DownloadEvolutionTracks function to get access to the Baraffe track data?"
-            % file
+            "Did you run `mors dowload ...` to get access to the Baraffe track data?"
         )
 
-    data = np.loadtxt(file,skiprows=1).T
+    data = np.loadtxt(path, skiprows=1).T
 
     # Parse data
     t =     data[1]
@@ -268,7 +267,7 @@ def BaraffeLoadTrack(Mstar, pre_interp = True, tmin = None, tmax = None):
             'Lstar':    10.0**Lstar,  # L_sun
             'Rstar':    Rstar         # R_sun
         }
-        
+
     return track
 
 def ModernSpectrumLoad(input_spec_file: str, output_spec_file: str):

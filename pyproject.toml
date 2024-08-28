@@ -24,9 +24,11 @@ classifiers = [
 keywords = ["exoplanet", "stellar evolution"]
 requires-python = '>=3.10'
 dependencies = [
+  'click',
   'matplotlib',
   'numpy',
   'osfclient',
+  'platformdirs',
   'scipy'
 ]
 
@@ -36,7 +38,15 @@ homepage = "https://github.com/FormingWorlds/MORS"
 [project.optional-dependencies]
 develop = [
   "bump-my-version",
+  "coverage[toml]",
+  "pip-tools",
   "pytest"
+]
+docs = [
+  "markdown-include",
+  "mkdocs",
+  "mkdocs-material",
+  "mkdocstrings[python]",
 ]
 publishing = [
   "twine",
@@ -44,15 +54,35 @@ publishing = [
   "build"
 ]
 
+[project.scripts]
+mors = "mors.cli:cli"
+
 [tool.setuptools]
 package-dir = {"mors" = "src/mors"}
 include-package-data = true
+
+[tool.coverage.run]
+branch = true
+source = ["mors"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 
 [tool.bumpversion]
+# https://callowayproject.github.io/bump-my-version/howtos/calver/
 current_version = "24.7.11"
+parse = """(?x)                     # Verbose mode
+    (?P<release>                    # The release part
+        (?:[1-9][0-9])\\.           # YY.
+        (?:1[0-2]|[1-9])\\.         # MM.
+        (?:3[0-1]|[1-2][0-9]|[1-9]) # DD
+    )
+    (?:\\.(?P<patch>\\d+))?         # .patch, optional
+"""
+serialize = ["{release}.{patch}", "{release}"]
+
+[tool.bumpversion.parts.release]
+calver_format = "{YY}.{MM}.{DD}"
 
 [[tool.bumpversion.files]]
 filename = "pyproject.toml"
