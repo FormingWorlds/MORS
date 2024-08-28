@@ -29,7 +29,7 @@ def DownloadEvolutionTracks(fname=""):
     Download evolution track data
 
     Inputs :
-        - fname (optional) :    folder name, "/Spada" or "/Baraffe"
+        - fname (optional) :    folder name, "Spada" or "Baraffe"
                                 if not provided download both
     '''
 
@@ -39,7 +39,7 @@ def DownloadEvolutionTracks(fname=""):
         raise Exception("The FWL_DATA environment variable where input data will be downloaded needs to be set up!")
 
     #Create stellar evolution tracks data repository if not existing
-    data_dir = fwl_data_dir + "/stellar_evolution_tracks"
+    data_dir = fwl_data_dir + "/stellar_evolution_tracks/"
     if not os.path.exists(data_dir):
         os.makedirs(data_dir)
 
@@ -57,15 +57,15 @@ def DownloadEvolutionTracks(fname=""):
             unzip_spada = True
         if not os.path.exists(data_dir+"/Baraffe"):
             download_folder(storage,"/Baraffe",data_dir)
-    elif fname == "/Spada":
+    elif fname == "Spada":
         if not os.path.exists(data_dir+"/Spada"):
             download_folder(storage,"/Spada",data_dir)
             unzip_spada = True
-    elif fname == "/Baraffe":
+    elif fname == "Baraffe":
         if not os.path.exists(data_dir+"/Baraffe"):
             download_folder(storage,"/Baraffe",data_dir)
     else:
-        print("Unrecognised folder name in DownloadEvolutionTrackst st")
+        print("Unrecognised folder name in DownloadEvolutionTracks")
 
     if unzip_spada:
         #Unzip Spada evolution tracks
