@@ -15,6 +15,22 @@ You can find the documentation source in the [docs](https://github.com/FormingWo
 If you are adding new pages, make sure to update the listing in the [`mkdocs.yml`](https://github.com/FormingWorlds/MORS/blob/main/mkdocs.yml) under the `nav` entry.
 
 The documentation is hosted on [readthedocs](https://fwl-mors.readthedocs.io).
+### Running tests
+
+MORS uses [pytest](https://docs.pytest.org/en/latest/) to run the tests. You can run the tests for yourself using:
+
+```console
+pytest
+```
+
+To check coverage:
+
+```console
+coverage run -m pytest
+coverage report  # to output to terminal
+coverage html    # to generate html report
+```
+
 
 ### Making a release
 
