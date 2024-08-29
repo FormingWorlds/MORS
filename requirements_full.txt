@@ -8,6 +8,8 @@ certifi==2024.7.4
     # via requests
 charset-normalizer==3.3.2
     # via requests
+click==8.1.7
+    # via fwl-mors (pyproject.toml)
 contourpy==1.2.1
     # via matplotlib
 cycler==0.12.1
@@ -32,6 +34,8 @@ packaging==24.1
     # via matplotlib
 pillow==10.3.0
     # via matplotlib
+platformdirs==4.2.2
+    # via fwl-mors (pyproject.toml)
 pyparsing==3.1.2
     # via matplotlib
 python-dateutil==2.9.0.post0

@@ -15,6 +15,22 @@ You can find the documentation source in the [docs](https://github.com/FormingWo
 If you are adding new pages, make sure to update the listing in the [`mkdocs.yml`](https://github.com/FormingWorlds/MORS/blob/main/mkdocs.yml) under the `nav` entry.
 
 The documentation is hosted on [readthedocs](https://fwl-mors.readthedocs.io).
+### Running tests
+
+MORS uses [pytest](https://docs.pytest.org/en/latest/) to run the tests. You can run the tests for yourself using:
+
+```console
+pytest
+```
+
+To check coverage:
+
+```console
+coverage run -m pytest
+coverage report  # to output to terminal
+coverage html    # to generate html report
+```
+
 
 ### Making a release
 
@@ -23,14 +39,14 @@ The versioning scheme we use is [CalVer](https://calver.org/).
 0. Update requirements files:
 
 ```console
-python tools/requirements_txt.py
+python tools/generate_requirements_txt.py
 pip-compile -o requirements_full.txt pyproject.toml
 ```
 
 1. Bump the version (`release`/`patch`) as needed
 
 ```console
-bump-my-version release
+bump-my-version bump release
 # 24.7.11
 ```
 
