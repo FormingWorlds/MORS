@@ -48,13 +48,13 @@ def DownloadEvolutionTracks(fname=""):
     Download evolution track data
 
     Inputs :
-        - fname (optional) :    folder name, "/Spada" or "/Baraffe"
+        - fname (optional) :    folder name, "Spada" or "Baraffe"
                                 if not provided download both
     """
 
     #Create stellar evolution tracks data repository if not existing
-    data_dir = GetFWLData() / "stellar_evolution_tracks"
-    data_dir.mkdir(parents=True, exist_ok=True)
+    data_dir = os.path.join(GetFWLData() , "stellar_evolution_tracks")
+    os.makedirs(data_dir, exist_ok=True)
 
     #Link with OSF project repository
     osf = OSF()
@@ -69,7 +69,7 @@ def DownloadEvolutionTracks(fname=""):
     else:
         raise ValueError(f"Unrecognised folder name: {fname}")
 
-    folders = [folder for folder in folder_list if not (data_dir / folder).exists()]
+    folders = [folder for folder in folder_list if not os.path.exists(os.path.join(data_dir, folder))]
 
     if folders:
         print(f"Downloading MORS evolution tracks to {data_dir}")
@@ -78,7 +78,7 @@ def DownloadEvolutionTracks(fname=""):
     if "Spada" in folders:
         #Unzip Spada evolution tracks
         wrk_dir = os.getcwd()
-        os.chdir(data_dir / "Spada")
+        os.chdir(os.path.join(data_dir , "Spada"))
         subprocess.call( ['tar','xvfz', 'fs255_grid.tar.gz'] )
         subprocess.call( ['rm','-f', 'fs255_grid.tar.gz'] )
         os.chdir(wrk_dir)
