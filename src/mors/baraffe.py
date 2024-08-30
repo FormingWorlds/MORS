@@ -4,6 +4,9 @@ http://perso.ens-lyon.fr/isabelle.baraffe/BHAC15dir/BHAC15_tracks+structure"""
 import os
 import shutil
 
+import logging
+log = logging.getLogger("fwl."+__name__)
+
 import numpy as np
 from scipy.interpolate import PchipInterpolator
 
@@ -99,10 +102,10 @@ class BaraffeTrack:
 
         # Get time and check that it is in range
         if (tstar < self.tmin):
-            print("Star age too low! Clipping to %.1g Myr" % int(self.tmin*1.e-6))
+            log.warning("Star age too low! Clipping to %.1g Myr" % int(self.tmin*1.e-6))
             tstar = self.tmin
         if (tstar > self.tmax):
-            print("Star age too high! Clipping to %.1g Myr" % int(self.tmax*1.e-6))
+            log.warning("Star age too high! Clipping to %.1g Myr" % int(self.tmax*1.e-6))
             tstar = self.tmax
 
         # Find closest row in track
@@ -154,10 +157,10 @@ class BaraffeTrack:
 
         # Get time and check that it is in range
         if (tstar < self.tmin):
-            print("Star age too low! Clipping to %.1g Myr" % int(self.tmin*1.e-6))
+            log.warning("Star age too low! Clipping to %.1g Myr" % int(self.tmin*1.e-6))
             tstar = self.tmin
         if (tstar > self.tmax):
-            print("Star age too high! Clipping to %.1g Myr" % int(self.tmax*1.e-6))
+            log.warning("Star age too high! Clipping to %.1g Myr" % int(self.tmax*1.e-6))
             tstar = self.tmax
 
         # Find closest row in track

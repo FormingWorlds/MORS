@@ -6,11 +6,12 @@ from pathlib import Path
 import platformdirs
 from osfclient.api import OSF
 
-logger = logging.getLogger(__name__)
+import logging
+log = logging.getLogger("fwl."+__name__)
 
 FWL_DATA_DIR = Path(os.environ.get('FWL_DATA', platformdirs.user_data_dir('fwl_data')))
 
-logger.info(f'FWL data location: {FWL_DATA_DIR}')
+log.info(f'FWL data location: {FWL_DATA_DIR}')
 
 #project ID of the stellar evolution tracks folder in the OSF
 project_id = '9u3fb'
@@ -31,7 +32,7 @@ def download_folder(*, storage, folders: list[str], data_dir: Path):
             parts = file.path.split('/')[1:]
             target = Path(data_dir, *parts)
             target.parent.mkdir(parents=True, exist_ok=True)
-            print(f'Downloading {file.path}...')
+            log.info(f'Downloading {file.path}...')
             with open(target, 'wb') as f:
                 file.write_to(f)
             break
@@ -72,7 +73,7 @@ def DownloadEvolutionTracks(fname=""):
     folders = [folder for folder in folder_list if not os.path.exists(os.path.join(data_dir, folder))]
 
     if folders:
-        print(f"Downloading MORS evolution tracks to {data_dir}")
+        log.info(f"Downloading MORS evolution tracks to {data_dir}")
         download_folder(storage=storage, folders=folders, data_dir=data_dir)
 
     if "Spada" in folders:

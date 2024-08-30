@@ -256,7 +256,7 @@ def _ReadEvolutionTrack(starEvoDir,evoModels,Mstar,MstarFilenameMiddle):
 
     # Make sure they are the same lengths
     if not ( len(content1) == len(content2) ):
-        misc._PrintErrorKill("two evo files not same length")
+        raise Exception("two evo files not same length")
 
     # Get number of age bins
     nAge = len(content1) - nHeader
@@ -608,9 +608,9 @@ def Value(MstarIn,AgeIn,ParamString,ModelData=ModelDataDefault):
 
     # Make sure Mstar and Age are correct types
     if Mstar is None:
-        misc._PrintErrorKill("argument Mstar has invalid type")
+        raise Exception("argument Mstar has invalid type")
     if Age is None:
-        misc._PrintErrorKill("argument Age has invalid type")
+        raise Exception("argument Age has invalid type")
 
     # Find if scenario 1 (most likely)
     if ( isinstance(Mstar,float) and isinstance(Age,float) and isinstance(ParamString,str) ):
@@ -676,17 +676,17 @@ def _ValueSingle(Mstar,Age,ParamString,ModelData=ModelDataDefault):
 
     ## Make sure Mstar and age are floats
     #if not isinstance(Mstar,float):
-        #misc._PrintErrorKill("argument Mstar must be float in call to Value")
+        #raise Exception("argument Mstar must be float in call to Value")
     #if not isinstance(Age,float):
-        #misc._PrintErrorKill("argument Age must be float in call to Value")
+        #raise Exception("argument Age must be float in call to Value")
 
     # Make sure ParamString is indeed a string
     if not isinstance(ParamString,str):
-        misc._PrintErrorKill("argument ParamString must be string in call to Value")
+        raise Exception("argument ParamString must be string in call to Value")
 
     # Make sure ParamString corresponds to a valid parameter
     if ParamString not in ModelData['ParamsAll']:
-        misc._PrintErrorKill("parameter '"+ParamString+"' is not valid")
+        raise Exception("parameter '"+ParamString+"' is not valid")
 
     # Check if an evolutionary track for this exact stellar mass is present
     if ( Mstar in ModelData ):
@@ -732,7 +732,7 @@ def _CheckAgeLimit(AgeArray,Age):
 
     # Do check
     if not ( AgeArray[0] <= Age <= AgeArray[-1] ):
-        misc._PrintErrorKill("input age "+str(Age)+" is not within limits of "+str(AgeArray[0])+" to "+str(AgeArray[-1]))
+        raise Exception("input age "+str(Age)+" is not within limits of "+str(AgeArray[0])+" to "+str(AgeArray[-1]))
 
     return
 
@@ -740,7 +740,7 @@ def _CheckMassLimit(MstarArray,Mstar):
     """Takes array of masses and an age, outputs error and stops code if mass is not within limits."""
 
     if not ( np.min(MstarArray) <= Mstar <= np.max(MstarArray) ):
-        misc._PrintErrorKill("input stellar mass "+str(Mstar)+" is not within limits of "+str(np.min(MstarArray))+" to "+str(np.max(MstarArray)))
+        raise Exception("input stellar mass "+str(Mstar)+" is not within limits of "+str(np.min(MstarArray))+" to "+str(np.max(MstarArray)))
 
     return
 
@@ -771,7 +771,7 @@ def _Interpolate1D(Xarray,Yarray,X):
 
     # Make sure X is in limits
     if not ( Xarray[0] <= X <= Xarray[-1] ):
-        misc._PrintErrorKill("input value "+str(X)+" is not within limits of "+str(Xarray[0])+" to "+str(Xarray[-1]))
+        raise Exception("input value "+str(X)+" is not within limits of "+str(Xarray[0])+" to "+str(Xarray[-1]))
 
     # Get index of X closest to but smaller than value
     iMin = misc._getIndexLTordered(Xarray,X)
