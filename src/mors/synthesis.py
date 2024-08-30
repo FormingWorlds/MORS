@@ -128,6 +128,8 @@ def CalcScaledSpectrumFromProps(modern_spec:spec.Spectrum, modern_dict:dict, his
             Spectrum object containing data for historical fluxes
     """
 
+    log.debug("Calculating scaled spectrum from properties")
+
     # Get scale factors relative to modern spectrum
     Q_dict = CalcBandScales(modern_dict, historical_age)
 
@@ -168,6 +170,8 @@ def FitModernProperties(modern_spec:spec.Spectrum, Mstar:float, age:float=-1):
         best_age : float
             Best estimate of star's age (equal to `age` if `age` is provided)
     """
+
+    log.debug("Fitting properties to modern spectrum")
 
     # Integrated fluxes
     modern_spec.CalcBandFluxes()
