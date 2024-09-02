@@ -1,10 +1,13 @@
 """Module for deriving stellar spectra from band-integrated fluxes"""
 
-# Import system libraries 
+# Import system libraries
 import numpy as np
-import os 
+import os
 
-# Import MORS files 
+import logging
+log = logging.getLogger("fwl."+__name__)
+
+# Import MORS files
 import mors.constants as const
 import mors.miscellaneous as misc
 
@@ -22,31 +25,31 @@ bands_ascending = ["xr","e1","e2","uv","pl"]
 
 def WhichBand(wl:float):
     """Determine which band(s) this wavelength is inside of
-    
+
     Parameters
     ----------
         wl : float
             Wavelength to query [nm]
-    
-    Returns 
+
+    Returns
     ----------
         bands : list | None
-            List of band names (strings) which this band is inside of. Bands 
-            can overlap, so this list may have a length greater than one.     
-            If `wl` is outside all bandpasses, then this value is None.   
-    
+            List of band names (strings) which this band is inside of. Bands
+            can overlap, so this list may have a length greater than one.
+            If `wl` is outside all bandpasses, then this value is None.
+
     """
 
-    # Find band, returning when found 
+    # Find band, returning when found
     bands = []
     for b in bands_ascending:
         if bands_limits[b][0] <= wl < bands_limits[b][1]:
             bands.append(b)
-    
+
     # Not found...
     if len(bands) == 0:
-        return None 
-    
+        return None
+
     # Else...
     return bands
 
@@ -55,10 +58,10 @@ class Spectrum():
     def __init__(self):
 
         # Flags
-        self.loaded = False 
+        self.loaded = False
 
         # Arrays (scaled to 1 AU)
-        self.nbins = 0      # Number of bins 
+        self.nbins = 0      # Number of bins
         self.wl = []        # Wavelength bins [nm]
         self.fl = []        # Flux bins [erg s-1 cm-2 nm-1]
         self.binwidth = []  # Width of wavelength bins [nm]
@@ -79,34 +82,33 @@ class Spectrum():
         Integrated fluxes will have units of [erg s-1 cm-2] scaled to 1 AU.
         """
 
-        # For each spectral band 
+        # For each spectral band
         idxs = []
         i_lo = 0
         for b in bands_ascending:
 
-            # Get band indicies 
+            # Get band indicies
             for i in range(i_lo, self.nbins, 1):
                 wb = WhichBand(self.wl[i])
 
                 # Out of range
                 if wb == None:
-                    continue 
+                    continue
 
                 if b in wb:
-                    # In current band 
+                    # In current band
                     idxs.append(i)
                 else:
-                    # End of band 
+                    # End of band
                     i_lo = i
-                    break 
-            
-            # With idxs defined, integrate over band 
+                    break
+
+            # With idxs defined, integrate over band
             band_wl = self.wl[idxs]
             band_fl = self.fl[idxs]
             self.fl_integ[b] = np.trapz(band_fl,band_wl)
 
-            # Reset idxs 
-            # print("%s band between in interval [%.2f, %.2f] nm"%(b,self.wl[idxs[0]],self.wl[idxs[-1]]))
+            # Reset idxs
             idxs = []
 
         # For bolometric "band"
@@ -117,29 +119,29 @@ class Spectrum():
     def LoadDirectly(self, spec_wl:np.ndarray, spec_fl:np.ndarray):
         """Store spectral data in object.
 
-        Scaled to 1 AU. 
+        Scaled to 1 AU.
 
         Parameters
         ----------
             spec_wl : np.ndarray
-                Array of wavelengths [nm] 
+                Array of wavelengths [nm]
             spec_fl : np.ndarray
                 Array of fluxes [erg s-1 cm-2 nm-1]
         """
 
 
-        # Check length 
+        # Check length
         if len(spec_wl) != len(spec_fl):
-            misc._PrintErrorKill("Stellar spectrum size mismatch (%d and %d)"%(len(spec_wl), len(spec_fl)))
+            raise Exception("Stellar spectrum size mismatch (%d and %d)"%(len(spec_wl), len(spec_fl)))
         if len(spec_wl) < 10:
-            misc._PrintErrorKill("Stellar spectrum size too small (%d bins)"%len(spec_wl))
+            raise Exception("Stellar spectrum size too small (%d bins)"%len(spec_wl))
 
         # Check reversal (should be wl ascending)
         if spec_wl[4] < spec_wl[0]:
             spec_wl = spec_wl[::-1]
             spec_fl = spec_fl[::-1]
 
-        # Replace NaN and zero values 
+        # Replace NaN and zero values
         for i in range(len(spec_fl)):
             if not np.isfinite(spec_fl[i]):
                 spec_fl[i] = 0.0
@@ -148,49 +150,51 @@ class Spectrum():
         # Calculate bin width
         binwidth_wl = spec_wl[1:] - spec_wl[0:-1]
 
-        # Store 
+        # Store
         self.nbins = len(spec_wl)
         self.wl = spec_wl
-        self.fl = spec_fl 
+        self.fl = spec_fl
         self.binwidth = np.array(binwidth_wl, dtype=float)
 
         self.loaded = True
 
-        return self 
+        return self
 
 
     def LoadTSV(self, fp:str):
         """Load stellar spectrum from TSV file into memory.
 
-        Scaled to 1 AU. File should be whitespace delimited with 
+        Scaled to 1 AU. File should be whitespace delimited with
         units of [nm] and [erg s-1 cm-2 nm-1].
 
         Parameters
         ----------
             fp : str
-                Path to file 
+                Path to file
         """
+
+        log.debug("Loading stellar spectrum from TSV file")
 
         # Check path
         fp = os.path.abspath(fp)
         if not os.path.isfile(fp):
-            misc._PrintErrorKill("Cannot find TSV file at '%s'"%fp)
+            raise Exception("Cannot find TSV file at '%s'"%fp)
 
         # Load file
         spec_data = np.loadtxt(fp).T
         spec_wl = spec_data[0]
         spec_fl = spec_data[1]
 
-        # Process data 
+        # Process data
         spec_wl = np.array(spec_wl, dtype=float)
         spec_fl = np.array(spec_fl, dtype=float)
 
-        # Store 
+        # Store
         self.LoadDirectly(spec_wl, spec_fl)
 
-        self.loaded = True 
+        self.loaded = True
 
-        return self 
+        return self
 
 
     def ExtendShortwave(self, wl_min:float):
@@ -198,26 +202,26 @@ class Spectrum():
 
         Parameters
         ----------
-            wl_min : float 
+            wl_min : float
                 New minimum wavelength [nm]
         """
 
         # Already extended
         if wl_min > self.wl[0]:
-            return 
-        
+            return
+
         # Calc wavelength extension
         wl_ext = np.logspace(np.log10(wl_min), np.log10(self.wl[0]), 200)[:-1]
 
         # Evalulate planck function
         fl_ext = np.ones(np.shape(wl_ext)) * self.fl[0]
 
-        # Update Spectrum object data 
+        # Update Spectrum object data
         self.ext_short = len(wl_ext)
         spec_wl = np.concatenate((wl_ext,self.wl))
         spec_fl = np.concatenate((fl_ext,self.fl))
 
-        # Store 
+        # Store
         self.LoadDirectly(spec_wl, spec_fl)
 
 
@@ -226,19 +230,19 @@ class Spectrum():
 
         Parameters
         ----------
-            Teff : float 
-                Effective temperature of star 
-            R_star : float 
+            Teff : float
+                Effective temperature of star
+            R_star : float
                 Radius of star [m]
-            wl_max : float 
+            wl_max : float
                 New maximum wavelength [nm]
         """
 
 
         # Already extended
         if wl_max < self.wl[-1]:
-            return 
-        
+            return
+
         # Calc wavelength extension
         wl_ext = np.logspace(np.log10(self.wl[-1]), np.log10(wl_max), 300)[1:]
 
@@ -248,23 +252,25 @@ class Spectrum():
         # Scale to 1 AU
         fl_ext = ScaleTo1AU(fl_ext, R_star)
 
-        # Update Spectrum object data 
+        # Update Spectrum object data
         self.ext_long = len(self.wl)
         spec_wl = np.concatenate((self.wl, wl_ext))
         spec_fl = np.concatenate((self.fl, fl_ext))
 
-        # Store 
+        # Store
         self.LoadDirectly(spec_wl, spec_fl)
 
-    
+
     def WriteTSV(self, fp:str):
         """Write spectrum to file(s) on disk.
 
         Parameters
         ----------
             fp : str
-                Path to file 
+                Path to file
         """
+
+        log.debug("Writing stellar spectrum to TSV file")
 
         fp = os.path.abspath(fp)
         X = np.array([self.wl,self.fl]).T
@@ -277,7 +283,7 @@ class Spectrum():
 
 def PlanckFunction_surf(wl:np.ndarray, Teff:float):
     """Returns the planck fluxes evaluated at the wavelength array
-    
+
     Parameters
     ----------
         wl : np.ndarray
@@ -308,7 +314,7 @@ def PlanckFunction_surf(wl:np.ndarray, Teff:float):
 
 def ScaleToSurf(fl:np.ndarray, R_star:float):
     """Scale spectrum from 1 AU to stellar surface
-    
+
     Parameters
     ----------
         fl : np.ndarray
@@ -327,7 +333,7 @@ def ScaleToSurf(fl:np.ndarray, R_star:float):
 
 def ScaleTo1AU(fl:np.ndarray, R_star:float):
     """Scale spectrum from stellar surface to 1AU
-    
+
     Parameters
     ----------
         fl : np.ndarray
@@ -343,27 +349,3 @@ def ScaleTo1AU(fl:np.ndarray, R_star:float):
 
     return fl * (R_star/const.AU_SI)**2
 
-def SpectrumWrite(time_dict, wl, sflux, folder):
-    """Write historical spectrum to files.
-
-    Parameters
-    ----------
-        time_dict : dict
-            Time dictionary, including stellar age and planet age
-        wl : np.array(float)
-            Numpy array of wavelengths
-        sflux : np.array(float)
-            Numpy array flux at 1 AU
-        folder : float
-            Path to folder where file is to be written
-
-    """
-
-    tstar = time_dict['star'] * 1.0e-6  # yr -> Myr
-
-    X = np.array([wl,sflux]).T
-    outname1 = folder + "/%d.sflux" % time_dict['planet']
-    header = '# WL(nm)\t Flux(ergs/cm**2/s/nm)          Stellar flux (1 AU) at t_star = %.3f Myr ' % round(tstar,3)
-    np.savetxt(outname1, X, header=header,comments='',fmt='%1.4e',delimiter='\t')
-
-    return outname1
