@@ -331,7 +331,7 @@ def _ReadEvolutionTrack(starEvoDir,evoModels,Mstar,MstarFilenameMiddle):
     dRcoredt[:] = _CalculateGradient( Age , Rcore )
 
     # Round mass and ages to nDecValue decimal places as specified at top of file
-    Mstar = round( Mstar , nDecValue )
+    Mstar = np.round( Mstar , decimals=nDecValue )
     Age = np.round( Age , decimals=nDecValue )
 
     # Add all quantities to the dictionary
@@ -496,7 +496,7 @@ def _LoadTrack(Mstar,ModelData):
     """Takes stellar mass and model data dictionary, returns dictionary with track for this mass."""
 
     # Round mass to nDecValue decimal places specified at top of this file
-    Mstar = round( Mstar , nDecValue )
+    Mstar = np.round( Mstar , decimals=nDecValue )
 
     # Make sure within mass limit
     _CheckMassLimit( ModelData['MstarAll'] , Mstar )
@@ -728,7 +728,7 @@ def _CheckAgeLimit(AgeArray,Age):
     """Takes age track and an age, outputs error and stops code if age is not within limits."""
 
     # Round the age to decimal places determined by nDecValue at top of file
-    Age = round( Age , nDecValue )
+    Age = np.round( Age , decimals=nDecValue )
 
     # Do check
     if not ( AgeArray[0] <= Age <= AgeArray[-1] ):
@@ -748,7 +748,7 @@ def _Interpolate2D(Z1,Z2,Z,Xarray1,Xarray2,X,Yarray1,Yarray2):
     """Takes two sets of 1D arrays for corresponding X and Y values, returns interpolated Y value corresponding to input X."""
 
     # Round the input values to decimal places determined by nDecValue at top of file
-    Z = round( Z , nDecValue )
+    Z = np.round( Z , decimals=nDecValue )
 
     # Do interpolations to get Y at X for both tracks
     Y1 = _Interpolate1D( Xarray1 , Yarray1 , X )
@@ -767,7 +767,7 @@ def _Interpolate1D(Xarray,Yarray,X):
     # Note that it is assumed here that Xarray is in ascending order and this won't work if it is not
 
     # Round the input values to decimal places determined by nDecValue at top of file
-    X = round( X , nDecValue )
+    X = np.round( X , decimals=nDecValue )
 
     # Make sure X is in limits
     if not ( Xarray[0] <= X <= Xarray[-1] ):
