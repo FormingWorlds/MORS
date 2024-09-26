@@ -748,16 +748,18 @@ def _Interpolate2D(Z1,Z2,Z,Xarray1,Xarray2,X,Yarray1,Yarray2):
     """Takes two sets of 1D arrays for corresponding X and Y values, returns interpolated Y value corresponding to input X."""
 
     # Round the input values to decimal places determined by nDecValue at top of file
-    Z = np.round( Z , decimals=nDecValue )
+    #Z = np.round( Z , decimals=nDecValue )
 
     # Do interpolations to get Y at X for both tracks
     Y1 = _Interpolate1D( Xarray1 , Yarray1 , X )
     Y2 = _Interpolate1D( Xarray2 , Yarray2 , X )
 
     # Do linear interpolation between Y1 and Y2 in Z direction
-    mInterp = ( Y2 - Y1 ) / ( Z2 - Z1 )
-    cInterp = Y1 - mInterp * Z1
-    Y = mInterp * Z + cInterp
+    #mInterp = ( Y2 - Y1 ) / ( Z2 - Z1 )
+    #cInterp = Y1 - mInterp * Z1
+    #Y = mInterp * Z + cInterp
+    delta = (Z-Z1)/(Z2-Z1)
+    Y = Y2*delta + Y1*(1-delta)
 
     return Y
 
@@ -767,7 +769,7 @@ def _Interpolate1D(Xarray,Yarray,X):
     # Note that it is assumed here that Xarray is in ascending order and this won't work if it is not
 
     # Round the input values to decimal places determined by nDecValue at top of file
-    X = np.round( X , decimals=nDecValue )
+    #X = np.round( X , decimals=nDecValue )
 
     # Make sure X is in limits
     if not ( Xarray[0] <= X <= Xarray[-1] ):
@@ -785,9 +787,11 @@ def _Interpolate1D(Xarray,Yarray,X):
     else:
 
         # Do linear interpolation
-        mInterp = ( Yarray[iMax] - Yarray[iMin] ) / ( Xarray[iMax] - Xarray[iMin] )
-        cInterp = Yarray[iMin] - mInterp * Xarray[iMin]
-        Y = mInterp * X + cInterp
+        #mInterp = ( Yarray[iMax] - Yarray[iMin] ) / ( Xarray[iMax] - Xarray[iMin] )
+        #cInterp = Yarray[iMin] - mInterp * Xarray[iMin]
+        #Y = mInterp * X + cInterp
+        delta = (X-Xarray[iMin])/(Xarray[iMax]-Xarray[iMin])
+        Y = Yarray[iMax]*delta + Yarray[iMin]*(1-delta)
 
     return Y
 
