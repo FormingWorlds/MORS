@@ -331,7 +331,7 @@ def _ReadEvolutionTrack(starEvoDir,evoModels,Mstar,MstarFilenameMiddle):
     dRcoredt[:] = _CalculateGradient( Age , Rcore )
 
     # Round mass and ages to nDecValue decimal places as specified at top of file
-    Mstar = round( Mstar , nDecValue )
+    Mstar = np.round( Mstar , decimals=nDecValue )
     Age = np.round( Age , decimals=nDecValue )
 
     # Add all quantities to the dictionary
@@ -496,7 +496,7 @@ def _LoadTrack(Mstar,ModelData):
     """Takes stellar mass and model data dictionary, returns dictionary with track for this mass."""
 
     # Round mass to nDecValue decimal places specified at top of this file
-    Mstar = round( Mstar , nDecValue )
+    Mstar = np.round( Mstar , decimals=nDecValue )
 
     # Make sure within mass limit
     _CheckMassLimit( ModelData['MstarAll'] , Mstar )
@@ -728,7 +728,7 @@ def _CheckAgeLimit(AgeArray,Age):
     """Takes age track and an age, outputs error and stops code if age is not within limits."""
 
     # Round the age to decimal places determined by nDecValue at top of file
-    Age = round( Age , nDecValue )
+    Age = np.round( Age , decimals=nDecValue )
 
     # Do check
     if not ( AgeArray[0] <= Age <= AgeArray[-1] ):
@@ -747,17 +747,13 @@ def _CheckMassLimit(MstarArray,Mstar):
 def _Interpolate2D(Z1,Z2,Z,Xarray1,Xarray2,X,Yarray1,Yarray2):
     """Takes two sets of 1D arrays for corresponding X and Y values, returns interpolated Y value corresponding to input X."""
 
-    # Round the input values to decimal places determined by nDecValue at top of file
-    Z = round( Z , nDecValue )
-
     # Do interpolations to get Y at X for both tracks
     Y1 = _Interpolate1D( Xarray1 , Yarray1 , X )
     Y2 = _Interpolate1D( Xarray2 , Yarray2 , X )
 
     # Do linear interpolation between Y1 and Y2 in Z direction
-    mInterp = ( Y2 - Y1 ) / ( Z2 - Z1 )
-    cInterp = Y1 - mInterp * Z1
-    Y = mInterp * Z + cInterp
+    delta = (Z-Z1)/(Z2-Z1)
+    Y = Y2*delta + Y1*(1-delta)
 
     return Y
 
@@ -765,9 +761,6 @@ def _Interpolate1D(Xarray,Yarray,X):
     """Takes 1D arrays for corresponding X and Y values, returns interpolated Y value corresponding to input X."""
 
     # Note that it is assumed here that Xarray is in ascending order and this won't work if it is not
-
-    # Round the input values to decimal places determined by nDecValue at top of file
-    X = round( X , nDecValue )
 
     # Make sure X is in limits
     if not ( Xarray[0] <= X <= Xarray[-1] ):
@@ -785,9 +778,8 @@ def _Interpolate1D(Xarray,Yarray,X):
     else:
 
         # Do linear interpolation
-        mInterp = ( Yarray[iMax] - Yarray[iMin] ) / ( Xarray[iMax] - Xarray[iMin] )
-        cInterp = Yarray[iMin] - mInterp * Xarray[iMin]
-        Y = mInterp * X + cInterp
+        delta = (X-Xarray[iMin])/(Xarray[iMax]-Xarray[iMin])
+        Y = Yarray[iMax]*delta + Yarray[iMin]*(1-delta)
 
     return Y
 
