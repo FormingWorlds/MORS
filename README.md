@@ -154,16 +154,16 @@ Mstar , Omega = ModelCluster()
 
 If this model cluster is used in any research, please cite the papers listed in Table 1 of Johnstone et al. (2020) for the 150 Myr age bin as the original sources for the rotation measurements (note that the function ModelCluster does not return these measurements, but 1 Myr rotation rates for these stars derived from their measurments using the rotational evolution model of Johnstone et al. 2020). To evolve this cluster, use the Cluster class as described below.
 
-When creating an instance of the Star class, use the keyword argument Percentile to set the initial rotation rate to a percentile of this distribution. This can either be given as a float or int between 0 and 100 or as a string, with the three options being 'slow', 'medium', and 'fast', corresponding to the 5th, 50th, and 95th percentiles of the rotation distribution. For example
+When creating an instance of the Star class, use the keyword argument percentile to set the initial rotation rate to a percentile of this distribution. This can either be given as a float or int between 0 and 100 or as a string, with the three options being 'slow', 'medium', and 'fast', corresponding to the 5th, 50th, and 95th percentiles of the rotation distribution. For example
 
 ```python
-star = mors.Star(Mstar=1.0, Percentile=5.0)
+star = mors.Star(Mstar=1.0, percentile=5.0)
 ```
 
 This creates a solar mass star with an initial rotation rate equal to the 5th percentile of the rotation distribution at 1 Myr, as determined from our model cluster. This is equivalent to
 
 ```python
-star = mors.Star(Mstar=1.0, Percentile='slow')
+star = mors.Star(Mstar=1.0, percentile='slow')
 ```
 
 To calculate this percentile, the parameter dMstarPer is used and can be set if the user sets up their own parameters as discussed above. This is set by default to 0.1, meaning that all stars within 0.1 Msun of the specified Mstar will be considered.
