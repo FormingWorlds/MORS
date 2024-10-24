@@ -50,8 +50,6 @@ def GetProperties(Mstar:float, pctle:float, age:float):
 
     # Output
     out = {
-        "mass"   : Mstar,      # units of M_sun
-        "pctle"  : pctle,
         "age"    : age,        # units of Myr
         "radius" : Rstar,
         "Teff"   : Tstar,
@@ -82,15 +80,15 @@ def GetProperties(Mstar:float, pctle:float, age:float):
     return out
 
 
-def CalcBandScales(modern_dict:dict, historical_age:float):
+def CalcBandScales(modern_dict:dict, historical_dict):
     """Get band scale factors for historical spectrum
 
     Parameters
     ----------
         modern_dict : dict
             Dictionary output of `GetProperties` call for modern spectrum
-        historical_age : float
-            Stellar age at which to get corresponding scale factors
+        historical_dict : dict
+            Dictionary output of `GetProperties` call for historical spectrum
 
     Returns
     ----------
@@ -98,17 +96,14 @@ def CalcBandScales(modern_dict:dict, historical_age:float):
             Dictionary of band scale factors
     """
 
-    # Get properties
-    historical = GetProperties(modern_dict["mass"], modern_dict["pctle"], historical_age)
-
     # Get scale factors
     Q_dict = {}
     for key in spec.bands_limits.keys():
-        Q_dict["Q_"+key] = historical["F_"+key]/modern_dict["F_"+key]
+        Q_dict["Q_"+key] = historical_dict["F_"+key]/modern_dict["F_"+key]
 
     return Q_dict
 
-def CalcScaledSpectrumFromProps(modern_spec:spec.Spectrum, modern_dict:dict, historical_age:float):
+def CalcScaledSpectrumFromProps(modern_spec:spec.Spectrum, modern_dict:dict, historical_dict:dict):
     """Scale a stellar spectrum according to stellar properties.
 
     Returns a new Spectrum object containing the historical fluxes.
@@ -119,8 +114,8 @@ def CalcScaledSpectrumFromProps(modern_spec:spec.Spectrum, modern_dict:dict, his
             Spectrum object containing data for a modern fluxes
         modern_dict : dict
             Dictionary output of `GetProperties` call for modern spectrum
-        historical_age : float
-            Stellar age at which to get corresponding scale factors
+        historical_dict : dict
+            Dictionary output of `GetProperties` call for historical spectrum
 
     Returns
     ----------
@@ -131,7 +126,7 @@ def CalcScaledSpectrumFromProps(modern_spec:spec.Spectrum, modern_dict:dict, his
     log.debug("Calculating scaled spectrum from properties")
 
     # Get scale factors relative to modern spectrum
-    Q_dict = CalcBandScales(modern_dict, historical_age)
+    Q_dict = CalcBandScales(modern_dict, historical_dict)
 
     # Get modern wl, fl
     spec_fl = deepcopy(modern_spec.fl)
