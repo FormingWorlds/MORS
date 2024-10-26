@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "fwl-mors"
-version = "24.10.25"
+version = "24.10.27"
 description = "Stellar rotation and activity evolution model"
 readme = "README.md"
 authors = [
@@ -19,7 +19,7 @@ classifiers = [
     "Natural Language :: English",
     "Operating System :: OS Independent",
     "Programming Language :: Python",
-    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.13",
 ]
 keywords = ["exoplanet", "stellar evolution"]
 requires-python = '>=3.10'
@@ -70,7 +70,7 @@ testpaths = ["tests"]
 
 [tool.bumpversion]
 # https://callowayproject.github.io/bump-my-version/howtos/calver/
-current_version = "24.10.25"
+current_version = "24.10.27"
 parse = """(?x)                     # Verbose mode
     (?P<release>                    # The release part
         (?:[1-9][0-9])\\.           # YY.
