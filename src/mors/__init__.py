@@ -1,4 +1,6 @@
 
+__version__ = "24.10.27"
+
 # The basic Star class that people should be using
 from .star import Star , Percentile
 

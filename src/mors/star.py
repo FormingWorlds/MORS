@@ -173,8 +173,7 @@ class Star:
         """Makes functions for each quantity that return this quantity at a given age as attributes of class."""
 
         # Loop over quantities held in self.Tracks
-        for track in self.Tracks:
-
+        # for track in self.Tracks:
             # The method for this is very strange and I don't like it. Better would likely just to be to
             # add individual functions for each quantity since I was unable to find a solution that did
             # not involve using exec() here. This should not provide a security risk since exec() is not
@@ -183,9 +182,179 @@ class Star:
             # Lx() that is created calls Value with Quantity='Lx'. This function is then added to the Star
             # class using setattr on self.__class__. Technically this means that if the user makes multiple
             # instances of Star, the next two lines will not be necessary.
-            exec( "def "+track+"(self,Age):\n  return self.Value(Age=Age,Quantity='"+track+"')" )
-            exec( "setattr( self.__class__ , '"+track+"' , "+track+" )" )
 
+            # exec( "def "+track+"(self,Age):\n  return self.Value(Age=Age,Quantity='"+track+"')")
+            # exec( "setattr( self.__class__ , '"+track+"' , "+track+" )")
+
+        def Age(self,Age):
+            return self.Value(Age=Age, Quantity="Age")
+        setattr(self.__class__, "Age", Age)
+        def dAge(self,Age):
+            return self.Value(Age=Age, Quantity="dAge")
+        setattr(self.__class__, "dAge", dAge)
+        def OmegaEnv(self,Age):
+            return self.Value(Age=Age, Quantity="OmegaEnv")
+        setattr(self.__class__, "OmegaEnv", OmegaEnv)
+        def OmegaCore(self,Age):
+            return self.Value(Age=Age, Quantity="OmegaCore")
+        setattr(self.__class__, "OmegaCore", OmegaCore)
+        def Mstar(self,Age):
+            return self.Value(Age=Age, Quantity="Mstar")
+        setattr(self.__class__, "Mstar", Mstar)
+        def Prot(self,Age):
+            return self.Value(Age=Age, Quantity="Prot")
+        setattr(self.__class__, "Prot", Prot)
+        def Rstar(self,Age):
+            return self.Value(Age=Age, Quantity="Rstar")
+        setattr(self.__class__, "Rstar", Rstar)
+        def tauConv(self,Age):
+            return self.Value(Age=Age, Quantity="tauConv")
+        setattr(self.__class__, "tauConv", tauConv)
+        def Ro(self,Age):
+            return self.Value(Age=Age, Quantity="Ro")
+        setattr(self.__class__, "Ro", Ro)
+        def Itotal(self,Age):
+            return self.Value(Age=Age, Quantity="Itotal")
+        setattr(self.__class__, "Itotal", Itotal)
+        def Ienv(self,Age):
+            return self.Value(Age=Age, Quantity="Ienv")
+        setattr(self.__class__, "Ienv", Ienv)
+        def Icore(self,Age):
+            return self.Value(Age=Age, Quantity="Icore")
+        setattr(self.__class__, "Icore", Icore)
+        def dItotaldt(self,Age):
+            return self.Value(Age=Age, Quantity="dItotaldt")
+        setattr(self.__class__, "dItotaldt", dItotaldt)
+        def dIenvdt(self,Age):
+            return self.Value(Age=Age, Quantity="dIenvdt")
+        setattr(self.__class__, "dIenvdt", dIenvdt)
+        def dIcoredt(self,Age):
+            return self.Value(Age=Age, Quantity="dIcoredt")
+        setattr(self.__class__, "dIcoredt", dIcoredt)
+        def Rcore(self,Age):
+            return self.Value(Age=Age, Quantity="Rcore")
+        setattr(self.__class__, "Rcore", Rcore)
+        def dMcoredt(self,Age):
+            return self.Value(Age=Age, Quantity="dMcoredt")
+        setattr(self.__class__, "dMcoredt", dMcoredt)
+        def Mdot(self,Age):
+            return self.Value(Age=Age, Quantity="Mdot")
+        setattr(self.__class__, "Mdot", Mdot)
+        def Bdip(self,Age):
+            return self.Value(Age=Age, Quantity="Bdip")
+        setattr(self.__class__, "Bdip", Bdip)
+        def vEsc(self,Age):
+            return self.Value(Age=Age, Quantity="vEsc")
+        setattr(self.__class__, "vEsc", vEsc)
+        def torqueEnvMom(self,Age):
+            return self.Value(Age=Age, Quantity="torqueEnvMom")
+        setattr(self.__class__, "torqueEnvMom", torqueEnvMom)
+        def torqueCoreMom(self,Age):
+            return self.Value(Age=Age, Quantity="torqueCoreMom")
+        setattr(self.__class__, "torqueCoreMom", torqueCoreMom)
+        def torqueEnvCG(self,Age):
+            return self.Value(Age=Age, Quantity="torqueEnvCG")
+        setattr(self.__class__, "torqueEnvCG", torqueEnvCG)
+        def torqueCoreCG(self,Age):
+            return self.Value(Age=Age, Quantity="torqueCoreCG")
+        setattr(self.__class__, "torqueCoreCG", torqueCoreCG)
+        def torqueEnvWind(self,Age):
+            return self.Value(Age=Age, Quantity="torqueEnvWind")
+        setattr(self.__class__, "torqueEnvWind", torqueEnvWind)
+        def torqueEnvCE(self,Age):
+            return self.Value(Age=Age, Quantity="torqueEnvCE")
+        setattr(self.__class__, "torqueEnvCE", torqueEnvCE)
+        def torqueCoreCE(self,Age):
+            return self.Value(Age=Age, Quantity="torqueCoreCE")
+        setattr(self.__class__, "torqueCoreCE", torqueCoreCE)
+        def torqueEnvDL(self,Age):
+            return self.Value(Age=Age, Quantity="torqueEnvDL")
+        setattr(self.__class__, "torqueEnvDL", torqueEnvDL)
+        def torqueEnv(self,Age):
+            return self.Value(Age=Age, Quantity="torqueEnv")
+        setattr(self.__class__, "torqueEnv", torqueEnv)
+        def dOmegaEnvdt(self,Age):
+            return self.Value(Age=Age, Quantity="dOmegaEnvdt")
+        setattr(self.__class__, "dOmegaEnvdt", dOmegaEnvdt)
+        def torqueCore(self,Age):
+            return self.Value(Age=Age, Quantity="torqueCore")
+        setattr(self.__class__, "torqueCore", torqueCore)
+        def dOmegaCoredt(self,Age):
+            return self.Value(Age=Age, Quantity="dOmegaCoredt")
+        setattr(self.__class__, "dOmegaCoredt", dOmegaCoredt)
+        def Lbol(self,Age):
+            return self.Value(Age=Age, Quantity="Lbol")
+        setattr(self.__class__, "Lbol", Lbol)
+        def Teff(self,Age):
+            return self.Value(Age=Age, Quantity="Teff")
+        setattr(self.__class__, "Teff", Teff)
+        def Lx(self,Age):
+            return self.Value(Age=Age, Quantity="Lx")
+        setattr(self.__class__, "Lx", Lx)
+        def Fx(self,Age):
+            return self.Value(Age=Age, Quantity="Fx")
+        setattr(self.__class__, "Fx", Fx)
+        def Rx(self,Age):
+            return self.Value(Age=Age, Quantity="Rx")
+        setattr(self.__class__, "Rx", Rx)
+        def Tcor(self,Age):
+            return self.Value(Age=Age, Quantity="Tcor")
+        setattr(self.__class__, "Tcor", Tcor)
+        def Leuv1(self,Age):
+            return self.Value(Age=Age, Quantity="Leuv1")
+        setattr(self.__class__, "Leuv1", Leuv1)
+        def Feuv1(self,Age):
+            return self.Value(Age=Age, Quantity="Feuv1")
+        setattr(self.__class__, "Feuv1", Feuv1)
+        def Reuv1(self,Age):
+            return self.Value(Age=Age, Quantity="Reuv1")
+        setattr(self.__class__, "Reuv1", Reuv1)
+        def Leuv2(self,Age):
+            return self.Value(Age=Age, Quantity="Leuv2")
+        setattr(self.__class__, "Leuv2", Leuv2)
+        def Feuv2(self,Age):
+            return self.Value(Age=Age, Quantity="Feuv2")
+        setattr(self.__class__, "Feuv2", Feuv2)
+        def Reuv2(self,Age):
+            return self.Value(Age=Age, Quantity="Reuv2")
+        setattr(self.__class__, "Reuv2", Reuv2)
+        def Leuv(self,Age):
+            return self.Value(Age=Age, Quantity="Leuv")
+        setattr(self.__class__, "Leuv", Leuv)
+        def Feuv(self,Age):
+            return self.Value(Age=Age, Quantity="Feuv")
+        setattr(self.__class__, "Feuv", Feuv)
+        def Reuv(self,Age):
+            return self.Value(Age=Age, Quantity="Reuv")
+        setattr(self.__class__, "Reuv", Reuv)
+        def Lly(self,Age):
+            return self.Value(Age=Age, Quantity="Lly")
+        setattr(self.__class__, "Lly", Lly)
+        def Fly(self,Age):
+            return self.Value(Age=Age, Quantity="Fly")
+        setattr(self.__class__, "Fly", Fly)
+        def Rly(self,Age):
+            return self.Value(Age=Age, Quantity="Rly")
+        setattr(self.__class__, "Rly", Rly)
+        def FxHZ(self,Age):
+            return self.Value(Age=Age, Quantity="FxHZ")
+        setattr(self.__class__, "FxHZ", FxHZ)
+        def Feuv1HZ(self,Age):
+            return self.Value(Age=Age, Quantity="Feuv1HZ")
+        setattr(self.__class__, "Feuv1HZ", Feuv1HZ)
+        def Feuv2HZ(self,Age):
+            return self.Value(Age=Age, Quantity="Feuv2HZ")
+        setattr(self.__class__, "Feuv2HZ", Feuv2HZ)
+        def FeuvHZ(self,Age):
+            return self.Value(Age=Age, Quantity="FeuvHZ")
+        setattr(self.__class__, "FeuvHZ", FeuvHZ)
+        def FlyHZ(self,Age):
+            return self.Value(Age=Age, Quantity="FlyHZ")
+        setattr(self.__class__, "FlyHZ", FlyHZ)
+        def nAge(self,Age):
+            return self.Value(Age=Age, Quantity="nAge")
+        setattr(self.__class__, "nAge", nAge)
+        
         return
 
     def Value(self,Age=None,Quantity=None):
