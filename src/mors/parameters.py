@@ -18,7 +18,7 @@ def SetDefaultParameters(paramsDefault):
     """Sets up the default parameters."""
 
     # Time integration solver parameters
-    paramsDefault['TimeIntegrationMethod'] = 'ForwardEuler'   # options are 'ForwardEuler', 'RungeKutta4', 'RungeKuttaFehlberg', 'Rosenbrock'
+    paramsDefault['TimeIntegrationMethod'] = 'RosenbrockFixed'   # options are 'ForwardEuler', 'RungeKutta4', 'RungeKuttaFehlberg', 'Rosenbrock'
     paramsDefault['nStepMax'] = 10**6                         # maximum number of timesteps to allow before error
     paramsDefault['DeltaDesired'] = 1.0e-5                    # desired Delta value to use in numerical solvers such as Runge-Kutta-Fehlberg and Rosenbrock
     paramsDefault['AgeMinDefault'] = 1.0                      # Myr - default age to start evolutionary tracks
