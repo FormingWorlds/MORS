@@ -10,7 +10,7 @@ TEST_DATA = (
 )
 
 @pytest.mark.parametrize("inp,expected", TEST_DATA)
-def test_spada(inp, expected):
+def test_spada_RB(inp, expected):
 
     mors.DownloadEvolutionTracks('Spada')
     star = mors.Star(Mstar=inp[0], Omega=inp[1])
