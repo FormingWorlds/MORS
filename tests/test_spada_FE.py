@@ -10,14 +10,16 @@ TEST_DATA = (
 )
 
 @pytest.mark.parametrize("inp,expected", TEST_DATA)
-def test_spada(inp, expected):
+def test_spada_FE(inp, expected):
 
     mors.DownloadEvolutionTracks('Spada')
-    star = mors.Star(Mstar=inp[0], Omega=inp[1])
+    params = mors.NewParams()
+    params['TimeIntegrationMethod'] = 'ForwardEuler'
+    star = mors.Star(Mstar=inp[0], Omega=inp[1], params = params)
     ret = (
          star.Value(inp[2], 'Rstar'),
          star.Value(inp[2], 'Lbol'),
          star.Value(inp[2], 'Leuv'),
          )
 
-    assert_allclose(ret, expected, rtol=1e-5, atol=0)
+    assert_allclose(ret, expected, rtol=1e-6, atol=0)

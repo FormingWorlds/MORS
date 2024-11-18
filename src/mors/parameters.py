@@ -18,7 +18,7 @@ def SetDefaultParameters(paramsDefault):
     """Sets up the default parameters."""
 
     # Time integration solver parameters
-    paramsDefault['TimeIntegrationMethod'] = 'ForwardEuler'   # options are 'ForwardEuler', 'RungeKutta4', 'RungeKuttaFehlberg', 'Rosenbrock'
+    paramsDefault['TimeIntegrationMethod'] = 'RosenbrockFixed'# options are 'ForwardEuler', 'RungeKutta4', 'RungeKuttaFehlberg', 'Rosenbrock' and 'RosenbrockFixed'
     paramsDefault['nStepMax'] = 10**6                         # maximum number of timesteps to allow before error
     paramsDefault['DeltaDesired'] = 1.0e-5                    # desired Delta value to use in numerical solvers such as Runge-Kutta-Fehlberg and Rosenbrock
     paramsDefault['AgeMinDefault'] = 1.0                      # Myr - default age to start evolutionary tracks
@@ -26,7 +26,7 @@ def SetDefaultParameters(paramsDefault):
     paramsDefault['deltaJac'] = 1.0e-5                        # pertubation to use when calculating Jacobian for Rosenbrock solver
     paramsDefault['CoefficientsRB'] = _CoefficientsRB()       # all coefficents needed for the Rosenbrock solver
     paramsDefault['dAgeMin'] = 1.0e-5                         # Myr - minimum timestep to allow
-    paramsDefault['dAgeMax'] = 5000.0                         # Myr - maximum timestep to allow
+    paramsDefault['dAgeMax'] = 50.0                           # Myr - maximum timestep to allow
 
     # Physical processes to include
     paramsDefault['CoreEnvelopeDecoupling'] = True            # should core envelope decoupling be included
