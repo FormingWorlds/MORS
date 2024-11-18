@@ -600,7 +600,9 @@ def _EvolveRotationStepRBFixed(Mstar=None,Age=None,OmegaEnv=None,OmegaCore=None,
     CoefficientsRB = params['CoefficientsRB']
 
     # Get time step
-    dAge = min(0.1 * np.power(Age, 0.75), dAgeMax)
+    dAge = 0.1 * np.power(Age, 0.75)
+    dAge = min( dAge , dAgeMax )
+    dAge = min( dAge , params['dAgeMax'] )
     dAgeNew = dAge
 
     # Setup array to hold integration values
