@@ -420,6 +420,12 @@ def EvolveRotationStep(Mstar=None,Age=None,OmegaEnv=None,OmegaCore=None,dAgeMax=
                                                                         OmegaCore=OmegaCore , dAge=dAge , dAgeMax=dAgeMax ,
                                                                         params=params , StarEvo=StarEvo )
 
+    elif ( params['TimeIntegrationMethod'] == 'RosenbrockFixed' ):
+
+        dAge , dAgeNew , OmegaEnv , OmegaCore =  _EvolveRotationStepRBFixed( Mstar=Mstar , Age=Age , OmegaEnv=OmegaEnv ,
+                                                                             OmegaCore=OmegaCore , dAge=dAge , dAgeMax=dAgeMax ,
+                                                                             params=params , StarEvo=StarEvo )
+
     else:
         raise Exception("invalid value of TimeIntegrationMethod in parameters")
 
@@ -528,7 +534,7 @@ def _EvolveRotationStepRKF(Mstar=None,Age=None,OmegaEnv=None,OmegaCore=None,dAge
     return dAge , dAgeNew , OmegaEnv , OmegaCore
 
 def _EvolveRotationStepRB(Mstar=None,Age=None,OmegaEnv=None,OmegaCore=None,dAgeMax=None,dAge=None,params=params.paramsDefault,StarEvo=None):
-    """Takes basic stellar parameters, evolves by timestep using Runge-Kutta-Fehlberg method."""
+    """Takes basic stellar parameters, evolves by timestep using Rosenbrock method."""
 
     # Get coefficients for solver
     CoefficientsRB = params['CoefficientsRB']
@@ -580,6 +586,37 @@ def _EvolveRotationStepRB(Mstar=None,Age=None,OmegaEnv=None,OmegaCore=None,dAgeM
         # Check for stopping of iteration
         if ( dAgeFactor > 1.0 ):
             break
+
+    # Save new estimate
+    OmegaEnv = Xnew[0]
+    OmegaCore = Xnew[1]
+
+    return dAge , dAgeNew , OmegaEnv , OmegaCore
+
+def _EvolveRotationStepRBFixed(Mstar=None,Age=None,OmegaEnv=None,OmegaCore=None,dAgeMax=None,dAge=None,params=params.paramsDefault,StarEvo=None):
+    """Takes basic stellar parameters, evolves by timestep using Rosenbrock method with fixed time grid."""
+
+    # Get coefficients for solver
+    CoefficientsRB = params['CoefficientsRB']
+
+    # Get time step
+    dAge = min(0.1 * np.power(Age, 0.75), dAgeMax)
+    dAgeNew = dAge
+
+    # Setup array to hold integration values
+    X = np.array([OmegaEnv,OmegaCore])
+    nVar = len(X)
+
+    # Get Jacobian and assume it is a constant over timestep
+    Jac = _JacobianRB( Mstar , Age+dAge , X , nVar , params , StarEvo )
+
+    # Calculate the k coefficients
+    kCoeff = _kCoeffRB( Mstar , Age , dAge , X , Jac , nVar , CoefficientsRB , params , StarEvo )
+
+    # Get updated values
+    Xnew = copy.deepcopy(X)
+    for i in range(0,CoefficientsRB['s']):
+        Xnew += CoefficientsRB['b'][i] * kCoeff[:,i]
 
     # Save new estimate
     OmegaEnv = Xnew[0]
