@@ -22,4 +22,4 @@ def test_spada(inp, expected):
          star.Value(inp[2], 'Leuv'),
          )
 
-    assert_allclose(ret, expected, rtol=1e-5, atol=0)
+    assert_allclose(ret, expected, rtol=1e-6, atol=0)
