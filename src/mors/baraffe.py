@@ -167,9 +167,33 @@ class BaraffeTrack:
         iclose = (np.abs(self.track['t'] - tstar)).argmin()
 
         # Get data from track
-        Rstar = self.track['Rstar'][iclose]
+        return self.track['Rstar'][iclose]
 
-        return Rstar
+    def BaraffeStellarTeff(self, tstar):
+        """Calculates the star's effective temperature at a time t.
+
+        Parameters
+        ----------
+            tstar : float
+                Star's age [yr]
+
+        Returns
+        ----------
+            Teff : float
+                Temperature of star [K]
+        """
+
+        # Get time and check that it is in range
+        if (tstar < self.tmin):
+            log.warning("Star age too low! Clipping to %.1g Myr" % int(self.tmin*1.e-6))
+            tstar = self.tmin
+        if (tstar > self.tmax):
+            log.warning("Star age too high! Clipping to %.1g Myr" % int(self.tmax*1.e-6))
+            tstar = self.tmax
+
+        # Find closest row in track
+        iclose = (np.abs(self.track['t'] - tstar)).argmin()
+        return self.track['Teff'][iclose]
 
     def BaraffeSpectrumCalc(self, tstar: float, Lstar_modern: float, spec_fl: list):
         """Determine historical spectrum at time_star, using the baraffe tracks
