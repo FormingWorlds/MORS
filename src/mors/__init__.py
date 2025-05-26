@@ -1,5 +1,5 @@
 
-__version__ = "24.10.27"
+__version__ = "25.05.26"
 
 # The basic Star class that people should be using
 from .star import Star , Percentile
@@ -18,13 +18,13 @@ from .stellarevo import ( Rstar , Lbol , Teff , Itotal , Icore , Ienv , Mcore , 
                          dItotaldt , dIcoredt , dIenvdt , dIenvdt , dMcoredt , dRcoredt )
 
 # Functions from physical model
-from .physicalmodel import ( dOmegadt , RotationQuantities , ExtendedQuantities , Lxuv , Lx , Leuv , Lly , 
+from .physicalmodel import ( dOmegadt , RotationQuantities , ExtendedQuantities , Lxuv , Lx , Leuv , Lly ,
                             OmegaSat , ProtSat , MdotFactor , OmegaBreak , XrayScatter , XUVScatter , aOrbHZ )
 
 # Rotational evolution stuff
 from .rotevo import EvolveRotation , EvolveRotationStep
 
-# Spectral synthesis 
+# Spectral synthesis
 from .synthesis import *
 
 # Data download
@@ -33,7 +33,7 @@ from .data import DownloadEvolutionTracks
 # Baraffe tracks
 from .baraffe import *
 
-# Spectrum stuff 
+# Spectrum stuff
 from .spectrum import *
 
 # Some other stuff
