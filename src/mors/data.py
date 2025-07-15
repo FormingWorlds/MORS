@@ -144,12 +144,12 @@ def DownloadEvolutionTracks(fname=""):
                 else:
                     log.error("Max retries reached. Download failed.")
 
-    if "Spada" in folders:
-        #Unzip Spada evolution tracks
-        wrk_dir = os.getcwd()
-        os.chdir(os.path.join(data_dir , "Spada"))
-        subprocess.call( ['tar','xvfz', 'fs255_grid.tar.gz'] )
-        subprocess.call( ['rm','-f', 'fs255_grid.tar.gz'] )
-        os.chdir(wrk_dir)
+            if folder=="Spada":
+                #Unzip Spada evolution tracks
+                wrk_dir = os.getcwd()
+                os.chdir(os.path.join(data_dir , "Spada"))
+                subprocess.call( ['tar','xvfz', 'fs255_grid.tar.gz'] )
+                subprocess.call( ['rm','-f', 'fs255_grid.tar.gz'] )
+                os.chdir(wrk_dir)
 
     return
