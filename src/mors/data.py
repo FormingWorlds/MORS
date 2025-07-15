@@ -95,8 +95,8 @@ def DownloadEvolutionTracks(fname=""):
     """
 
     #Create stellar evolution tracks data repository if not existing
-    data_dir = os.path.join(GetFWLData() , "stellar_evolution_tracks")
-    os.makedirs(data_dir, exist_ok=True)
+    data_dir = GetFWLData() / "stellar_evolution_tracks"
+    data_dir.mkdir(parents=True, exist_ok=True)
 
     #Link with OSF project repository
     osf = OSF()
