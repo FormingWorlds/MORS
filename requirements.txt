@@ -5,3 +5,4 @@ numpy
 osfclient
 platformdirs
 scipy
+zenodo_get
