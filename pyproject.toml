@@ -31,7 +31,8 @@ dependencies = [
   'numpy',
   'osfclient',
   'platformdirs',
-  'scipy'
+  'scipy',
+  'zenodo_get',
 ]
 
 [project.urls]
