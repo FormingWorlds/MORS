@@ -7,8 +7,17 @@ nav:
   - Home: index.md
   - Contributing: CONTRIBUTING.md
   - Code of Conduct: CODE_OF_CONDUCT.md
-  - 🔗 Source code: https://github.com/FormingWorlds/MORS
-  - 🔗 Issues: https://github.com/FormingWorlds/MORS/issues
+  - Source code: https://github.com/FormingWorlds/MORS
+  - Issues page: https://github.com/FormingWorlds/MORS/issues
+  - 🔗 PROTEUS: https://fwl-proteus.readthedocs.io/
+  - 🔗 JANUS: https://fwl-proteus.readthedocs.io/projects/janus/en/latest/
+  - 🔗 ZEPHYRUS: https://github.com/FormingWorlds/ZEPHYRUS/
+  - 🔗 CALLIOPE: https://fwl-proteus.readthedocs.io/projects/calliope/en/latest/
+  - 🔗 AGNI: https://h-nicholls.space/AGNI/dev/
+  - 🔗 LovePy: https://github.com/nichollsh/lovepy
+  - 🔗 VULCAN: https://github.com/FormingWorlds/VULCAN
+  - 🔗 Zalmoxis: https://zalmoxis.readthedocs.io/en/latest/
+  - 🔗 Aragog: https://github.com/FormingWorlds/aragog
 
 theme:
   name: material
