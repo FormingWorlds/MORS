@@ -12,8 +12,6 @@ log = logging.getLogger("fwl."+__name__)
 
 FWL_DATA_DIR = Path(os.environ.get('FWL_DATA', platformdirs.user_data_dir('fwl_data')))
 
-log.info(f'FWL data location: {FWL_DATA_DIR}')
-
 #project ID of the stellar evolution tracks folder in the OSF
 project_id = '9u3fb'
 
