@@ -106,13 +106,13 @@ class Spectrum():
             # With idxs defined, integrate over band
             band_wl = self.wl[idxs]
             band_fl = self.fl[idxs]
-            self.fl_integ[b] = np.trapz(band_fl,band_wl)
+            self.fl_integ[b] = np.trapezoid(band_fl,band_wl)
 
             # Reset idxs
             idxs = []
 
         # For bolometric "band"
-        self.fl_integ["bo"] = np.trapz(self.fl,self.wl)
+        self.fl_integ["bo"] = np.trapezoid(self.fl,self.wl)
 
         return self.fl_integ
 

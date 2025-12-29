@@ -70,7 +70,7 @@ def GetProperties(Mstar:float, pctle:float, age:float):
     wl_pl = np.logspace(np.log10(spec.bands_limits["pl"][0]), np.log10(spec.bands_limits["pl"][1]), 1000)
     fl_pl = spec.PlanckFunction_surf(wl_pl, Tstar)
     fl_pl = spec.ScaleTo1AU(fl_pl, Rstar)
-    out["F_pl"] = np.trapz(fl_pl, wl_pl)
+    out["F_pl"] = np.trapezoid(fl_pl, wl_pl)
     out["L_pl"] = out["F_pl"] * area
 
     # Get flux of UV band from remainder
