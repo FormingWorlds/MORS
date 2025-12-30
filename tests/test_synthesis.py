@@ -78,6 +78,23 @@ def test_GetProperties_flux_budget(monkeypatch, Mstar, pctle, age, Lxuv_dict, Lb
     expL = (expected_L_bo, expected_L_xr, expected_L_e1, expected_L_e2, expected_L_pl, expected_L_uv)
     assert_allclose(retL, expL, rtol=1e-12, atol=0.0)
 
+def test_GetProperties_planck_trapezoid_constant(monkeypatch):
+    # Patch dependencies
+    monkeypatch.setattr(synth, "Value", lambda M, a, k: 1.0 if k == "Rstar" else 5000.0)
+    monkeypatch.setattr(synth, "Percentile", lambda **kwargs: 1.0)
+    monkeypatch.setattr(synth, "Lxuv", lambda **kwargs: {"Lx": 0.0, "Leuv1": 0.0, "Leuv2": 0.0})
+    monkeypatch.setattr(synth, "Lbol", lambda M, a: 1.0)
+
+    # Make Planck flux at 1 AU be exactly 1 everywhere in wl_pl
+    monkeypatch.setattr(spec, "PlanckFunction_surf", lambda wl, Teff: np.ones_like(wl, dtype=float))
+    monkeypatch.setattr(spec, "ScaleTo1AU", lambda fl, R_star: fl)
+
+    out = synth.GetProperties(Mstar=1.0, pctle=50.0, age=1000.0)
+
+    wlmin, wlmax = spec.bands_limits["pl"]
+    expected_F_pl = wlmax - wlmin  # integral of 1 dlambda over the pl band
+
+    assert_allclose(out["F_pl"], expected_F_pl, rtol=1e-12, atol=0.0)
 
 # CalcBandScales
 
