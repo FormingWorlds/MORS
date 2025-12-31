@@ -222,10 +222,10 @@ def IntegrateEmission(AgeMin=None,AgeMax=None,Age=None,Luminosity=None,aOrb=None
         Track *= 1.0 / ( 4.0 * const.Pi * (aOrb*const.AU)**2.0 )
 
     # Get index of first age bin with age above AgeMin
-    indexMin = SE._getIndexGT(Age,AgeMin)
+    indexMin = _getIndexGT(Age,AgeMin)
 
     # Get index of final age bin with age below AgeMax
-    indexMax = SE._getIndexLT(Age,AgeMax)
+    indexMax = _getIndexLT(Age,AgeMax)
 
     # Initially take no energy then add up energy from bins
     Energy = 0.0
