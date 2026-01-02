@@ -326,8 +326,8 @@ def ModernSpectrumLoad(input_spec_file: str, output_spec_file: str):
         spec_wl = spec_data[0]
         spec_fl = spec_data[1]
     else:
-        UpdateStatusfile(dirs, 20)
-        raise Exception("Cannot find stellar spectrum")
+        raise FileNotFoundError(f"Cannot find stellar spectrum at '{input_spec_file}'")
+
 
     #Old log print in PROTEUS
     #binwidth_wl = spec_wl[1:] - spec_wl[0:-1]

@@ -83,7 +83,7 @@ class StarEvo:
 
         return
 
-    def Value(Mstar,Age,ParamString):
+    def Value(self, Mstar,Age,ParamString):
         """Takes stellar mass, age, and a parameter string, returns values corresponding to named parameter.
 
         The set of models should have already been loaded. With this function, the user can ask for a value
@@ -113,7 +113,7 @@ class StarEvo:
         # Call Value() outside this class to get the value with this model
         value = Value(Mstar,Age,ParamString,ModelData=self.ModelData)
 
-        return
+        return value 
 
     # The following functions are for individual parameters that can be called
     def Rstar(self,Mstar,Age,ModelData=ModelDataDefault):

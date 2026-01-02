@@ -790,24 +790,14 @@ def _PerPercentile(Mstar,Omega,MstarDist,OmegaDist,params):
         return 100.0
 
     # Use bisector to invert numpy.percentile function
-
     # Initial limits
-    perMin = 0.0
-    perMax = 100.0
-
-    # Omegas for limits
-    OmegaMin = np.percentile( OmegaDist[includeStars] , perMin )
-    OmegaMax = np.percentile( OmegaDist[includeStars] , perMax )
-
-    # Tolerance and maximum number of iterations
+    perMin, perMax = 0.0, 100.0
     tol = 1.0e-5
     nIterMax = 10000
 
     # Start iterating
-    found = False
     for iIter in range(nIterMax):
-
-        # Get mid value and percentle
+    # Get mid percentile and corresponding Omega
         perMid = 0.5 * ( perMin + perMax )
         OmegaMid = np.percentile( OmegaDist[includeStars] , perMid )
 
@@ -816,15 +806,12 @@ def _PerPercentile(Mstar,Omega,MstarDist,OmegaDist,params):
             return perMid
 
         # See which limit to change
-        if ( OmegaMid > Omega ):
+        if OmegaMid > Omega:
             perMax = perMid
-            OmegaMax = OmegaMid
         else:
             perMin = perMid
-            OmegaMin = OmegaMid
 
-    # Make sure it was found
-    if not found:
-        raise Exception( "did not find percentile "+str(per)+" for Omega of "+str(Omega) )
+    # If we get here, not converged
+    raise Exception(
+        f"did not find percentile for Omega={Omega} (Mstar={Mstar}) after {nIterMax} iterations; last bracket=({perMin},{perMax}), last mid={perMid}")
 
-    return per
