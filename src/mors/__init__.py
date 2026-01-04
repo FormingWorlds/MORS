@@ -1,5 +1,5 @@
 
-__version__ = "25.07.15"
+__version__ = "26.01.02"
 
 # The basic Star class that people should be using
 from .star import Star , Percentile
