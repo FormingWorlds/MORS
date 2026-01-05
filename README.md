@@ -20,7 +20,7 @@ The Forming Worlds Mors package is available on PyPI. Run the following command 
 ```
 pip install fwl-mors
 ```
-### 1.2. Developper install
+### 1.2. Developer install
 
 You can alternatively download the source code from GitHub somewhere on your computer using
 

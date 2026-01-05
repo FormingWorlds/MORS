@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "fwl-mors"
-version = "25.07.15"
+version = "26.01.02"
 description = "Stellar rotation and activity evolution model"
 readme = "README.md"
 authors = [
@@ -73,7 +73,7 @@ testpaths = ["tests"]
 
 [tool.bumpversion]
 # https://callowayproject.github.io/bump-my-version/howtos/calver/
-current_version = "25.07.15"
+current_version = "26.01.02"
 parse = """(?x)                     # Verbose mode
     (?P<release>                    # The release part
         (?:[1-9][0-9])\\.           # YY.
