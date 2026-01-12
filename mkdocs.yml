@@ -1,5 +1,5 @@
 site_name: MORS
-site_url: https://fwl-mors.readthedocs.io
+site_url: https://proteus-framework.org/MORS/
 repo_url: https://github.com/FormingWorlds/MORS
 repo_name: GitHub
 
@@ -9,15 +9,15 @@ nav:
   - Code of Conduct: CODE_OF_CONDUCT.md
   - Source code: https://github.com/FormingWorlds/MORS
   - Issues page: https://github.com/FormingWorlds/MORS/issues
-  - 🔗 PROTEUS: https://fwl-proteus.readthedocs.io/
-  - 🔗 JANUS: https://fwl-proteus.readthedocs.io/projects/janus/en/latest/
-  - 🔗 ZEPHYRUS: https://github.com/FormingWorlds/ZEPHYRUS/
-  - 🔗 CALLIOPE: https://fwl-proteus.readthedocs.io/projects/calliope/en/latest/
+  - 🔗 PROTEUS: https://proteus-framework.org/PROTEUS/
+  - 🔗 JANUS: https://proteus-framework.org/JANUS/
+  - 🔗 ZEPHYRUS: https://proteus-framework.org/ZEPHYRUS/
+  - 🔗 CALLIOPE: https://proteus-framework.org/CALLIOPE/
   - 🔗 AGNI: https://h-nicholls.space/AGNI/dev/
-  - 🔗 LovePy: https://github.com/nichollsh/lovepy
-  - 🔗 VULCAN: https://github.com/FormingWorlds/VULCAN
-  - 🔗 Zalmoxis: https://zalmoxis.readthedocs.io/en/latest/
-  - 🔗 Aragog: https://github.com/FormingWorlds/aragog
+  - 🔗 Love.jl: https://proteus-framework.org/Love.jl/dev/ #
+  - 🔗 VULCAN: https://proteus-framework.org/VULCAN/
+  - 🔗 Zalmoxis: https://proteus-framework.org/ZALMOXIS/
+  - 🔗 Aragog: https://proteus-framework.org/aragog/
 
 theme:
   name: material
