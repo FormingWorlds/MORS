@@ -1,8 +1,8 @@
 # How-to guides
 
-Welcome to the how-to guides for MORS. These are task-focused recipes for common MORS workflows. If you are just getting started, consider going through the [tutorials][../Tutorials/index.md]. 
+Welcome to the how-to guides for MORS. These are task-focused recipes for common MORS workflows.
 
-1. [Installation](installation.md)
+1. [(Developer) installation](installation.md)
 2. [Calculate a star's evolution](evolution.md)
 3. [Calculate a cluster's evolution](clusters.md)
 4. [Using model percentiles for initial rotation](distribution_percentile.md)
