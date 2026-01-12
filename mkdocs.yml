@@ -5,6 +5,23 @@ repo_name: GitHub
 
 nav:
   - Home: index.md
+
+  - How-to guides:
+      - Overview: How-to/index.md
+      - Installation: How-to/installation.md
+      - Calculate stellar evolution: How-to/evolution.md
+      - Calculate cluster evolution: How-to/clusters.md
+      - Using model percentiles for initial rotation: How-to/distribution_percentile.md
+      - Setting custom simulation parameters: How-to/set_parameters.md
+      - Find stellar rotation and activity quantities: How-to/activity_quantities.md
+      - Find stellar quantities with stellar evolution tracks: How-to/track_quantities.md
+      - Find habitable zone boundaries: How-to/habitablezone.md
+      - Find stellar activity timelines: How-to/activity_timelines.md
+
+  - Tutorials:
+      - Overview: Tutorials/index.md
+      - First run: Tutorials/first_run.md
+
   - Contributing: CONTRIBUTING.md
   - Code of Conduct: CODE_OF_CONDUCT.md
   - Source code: https://github.com/FormingWorlds/MORS
@@ -14,7 +31,7 @@ nav:
   - 🔗 ZEPHYRUS: https://proteus-framework.org/ZEPHYRUS/
   - 🔗 CALLIOPE: https://proteus-framework.org/CALLIOPE/
   - 🔗 AGNI: https://h-nicholls.space/AGNI/dev/
-  - 🔗 Love.jl: https://proteus-framework.org/Love.jl/dev/ #
+  - 🔗 Obliqua: https://proteus-framework.org/Obliqua/ 
   - 🔗 VULCAN: https://proteus-framework.org/VULCAN/
   - 🔗 Zalmoxis: https://proteus-framework.org/ZALMOXIS/
   - 🔗 Aragog: https://proteus-framework.org/aragog/
