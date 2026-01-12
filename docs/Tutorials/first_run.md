@@ -15,6 +15,7 @@ By the end of this tutorial you will:
 
 ## 0) Prerequisites
 You need:
+
 - Python 3 environment with `pip`
 - A working internet connection (for downloading data once)
 
