@@ -74,6 +74,7 @@ For a `mors.Cluster`, the call is the same but returns one value per star:
 AgeThreshold = cluster.ActivityLifetime(Quantity="Lx", Threshold=1.0e28)
 print(AgeThreshold)  # numpy array
 ```
+
 ---
 
 ### Compute saturation lifetime 
