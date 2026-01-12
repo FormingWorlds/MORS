@@ -21,6 +21,8 @@ nav:
 
 theme:
   name: material
+  favicon: Images/PROTEUS_black_on_white_logo_only.png
+  logo: Images/PROTEUS_white_on_black.png
   palette:
     primary: black
     accent: deep orange
