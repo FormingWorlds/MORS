@@ -14,7 +14,7 @@ mkdocs serve
 You can find the documentation source in the [docs](https://github.com/FormingWorlds/MORS/tree/main/docs) directory.
 If you are adding new pages, make sure to update the listing in the [`mkdocs.yml`](https://github.com/FormingWorlds/MORS/blob/main/mkdocs.yml) under the `nav` entry.
 
-The documentation is hosted on [readthedocs](https://fwl-mors.readthedocs.io).
+The documentation is hosted on [PROTEUS Framework](https://proteus-framework.org/MORS/).
 ### Running tests
 
 MORS uses [pytest](https://docs.pytest.org/en/latest/) to run the tests. You can run the tests for yourself using:
