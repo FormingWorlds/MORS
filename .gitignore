@@ -53,5 +53,5 @@ docs/_build/
 fs255_grid*
 
 # Debug 
-*.png
+#*.png
 nogit*
