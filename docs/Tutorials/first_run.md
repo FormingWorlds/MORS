@@ -2,6 +2,7 @@
 
 ## What you’ll do
 By the end of this tutorial you will:
+
 1. Install MORS and download the required data
 2. Create a `Star` and compute evolutionary tracks
 3. Inspect available tracks + units
