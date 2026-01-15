@@ -1,0 +1,1572 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://proteus-framework.org/MORS/How-to/activity_quantities/">
+      
+      
+        <link rel="prev" href="../set_parameters/">
+      
+      
+        <link rel="next" href="../track_quantities/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/PROTEUS_black_on_white_logo_only.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
+    
+    
+      
+        <title>Find stellar rotation and activity quantities - MORS</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
+    
+      <link rel="stylesheet" href="../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="black" data-md-color-accent="deep-orange">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#rotation-and-activity-quantities-how-to" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="MORS" class="md-header__button md-logo" aria-label="MORS" data-md-component="logo">
+      
+  <img src="../../assets/PROTEUS_white_on_black.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            MORS
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Find stellar rotation and activity quantities
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/FormingWorlds/MORS" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="MORS" class="md-nav__button md-logo" aria-label="MORS" data-md-component="logo">
+      
+  <img src="../../assets/PROTEUS_white_on_black.png" alt="logo">
+
+    </a>
+    MORS
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/FormingWorlds/MORS" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    How-to guides
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    How-to guides
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../installation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Installation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../evolution/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Calculate stellar evolution
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../clusters/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Calculate cluster evolution
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../distribution_percentile/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Using model percentiles for initial rotation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../set_parameters/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Setting custom simulation parameters
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Find stellar rotation and activity quantities
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Find stellar rotation and activity quantities
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#rotation-and-activity-quantities-how-to" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Rotation and activity quantities (How-to)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Rotation and activity quantities (How-to)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#goal" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Goal
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#prerequisites" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prerequisites
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-1-get-the-full-xuv-dictionary-lxuv" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 1: Get the full XUV dictionary (Lxuv)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-2-retrieve-a-single-quantity-directly-lx-leuv-lly" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 2: Retrieve a single quantity directly (Lx, Leuv, Lly)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Step 2: Retrieve a single quantity directly (Lx, Leuv, Lly)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#choose-an-euv-sub-band-with-band" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Choose an EUV sub-band with band
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-3-add-variabilityscatter-optional" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 3: Add variability/scatter (optional)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Step 3: Add variability/scatter (optional)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#x-ray-scatter-xrayscatter" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        X-ray scatter (XrayScatter)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#full-xuv-scatter-xuvscatter" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Full XUV scatter (XUVScatter)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-4-get-detailed-diagnostics-extendedquantities" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 4: Get detailed diagnostics (ExtendedQuantities)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#common-pitfalls" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Common pitfalls
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../track_quantities/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Find stellar quantities with stellar evolution tracks
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../habitablezone/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Find habitable zone boundaries
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../activity_timelines/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Find stellar activity timelines
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tutorials
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Tutorials
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../Tutorials/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../Tutorials/first_run/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    First run
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../CONTRIBUTING/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contributing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../CODE_OF_CONDUCT/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Code of Conduct
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://github.com/FormingWorlds/MORS" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Source code
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://github.com/FormingWorlds/MORS/issues" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Issues page
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://proteus-framework.org/PROTEUS/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    🔗 PROTEUS
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://proteus-framework.org/JANUS/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    🔗 JANUS
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://proteus-framework.org/ZEPHYRUS/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    🔗 ZEPHYRUS
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://proteus-framework.org/CALLIOPE/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    🔗 CALLIOPE
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://h-nicholls.space/AGNI/dev/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    🔗 AGNI
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://proteus-framework.org/Obliqua/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    🔗 Obliqua
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://github.com/FormingWorlds/VULCAN" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    🔗 VULCAN
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://proteus-framework.org/Zalmoxis/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    🔗 Zalmoxis
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://proteus-framework.org/aragog/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    🔗 Aragog
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#rotation-and-activity-quantities-how-to" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Rotation and activity quantities (How-to)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Rotation and activity quantities (How-to)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#goal" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Goal
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#prerequisites" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prerequisites
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-1-get-the-full-xuv-dictionary-lxuv" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 1: Get the full XUV dictionary (Lxuv)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-2-retrieve-a-single-quantity-directly-lx-leuv-lly" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 2: Retrieve a single quantity directly (Lx, Leuv, Lly)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Step 2: Retrieve a single quantity directly (Lx, Leuv, Lly)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#choose-an-euv-sub-band-with-band" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Choose an EUV sub-band with band
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-3-add-variabilityscatter-optional" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 3: Add variability/scatter (optional)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Step 3: Add variability/scatter (optional)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#x-ray-scatter-xrayscatter" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        X-ray scatter (XrayScatter)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#full-xuv-scatter-xuvscatter" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Full XUV scatter (XUVScatter)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-4-get-detailed-diagnostics-extendedquantities" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 4: Get detailed diagnostics (ExtendedQuantities)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#common-pitfalls" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Common pitfalls
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+  <h1>Find stellar rotation and activity quantities</h1>
+
+<h2 id="rotation-and-activity-quantities-how-to">Rotation and activity quantities (How-to)</h2>
+<h3 id="goal">Goal</h3>
+<p>Compute high-energy emission quantities (X-ray, EUV, Ly-α) from stellar <strong>mass</strong>, <strong>age</strong>, and <strong>rotation</strong>, optionally add variability/scatter, and (if needed) retrieve a larger set of model diagnostics via <code>ExtendedQuantities</code>.</p>
+<h3 id="prerequisites">Prerequisites</h3>
+<p>Install MORS and download the required stellar evolution data:</p>
+<div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>fwl-mors
+mors<span class="w"> </span>download<span class="w"> </span>all
+</code></pre></div>
+<blockquote>
+<p><strong>Units:</strong> <code>Mstar</code> in <strong>M☉</strong>, <code>Age</code> in <strong>Myr</strong>, <code>Prot</code> in <strong>days</strong>, <code>Omega</code> in <strong>Ω☉</strong>. Luminosities are in <strong>erg s⁻¹</strong> and surface fluxes in <strong>erg s⁻¹ cm⁻²</strong>.</p>
+</blockquote>
+<hr />
+<h3 id="step-1-get-the-full-xuv-dictionary-lxuv">Step 1: Get the full XUV dictionary (<code>Lxuv</code>)</h3>
+<p>Use <code>Omega</code> (or <code>OmegaEnv</code>) <strong>or</strong> <code>Prot</code> to specify the surface rotation.</p>
+<p><strong>Using Ω (Ω☉):</strong>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">mors</span>
+<span class="n">xuv</span> <span class="o">=</span> <span class="n">mors</span><span class="o">.</span><span class="n">Lxuv</span><span class="p">(</span><span class="n">Mstar</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">Age</span><span class="o">=</span><span class="mf">5000.0</span><span class="p">,</span> <span class="n">Omega</span><span class="o">=</span><span class="mf">10.0</span><span class="p">)</span>
+</code></pre></div></p>
+<p><strong>Using rotation period (days):</strong>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">mors</span>
+<span class="n">xuv</span> <span class="o">=</span> <span class="n">mors</span><span class="o">.</span><span class="n">Lxuv</span><span class="p">(</span><span class="n">Mstar</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">Age</span><span class="o">=</span><span class="mf">5000.0</span><span class="p">,</span> <span class="n">Prot</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
+</code></pre></div></p>
+<p>The returned dictionary includes luminosities, surface fluxes, and bolometric-normalized values, e.g.:
+- Luminosities: <code>Lxuv</code>, <code>Lx</code>, <code>Leuv1</code>, <code>Leuv2</code>, <code>Leuv</code>, <code>Lly</code>  (erg s⁻¹)
+- Fluxes: <code>Fxuv</code>, <code>Fx</code>, <code>Feuv1</code>, ... (erg s⁻¹ cm⁻²)
+- Normalized: <code>Rxuv</code>, <code>Rx</code>, <code>Reuv1</code>, ... (dimensionless)</p>
+<p>To see what keys are present:
+<div class="highlight"><pre><span></span><code><span class="nb">print</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">xuv</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+</code></pre></div></p>
+<hr />
+<h3 id="step-2-retrieve-a-single-quantity-directly-lx-leuv-lly">Step 2: Retrieve a single quantity directly (<code>Lx</code>, <code>Leuv</code>, <code>Lly</code>)</h3>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">mors</span>
+
+<span class="n">Lx</span>  <span class="o">=</span> <span class="n">mors</span><span class="o">.</span><span class="n">Lx</span><span class="p">(</span><span class="n">Mstar</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">Age</span><span class="o">=</span><span class="mf">5000.0</span><span class="p">,</span> <span class="n">Omega</span><span class="o">=</span><span class="mf">10.0</span><span class="p">)</span>
+<span class="n">Leu</span> <span class="o">=</span> <span class="n">mors</span><span class="o">.</span><span class="n">Leuv</span><span class="p">(</span><span class="n">Mstar</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">Age</span><span class="o">=</span><span class="mf">5000.0</span><span class="p">,</span> <span class="n">Omega</span><span class="o">=</span><span class="mf">10.0</span><span class="p">)</span>
+<span class="n">Lly</span> <span class="o">=</span> <span class="n">mors</span><span class="o">.</span><span class="n">Lly</span><span class="p">(</span><span class="n">Mstar</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">Age</span><span class="o">=</span><span class="mf">5000.0</span><span class="p">,</span> <span class="n">Omega</span><span class="o">=</span><span class="mf">10.0</span><span class="p">)</span>
+</code></pre></div>
+<h4 id="choose-an-euv-sub-band-with-band">Choose an EUV sub-band with <code>band</code></h4>
+<p><code>Leuv(..., band=...)</code> supports:
+- <code>band=0</code> → 10–92 nm (total EUV)
+- <code>band=1</code> → 10–36 nm (EUV1)
+- <code>band=2</code> → 36–92 nm (EUV2)</p>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">mors</span>
+<span class="n">Leuv_total</span> <span class="o">=</span> <span class="n">mors</span><span class="o">.</span><span class="n">Leuv</span><span class="p">(</span><span class="n">Mstar</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">Age</span><span class="o">=</span><span class="mf">5000.0</span><span class="p">,</span> <span class="n">Omega</span><span class="o">=</span><span class="mf">10.0</span><span class="p">,</span> <span class="n">band</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">Leuv1</span>      <span class="o">=</span> <span class="n">mors</span><span class="o">.</span><span class="n">Leuv</span><span class="p">(</span><span class="n">Mstar</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">Age</span><span class="o">=</span><span class="mf">5000.0</span><span class="p">,</span> <span class="n">Omega</span><span class="o">=</span><span class="mf">10.0</span><span class="p">,</span> <span class="n">band</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">Leuv2</span>      <span class="o">=</span> <span class="n">mors</span><span class="o">.</span><span class="n">Leuv</span><span class="p">(</span><span class="n">Mstar</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">Age</span><span class="o">=</span><span class="mf">5000.0</span><span class="p">,</span> <span class="n">Omega</span><span class="o">=</span><span class="mf">10.0</span><span class="p">,</span> <span class="n">band</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+</code></pre></div>
+<hr />
+<h3 id="step-3-add-variabilityscatter-optional">Step 3: Add variability/scatter (optional)</h3>
+<p>MORS provides random scatter terms intended to represent variability as a log-normal scatter.</p>
+<h4 id="x-ray-scatter-xrayscatter">X-ray scatter (<code>XrayScatter</code>)</h4>
+<p>You pass the mean value (e.g., <code>Lx</code>) and get a delta to add:
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">mors</span>
+
+<span class="n">Lx</span> <span class="o">=</span> <span class="n">mors</span><span class="o">.</span><span class="n">Lx</span><span class="p">(</span><span class="n">Mstar</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">Age</span><span class="o">=</span><span class="mf">5000.0</span><span class="p">,</span> <span class="n">Omega</span><span class="o">=</span><span class="mf">10.0</span><span class="p">)</span>
+<span class="n">dLx</span> <span class="o">=</span> <span class="n">mors</span><span class="o">.</span><span class="n">XrayScatter</span><span class="p">(</span><span class="n">Lx</span><span class="p">)</span>
+
+<span class="n">Lx_scattered</span> <span class="o">=</span> <span class="n">Lx</span> <span class="o">+</span> <span class="n">dLx</span>
+</code></pre></div></p>
+<p>You can also pass <code>Fx</code> or <code>Rx</code> and receive <code>dFx</code> / <code>dRx</code>.</p>
+<h4 id="full-xuv-scatter-xuvscatter">Full XUV scatter (<code>XUVScatter</code>)</h4>
+<p><code>XUVScatter</code> takes the dictionary from <code>Lxuv</code> and returns a dictionary of deltas with the same keys:
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">mors</span>
+
+<span class="n">xuv</span>  <span class="o">=</span> <span class="n">mors</span><span class="o">.</span><span class="n">Lxuv</span><span class="p">(</span><span class="n">Mstar</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">Age</span><span class="o">=</span><span class="mf">5000.0</span><span class="p">,</span> <span class="n">Omega</span><span class="o">=</span><span class="mf">10.0</span><span class="p">)</span>
+<span class="n">dxuv</span> <span class="o">=</span> <span class="n">mors</span><span class="o">.</span><span class="n">XUVScatter</span><span class="p">(</span><span class="n">xuv</span><span class="p">)</span>
+
+<span class="c1"># Example: apply deltas to get one scattered realization</span>
+<span class="n">xuv_scattered</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">xuv</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">+</span> <span class="n">dxuv</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">xuv</span><span class="p">}</span>
+</code></pre></div></p>
+<p><strong>Controlling the scatter width:</strong> the X-ray scatter width is controlled by <code>sigmaXray</code> in the parameters file. You can override it by passing a custom <code>params</code> dictionary (see the parameter how-to):</p>
+<p><div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">mors</span>
+
+<span class="n">params</span> <span class="o">=</span> <span class="n">mors</span><span class="o">.</span><span class="n">NewParams</span><span class="p">(</span><span class="n">sigmaXray</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>  <span class="c1"># example value</span>
+<span class="n">Lx</span> <span class="o">=</span> <span class="n">mors</span><span class="o">.</span><span class="n">Lx</span><span class="p">(</span><span class="n">Mstar</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">Age</span><span class="o">=</span><span class="mf">5000.0</span><span class="p">,</span> <span class="n">Omega</span><span class="o">=</span><span class="mf">10.0</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">)</span>
+<span class="n">dLx</span> <span class="o">=</span> <span class="n">mors</span><span class="o">.</span><span class="n">XrayScatter</span><span class="p">(</span><span class="n">Lx</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">)</span> <span class="k">if</span> <span class="s2">&quot;params&quot;</span> <span class="ow">in</span> <span class="n">mors</span><span class="o">.</span><span class="n">XrayScatter</span><span class="o">.</span><span class="vm">__code__</span><span class="o">.</span><span class="n">co_varnames</span> <span class="k">else</span> <span class="n">mors</span><span class="o">.</span><span class="n">XrayScatter</span><span class="p">(</span><span class="n">Lx</span><span class="p">)</span>
+</code></pre></div>
+<em>(If <code>XrayScatter</code> does not accept <code>params</code> directly, set <code>sigmaXray</code> via your model run parameters and use it consistently.)</em></p>
+<hr />
+<h3 id="step-4-get-detailed-diagnostics-extendedquantities">Step 4: Get detailed diagnostics (<code>ExtendedQuantities</code>)</h3>
+<p>If you need additional model internals (stellar properties, wind quantities, magnetic fields, torques), call <code>ExtendedQuantities</code> with envelope and core rotation rates:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">mors</span>
+
+<span class="n">q</span> <span class="o">=</span> <span class="n">mors</span><span class="o">.</span><span class="n">ExtendedQuantities</span><span class="p">(</span><span class="n">Mstar</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">Age</span><span class="o">=</span><span class="mf">5000.0</span><span class="p">,</span> <span class="n">OmegaEnv</span><span class="o">=</span><span class="mf">10.0</span><span class="p">,</span> <span class="n">OmegaCore</span><span class="o">=</span><span class="mf">10.0</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">q</span><span class="p">))</span>
+</code></pre></div>
+<hr />
+<h3 id="common-pitfalls">Common pitfalls</h3>
+<ul>
+<li>Don’t mix <code>Omega</code> (Ω☉) and <code>Prot</code> (days) in the same call; pick one rotation representation.</li>
+<li>Scatter functions are random; results differ each run unless you control the random seed in your workflow.</li>
+<li><code>ExtendedQuantities</code> requires <strong>both</strong> <code>OmegaEnv</code> and <code>OmegaCore</code>.</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": [], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+    
+  </body>
+</html>
