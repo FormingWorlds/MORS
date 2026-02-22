@@ -1,4 +1,4 @@
-# Model distribution and percentiles (How-to)
+# Using model percentiles for initial rotation
 
 ### Goal
 Pick an initial rotation rate from the built-in **model rotation distribution** (Johnstone et al. 2020), inspect a star’s inferred percentile, and convert between **rotation rate and percentile** for a given stellar mass.
@@ -11,7 +11,8 @@ pip install fwl-mors
 mors download all
 ```
 
-> **Units:** `Omega` is in units of the current solar rotation rate (**Ω☉**). `Prot` is in **days**. `Mstar` is in **M☉**.
+!!! Units
+    `Omega` is in units of the current solar rotation rate (**Ω☉**). `Prot` is in **days**. `Mstar` is in **M☉**.
 
 ---
 

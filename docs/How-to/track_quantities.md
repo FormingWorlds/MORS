@@ -1,4 +1,4 @@
-## Find stellar quantities using evolution tracks (How-to)
+# Find stellar quantities using evolution tracks
 
 ### Goal
 Find basic stellar evolution properties (radius, luminosity, convective turnover time, moments of inertia, etc.) as a function of **stellar mass** and **age**, using the Spada et al. (2013) tracks bundled with MORS. Optionally, stellar evolution quantities according to the Baraffe model (Baraffe et al., 2002) can be found.
@@ -11,7 +11,8 @@ pip install fwl-mors
 mors download all
 ```
 
-> **Units:** `Mstar` in **M☉**, `Age` in **Myr**. Output units depend on the quantity (listed below).
+!!! Units
+    `Mstar` in **M☉**, `Age` in **Myr**. Output units depend on the quantity (listed below).
 
 ## Spada tracks
 
@@ -130,7 +131,8 @@ If it’s already loaded, this call does nothing.
 
 MORS also provides access to Baraffe et al. (2002) tracks, which use **different units** than the Spada helpers above.
 
-> **Baraffe units:** `Mstar` in **M☉** (valid range: ~0.01–1.4), `time` in **years (yr)**.
+!!! Units
+    `Mstar` in **M☉** (valid range: ~0.01–1.4), `time` in **years (yr)**.
 
 ### Step 1. Load a Baraffe track (with interpolation)
 ```python

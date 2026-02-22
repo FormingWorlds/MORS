@@ -1,4 +1,4 @@
-## Cluster evolution calculation (How-to)
+# Calculate cluster evolution
 
 ### Goal
 Compute rotation/activity evolution tracks for a **cluster of stars**, then (a) inspect per-star tracks, (b) evaluate cluster distributions at a given age, and (c) save/reload the cluster to avoid recomputation.
@@ -11,11 +11,12 @@ pip install fwl-mors
 mors download all
 ```
 
-> **Units:** `Mstar` in **M☉**, `Age` in **Myr**, `Prot` in **days**, `Omega` in **Ω☉**.
+!!! Units
+    `Mstar` in **M☉**, `Age` in **Myr**, `Prot` in **days**, `Omega` in **Ω☉**.
 
 ---
 
-### Step 1 — Create a cluster from arrays
+### Step 1: Create a cluster from arrays
 
 Create arrays/lists of masses and rotation rates (same length). If `Age` is omitted, MORS interprets `Omega` as the **initial (~1 Myr)** rotation rate.
 
@@ -37,7 +38,7 @@ cluster = mors.Cluster(Mstar=Mstar, Omega=Omega, verbose=True)
 
 ---
 
-### Step 2 — Fit tracks through a specified age (optional)
+### Step 2: Fit tracks through a specified age (optional)
 
 If you provide `Age`, MORS fits tracks so that each star passes through the given rotation rate at that age.
 
@@ -66,7 +67,7 @@ cluster = mors.Cluster(Mstar=Mstar, Omega=Omega, Age=Age)
 
 ---
 
-### Step 3 — Access per-star tracks
+### Step 3: Access per-star tracks
 
 Each star is a `mors.Star` instance stored in `cluster.stars`.
 
@@ -87,7 +88,7 @@ plt.plot(cluster.stars0.AgeTrack, cluster.stars0.LxTrack)
 
 ---
 
-### Step 4 — Get cluster values at a fixed age
+### Step 4: Get cluster values at a fixed age
 
 Use `Values(Age=..., Quantity=...)` to retrieve an array across the cluster:
 
@@ -113,7 +114,7 @@ plt.show()
 
 ---
 
-### Step 5 — Save and reload (recommended for large clusters)
+### Step 5: Save and reload (recommended for large clusters)
 
 Cluster calculations can be expensive for many stars, so saving is recommended.
 
@@ -124,7 +125,7 @@ cluster2 = mors.Load("cluster.pickle")
 
 ---
 
-### Step 6 — Evolve the built-in “model cluster” (optional)
+### Step 6: Evolve the built-in “model cluster” (optional)
 
 MORS includes a composite “model cluster” distribution (derived from observed clusters at ~150 Myr evolved back to 1 Myr). You can load it and evolve it like any other cluster:
 
@@ -135,7 +136,8 @@ Mstar, Omega = mors.ModelCluster()
 cluster = mors.Cluster(Mstar=Mstar, Omega=Omega)
 ```
 
-**Citation note:** If you use this model cluster distribution in research, cite the rotation-measurement sources listed in **Johnstone et al. (2020), Table 1** (150 Myr bin), in addition to the MORS model paper(s).
+!!! Citation
+    If you use this model cluster distribution in research, cite the rotation-measurement sources listed in [Johnstone et al. (2021), Table 1](https://www.aanda.org/articles/aa/pdf/2021/05/aa38407-20.pdf#page=4) (150 Myr bin), in addition to the MORS model paper(s).
 
 ---
 

@@ -1,4 +1,4 @@
-## Rotation and activity quantities (How-to)
+# Find stellar rotation and activity quantities
 
 ### Goal
 Compute high-energy emission quantities (X-ray, EUV, Ly-α) from stellar **mass**, **age**, and **rotation**, optionally add variability/scatter, and (if needed) retrieve a larger set of model diagnostics via `ExtendedQuantities`.
@@ -11,7 +11,8 @@ pip install fwl-mors
 mors download all
 ```
 
-> **Units:** `Mstar` in **M☉**, `Age` in **Myr**, `Prot` in **days**, `Omega` in **Ω☉**. Luminosities are in **erg s⁻¹** and surface fluxes in **erg s⁻¹ cm⁻²**.
+!!! Units
+    `Mstar` in **M☉**, `Age` in **Myr**, `Prot` in **days**, `Omega` in **Ω☉**. Luminosities are in **erg s⁻¹** and surface fluxes in **erg s⁻¹ cm⁻²**.
 
 ---
 

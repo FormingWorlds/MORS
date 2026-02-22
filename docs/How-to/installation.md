@@ -1,5 +1,8 @@
 # Installation 
 
+!!! note
+    The standard way of installing this version of MORS is within the PROTEUS Framework, as described in the [PROTEUS installation guide](https://proteus-framework.org/PROTEUS/installation.html#9-install-submodules-as-editable). 
+
 ### Prerequisites
 - **Python:** >3.11 installed
 - **pip:** available (`python -m pip --version`)
@@ -60,7 +63,7 @@ export FWL_DATA=...
 Where ... should be replaced with the path to your main data directory. To make this permanent on Ubuntu, use
 
 ```console
-gedit ~/.profile
+nano ~/.bashrc
 ```
 
 and add the export command to the bottom of the file.

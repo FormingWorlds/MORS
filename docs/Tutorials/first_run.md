@@ -10,11 +10,12 @@ By the end of this tutorial you will:
 5. Find stellar values at specific ages
 6. Save and reload the result
 
-> **Time/units cheat sheet:** `Mstar` in **M☉**, `Age` in **Myr**, `Prot` in **days**, `Omega` in **Ω☉**.
+!!! Units
+    `Mstar` in **M☉**, `Age` in **Myr**, `Prot` in **days**, `Omega` in **Ω☉**.
 
 ---
 
-## 0) Prerequisites
+## 0. Prerequisites
 You need:
 
 - Python 3 environment with `pip`
@@ -34,7 +35,7 @@ source .venv/bin/activate
 
 ---
 
-## 1) Install MORS
+## 1. Install MORS
 ```bash
 pip install fwl-mors
 ```
@@ -46,7 +47,7 @@ python -c "import mors; print('mors imported:', mors.__version__ if hasattr(mors
 
 ---
 
-## 2) Download stellar evolution data
+## 2. Download stellar evolution data
 MORS requires stellar evolution tracks (downloaded once):
 ```bash
 mors download all
@@ -64,7 +65,7 @@ export FWL_DATA=/path/to/your/data
 
 ---
 
-## 3) Create your first star
+## 3. Create your first star
 Create a 1 M☉ star with an initial rotation period of 2.7 days (at ~1 Myr):
 ```python
 import mors
@@ -78,7 +79,7 @@ star = mors.Star(Mstar=1.0, Omega=10.0)
 
 ---
 
-## 4) Inspect what tracks exist
+## 4. Inspect what tracks exist
 Print track names and units:
 ```python
 star.PrintAvailableTracks()
@@ -98,7 +99,7 @@ lx  = star.LxTrack
 
 ---
 
-## 5) Plot a track
+## 5. Plot a track
 ```python
 import matplotlib.pyplot as plt
 
@@ -112,7 +113,7 @@ If you see a plot and no errors, your installation + data are working.
 
 ---
 
-## 6) Find stellar values at specific ages
+## 6. Find stellar values at specific ages
 Use the generic accessor:
 ```python
 print(star.Value(Age=150.0, Quantity="Lx"))
@@ -125,7 +126,7 @@ print(star.Lx(150.0))
 
 ---
 
-## 7) (Optional) Try percentiles: slow/medium/fast rotators
+## 7. (Optional) Try percentiles: slow/medium/fast rotators
 This uses the built-in model distribution:
 ```python
 slow   = mors.Star(Mstar=1.0, percentile="slow")    # 5th percentile
@@ -138,7 +139,7 @@ print("fast percentile:", fast.percentile)
 
 ---
 
-## 8) Save and reload (recommended)
+## 8. Save and reload (recommended)
 Save:
 ```python
 star.Save(filename="star.pickle")

@@ -1,4 +1,4 @@
-## Activity timelines (How-to)
+# Find stellar activity timelines
 
 ### Goal
 Compute how long a star (or a cluster of stars) stays above an activity threshold (e.g., X-ray luminosity) or how long it remains in the saturated regime.
@@ -11,7 +11,8 @@ pip install fwl-mors
 mors download all
 ```
 
-> **Units:** thresholds must match the quantity you use (e.g., `Lx` in **erg s⁻¹**). Ages returned are in **Myr**.
+!!! Units
+    Thresholds must match the quantity you use (e.g., `Lx` in **erg s⁻¹**). Ages returned are in **Myr**.
 
 ---
 
