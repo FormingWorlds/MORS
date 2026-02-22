@@ -131,7 +131,7 @@ If it’s already loaded, this call does nothing.
 
 MORS also provides access to Baraffe et al. (2002) tracks, which use **different units** than the Spada helpers above.
 
-!!! Baraffe units
+!!! Units
     `Mstar` in **M☉** (valid range: ~0.01–1.4), `time` in **years (yr)**.
 
 ### Step 1. Load a Baraffe track (with interpolation)
