@@ -1,4 +1,4 @@
-[![Tests](https://github.com/FormingWorlds/MORS/actions/workflows/tests.yaml/badge.svg)](https://github.com/FormingWorlds/MORS/actions/workflows/tests.yaml)
+[![Tests](https://github.com/FormingWorlds/MORS/actions/workflows/tests.yaml/badge.svg?branch=main)](https://github.com/FormingWorlds/MORS/actions/workflows/tests.yaml?query=branch%3Amain)
 ![Coverage](https://gist.githubusercontent.com/lsoucasse/a25c37a328839edd00bb32d8527aec30/raw/covbadge.svg)
 
 
