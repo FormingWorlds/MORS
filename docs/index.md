@@ -1,4 +1,6 @@
+[![Tests](https://github.com/FormingWorlds/MORS/actions/workflows/tests.yaml/badge.svg)](https://github.com/FormingWorlds/MORS/actions/workflows/tests.yaml)
 ![Coverage](https://gist.githubusercontent.com/lsoucasse/a25c37a328839edd00bb32d8527aec30/raw/covbadge.svg)
+
 
 # MODEL FOR ROTATION OF STARS (MORS)
 
