@@ -63,7 +63,7 @@ export FWL_DATA=...
 Where ... should be replaced with the path to your main data directory. To make this permanent on Ubuntu, use
 
 ```console
-gedit ~/.profile
+nano ~/.bashrc
 ```
 
 and add the export command to the bottom of the file.
