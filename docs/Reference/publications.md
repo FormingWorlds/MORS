@@ -1,6 +1,6 @@
 # Publications and bibliography
 
-## MORS publication
+## MORS publications
 
 - Johnstone, C. P., Bartel, M., & Güdel, M. (2021). The active lives of stars: A complete description of the rotation and XUV evolution of F, G, K, and M dwarfs. *Astronomy & Astrophysics*, 649, A96. [https://doi.org/10.1051/0004-6361/202038407](https://doi.org/10.1051/0004-6361/202038407)
 
