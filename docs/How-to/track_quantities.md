@@ -1,4 +1,4 @@
-## Find stellar quantities using evolution tracks (How-to)
+# Find stellar quantities using evolution tracks
 
 ### Goal
 Find basic stellar evolution properties (radius, luminosity, convective turnover time, moments of inertia, etc.) as a function of **stellar mass** and **age**, using the Spada et al. (2013) tracks bundled with MORS. Optionally, stellar evolution quantities according to the Baraffe model (Baraffe et al., 2002) can be found.

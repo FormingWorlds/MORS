@@ -1,4 +1,4 @@
-## Setting custom simulation parameters (How-to)
+# Setting custom simulation parameters
 
 ### Goal
 Create simulation parameters for a `Star` (or `Cluster`) run, and optionally restrict the ages saved in output tracks using `AgesOut`.  This overrides MORS default simulation parameters. 

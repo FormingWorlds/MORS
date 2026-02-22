@@ -1,4 +1,4 @@
-## Evolutionary calculations (How-to)
+# Calculate a star's evolution
 
 ### Goal
 Compute a star’s rotation and activity evolution tracks, then (a) plot a quantity, (b) query values at specific ages, and (c) save the result for reuse.

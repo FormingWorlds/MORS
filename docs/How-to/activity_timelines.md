@@ -1,4 +1,4 @@
-## Activity timelines (How-to)
+# Find stellar activity timelines
 
 ### Goal
 Compute how long a star (or a cluster of stars) stays above an activity threshold (e.g., X-ray luminosity) or how long it remains in the saturated regime.

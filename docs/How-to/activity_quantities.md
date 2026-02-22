@@ -1,4 +1,4 @@
-## Rotation and activity quantities (How-to)
+# Find stellar rotation and activity quantities
 
 ### Goal
 Compute high-energy emission quantities (X-ray, EUV, Ly-α) from stellar **mass**, **age**, and **rotation**, optionally add variability/scatter, and (if needed) retrieve a larger set of model diagnostics via `ExtendedQuantities`.

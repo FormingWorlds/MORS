@@ -1,4 +1,4 @@
-## Cluster evolution calculation (How-to)
+# Calculate cluster evolution
 
 ### Goal
 Compute rotation/activity evolution tracks for a **cluster of stars**, then (a) inspect per-star tracks, (b) evaluate cluster distributions at a given age, and (c) save/reload the cluster to avoid recomputation.

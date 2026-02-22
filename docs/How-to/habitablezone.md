@@ -1,4 +1,4 @@
-## 8. Find habitable zone boundaries (How-to)
+# Find habitable zone boundaries
 
 ### Goal
 Compute habitable zone (HZ) boundary orbital distances (AU) as a function of stellar **mass** and **age** using `mors.aOrbHZ`.
