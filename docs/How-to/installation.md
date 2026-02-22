@@ -1,5 +1,8 @@
 # Installation 
 
+!!! note
+    The standard way of installing this version of MORS is within the PROTEUS Framework, as described in the [PROTEUS installation guide](https://proteus-framework.org/PROTEUS/installation.html#9-install-submodules-as-editable). 
+
 ### Prerequisites
 - **Python:** >3.11 installed
 - **pip:** available (`python -m pip --version`)
