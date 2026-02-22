@@ -11,7 +11,8 @@ pip install fwl-mors
 mors download all
 ```
 
-> **Units:** `Age` is in **Myr**, `Prot` is in **days**, and `Omega` is in units of the **current solar rotation rate (Ω☉)**.
+!!! Units
+    `Age` is in **Myr**, `Prot` is in **days**, and `Omega` is in units of the **current solar rotation rate (Ω☉)**.
 
 ---
 

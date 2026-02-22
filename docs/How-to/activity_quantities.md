@@ -11,7 +11,8 @@ pip install fwl-mors
 mors download all
 ```
 
-> **Units:** `Mstar` in **M☉**, `Age` in **Myr**, `Prot` in **days**, `Omega` in **Ω☉**. Luminosities are in **erg s⁻¹** and surface fluxes in **erg s⁻¹ cm⁻²**.
+!!! Units
+    `Mstar` in **M☉**, `Age` in **Myr**, `Prot` in **days**, `Omega` in **Ω☉**. Luminosities are in **erg s⁻¹** and surface fluxes in **erg s⁻¹ cm⁻²**.
 
 ---
 

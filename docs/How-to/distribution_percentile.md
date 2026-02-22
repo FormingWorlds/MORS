@@ -11,7 +11,8 @@ pip install fwl-mors
 mors download all
 ```
 
-> **Units:** `Omega` is in units of the current solar rotation rate (**Ω☉**). `Prot` is in **days**. `Mstar` is in **M☉**.
+!!! Units
+    `Omega` is in units of the current solar rotation rate (**Ω☉**). `Prot` is in **days**. `Mstar` is in **M☉**.
 
 ---
 

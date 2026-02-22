@@ -11,7 +11,8 @@ pip install fwl-mors
 mors download all
 ```
 
-> **Units:** `Mstar` in **M☉**, `Age` in **Myr**. Output units depend on the quantity (listed below).
+!!! Units
+    `Mstar` in **M☉**, `Age` in **Myr**. Output units depend on the quantity (listed below).
 
 ## Spada tracks
 
@@ -130,7 +131,8 @@ If it’s already loaded, this call does nothing.
 
 MORS also provides access to Baraffe et al. (2002) tracks, which use **different units** than the Spada helpers above.
 
-> **Baraffe units:** `Mstar` in **M☉** (valid range: ~0.01–1.4), `time` in **years (yr)**.
+!!! Baraffe units
+    `Mstar` in **M☉** (valid range: ~0.01–1.4), `time` in **years (yr)**.
 
 ### Step 1. Load a Baraffe track (with interpolation)
 ```python

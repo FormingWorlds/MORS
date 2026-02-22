@@ -11,7 +11,8 @@ pip install fwl-mors
 mors download all
 ```
 
-> **Units:** `Mstar` in **M☉**, `Age` in **Myr**, returned distances in **AU**.
+!!! Units
+    **Units:** `Mstar` in **M☉**, `Age` in **Myr**, returned distances in **AU**.
 
 **Citation note:** If you use these HZ boundaries in research, cite **Kopparapu et al. (2013)** (HZ prescription) and **Spada et al. (2013)** (stellar parameters used).
 
