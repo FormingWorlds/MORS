@@ -14,7 +14,8 @@ mors download all
 !!! Units
     **Units:** `Mstar` in **M☉**, `Age` in **Myr**, returned distances in **AU**.
 
-**Citation note:** If you use these HZ boundaries in research, cite **Kopparapu et al. (2013)** (HZ prescription) and **Spada et al. (2013)** (stellar parameters used).
+!!! Citation
+    If you use these HZ boundaries in research, cite [Kopparapu et al. (2013)](../Reference/publications.md#bibliography) (HZ prescription) and [Spada et al. (2013)](../Reference/publications.md#bibliography)(stellar parameters used).
 
 ---
 

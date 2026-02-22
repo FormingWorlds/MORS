@@ -136,7 +136,8 @@ Mstar, Omega = mors.ModelCluster()
 cluster = mors.Cluster(Mstar=Mstar, Omega=Omega)
 ```
 
-**Citation note:** If you use this model cluster distribution in research, cite the rotation-measurement sources listed in **Johnstone et al. (2020), Table 1** (150 Myr bin), in addition to the MORS model paper(s).
+!!! Citation
+    If you use this model cluster distribution in research, cite the rotation-measurement sources listed in **Johnstone et al. (2021), Table 1** (150 Myr bin), in addition to the MORS model paper(s).
 
 ---
 
