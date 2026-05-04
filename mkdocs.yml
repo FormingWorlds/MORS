@@ -52,6 +52,23 @@ nav:
       - 🔗 PLATON: https://platon.readthedocs.io/en/latest/
       - SOCRATES: https://github.com/FormingWorlds/SOCRATES/
 
+# footer:
+extra:
+  generator: false
+  social:
+    - icon: material/web
+      link: https://proteus-framework.org/
+      name: PROTEUS website
+    - icon: material/email
+      link: mailto:proteus_dev@formingworlds.space
+      name: Mail PROTEUS developers
+    - icon: fontawesome/brands/python
+      link: https://pypi.org/project/fwl-mors/
+      name: MORS on PyPI
+    - icon: fontawesome/brands/github
+      link: https://github.com/FormingWorlds/MORS
+      name: MORS on GitHub
+
 theme:
   name: material
   custom_dir: docs/overrides
