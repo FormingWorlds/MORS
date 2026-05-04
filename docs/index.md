@@ -4,7 +4,7 @@
 
 # MODEL FOR ROTATION OF STARS (MORS)
 
-**MORS** is a program designed to model stellar rotation and evolution. The package can be used to calculate evolutionary tracks for stellar rotaton and X-ray, EUV, and Ly-alpha emission for stars with masses between 0.1 and 1.25 Msun. 
+**MORS** is a program designed to model stellar rotation and evolution. The package can be used to calculate evolutionary tracks for stellar rotation and X-ray, EUV, and Ly-alpha emission for stars with masses between 0.1 and 1.25 Msun. 
 
 !!! info "PROTEUS framework"
     MORS is the stellar rotation and XUV evolution model integrated into the PROTEUS framework,  a modular Python framework that simulates the coupled evolution of the atmospheres and interiors of rocky planets and exoplanets. The documentation for PROTEUS can be found [here](https://proteus-framework.org/PROTEUS). 
