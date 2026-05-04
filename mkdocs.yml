@@ -3,8 +3,12 @@ site_url: https://proteus-framework.org/MORS/
 repo_url: https://github.com/FormingWorlds/MORS
 repo_name: GitHub
 
+copyright: '© 2023-2026 <a href="https://formingworlds.space">Forming Worlds Lab</a>'
+
 nav:
-  - Home: index.md
+  - Home:
+      - About: index.md
+      - Getting started: getting_started.md
 
   - How-to guides:
       - Installation: How-to/installation.md
@@ -24,15 +28,15 @@ nav:
       - Publications and bibliography: Reference/publications.md
     
   - Community:
-      - Contributing: CONTRIBUTING.md
-      - Code of Conduct: CODE_OF_CONDUCT.md
+      - Contact: Community/contact.md
+      - Contributing: Community/CONTRIBUTING.md
+      - Code of Conduct: Community/CODE_OF_CONDUCT.md
       - Developers: https://proteus-framework.org/people
-      - Contact: contact.md
 
   - Source code: https://github.com/FormingWorlds/MORS
-  - Issues page: https://github.com/FormingWorlds/MORS/issues
 
   - Other PROTEUS modules:
+      - PROTEUS framework: proteus_framework.md
       - 🔗 PROTEUS:  https://proteus-framework.org/PROTEUS/
       - 🔗 JANUS: https://proteus-framework.org/JANUS/
       - 🔗 ZEPHYRUS: https://proteus-framework.org/ZEPHYRUS/
@@ -46,13 +50,17 @@ nav:
       - 🔗 Atmodeller: https://atmodeller.readthedocs.io/en/latest/
       - 🔗 FastChem: https://newstrangeworlds.github.io/FastChem/
       - 🔗 PLATON: https://platon.readthedocs.io/en/latest/
+      - SOCRATES: https://github.com/FormingWorlds/SOCRATES/
 
 theme:
   name: material
   custom_dir: docs/overrides
   features:
-  - content.code.copy
-  - navigation.expand
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.expand
+    - content.code.copy
+    - content.tabs.link
 
   # Default assets (used unless overridden per palette below)
   favicon: assets/PROTEUS_black_on_white_logo_only.png
@@ -81,7 +89,7 @@ theme:
         name: Switch to light mode
 
 extra_css:
-  - stylesheets/extra.css
+  - stylesheets/proteus_theme.css
  
 markdown_extensions:
   - admonition
@@ -91,7 +99,13 @@ markdown_extensions:
   - pymdownx.extra
   - pymdownx.arithmatex:
       generic: true
+  - pymdownx.tabbed:
+      alternate_style: true
   - footnotes
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+
 
 extra_javascript:
   - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
@@ -133,5 +147,5 @@ watch:
   - src/
   - docs/
   - README.md
-  - CONTRIBUTING.md
-  - CODE_OF_CONDUCT.md
+  - Community/CONTRIBUTING.md
+  - Community/CODE_OF_CONDUCT.md
