@@ -1,4 +1,4 @@
-# Rotational Evolution Model
+# Rotational evolution model
 
 ## 1. Two-zone structure
 

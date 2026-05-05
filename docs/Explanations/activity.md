@@ -1,4 +1,4 @@
-# High-energy Emission
+# High-energy emission
 
 All high-energy emission is computed from the instantaneous rotation state in `physicalmodel.ExtendedQuantities`. Throughout this section, surface fluxes are evaluated at the stellar surface (in erg s$^{-1}$ cm$^{-2}$) and luminosities are in erg s$^{-1}$.
 
