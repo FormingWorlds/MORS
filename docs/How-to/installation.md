@@ -75,7 +75,7 @@ MORS requires a set of pre-computed stellar evolution tracks. After installation
 mors download all
 ```
 
-This fetches both the **Spada** and **Baraffe** track sets from the [OSF repository](https://osf.io/9u3fb/), with an automatic fallback to Zenodo if OSF is unavailable. If you only need one set, you can download them individually:
+This fetches both the [Spada](https://zenodo.org/records/15729101) and [Baraffe](https://zenodo.org/records/15729114) track sets from two Zenodo records, with an automatic fallback to [OSF]((https://osf.io/9u3fb/)) if Zenodo is unavailable. If you only need one set, you can download them individually:
 
 ```sh
 mors download spada
@@ -130,4 +130,4 @@ star = mors.Star(Mstar=1.0, Omega=1.0)
 print(f"Lx at 4.5 Gyr: {star.Lx(Age=4500.0):.3e} erg/s")
 ```
 
-You should see an X-ray luminosity value printed without errors. If you run into any issues, check the [troubleshooting](How-to/troubleshooting.md) page or open an issue on [GitHub](https://github.com/FormingWorlds/MORS/issues).
+You should see an X-ray luminosity value printed without errors. If you run into any issues, check the [troubleshooting](../How-to/troubleshooting.md) page or open an issue on [GitHub](https://github.com/FormingWorlds/MORS/issues).
