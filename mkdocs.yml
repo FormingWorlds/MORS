@@ -20,12 +20,22 @@ nav:
       - Find stellar quantities with stellar evolution tracks: How-to/track_quantities.md
       - Find habitable zone boundaries: How-to/habitablezone.md
       - Find stellar activity timelines: How-to/activity_timelines.md
+      - Troubleshooting: How-to/troubleshooting.md
 
   - Tutorials:
       - First run: Tutorials/first_run.md
 
+  - Explanations:
+      - Model overview: 
+        - Introduction:  Explanations/structure.md
+        - Rotational evolution model:   Explanations/rotation.md
+        - High-energy emission and activity model: Explanations/activity.md
+        - Habitable zone boundaries: Explanations/habitablezone.md
+        - Spectral synthesis: Explanations/spectral_synthesis.md
+
   - Reference:
       - Publications and bibliography: Reference/publications.md
+      - Parameter reference: Reference/parameters.md
     
   - Community:
       - Contact: Community/contact.md
@@ -107,6 +117,7 @@ theme:
 
 extra_css:
   - stylesheets/proteus_theme.css
+  - stylesheets/footnotes.css
  
 markdown_extensions:
   - admonition
