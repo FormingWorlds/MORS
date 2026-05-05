@@ -38,7 +38,7 @@ $F_X$, $F_\mathrm{EUV,1}$, $F_\mathrm{EUV,2}$, $F_\mathrm{EUV}$, and $F_\mathrm{
 These are computed as $F = L / (4\pi a_\mathrm{HZ}^2)$ for each band.
 
 !!! note
-    The habitable zone boundaries are calculated once at instantiation using stellar properties at `params['AgeHZ']` (default 5000 Myr) and held fixed throughout the evolutionary track. This reflects the interest in planets that spend billions of years in the habitable zone, for which the main-sequence stellar properties are the appropriate reference.
+    The habitable zone boundaries are calculated once at instantiation using stellar properties at `params['AgeHZ']` (default 5 Gyr) and held fixed throughout the evolutionary track. This reflects the interest in planets that spend billions of years in the habitable zone, for which the main-sequence stellar properties are the appropriate reference.
 
 ---
 
