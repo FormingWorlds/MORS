@@ -2,6 +2,8 @@
 
 MORS computes the rotational spin-down and high-energy (X-ray, EUV, Ly-$\alpha$) emission history of low-mass stars with masses between $0.1$ and $1.25\,M_\odot$, from 1 Myr through the end of the main sequence. The model is described in full in Johnstone, Bartel & Güdel (2021) [^johnstone2021] and consists of a rotational evolution model and a high-energy emission model, found in the sidebar. It also calculates habitable zone fluxes and builds historical spectra from modern reference spectra.
 
+A model parameter reference can be found [here](../Reference/parameters.md).
+
 ## Stellar structure
 
 All time-dependent internal stellar properties (radius, luminosity, effective temperature, core and envelope moments of inertia and their rates of change, convective turnover time, core radius and mass) are taken from the pre-computed grids of Spada et al. (2013) [^spada]. The grid spans 24 mass bins from $0.1$ to $1.25\,M_\odot$ and is loaded once at startup by `stellarevo.StarEvo`. When a stellar mass falls between two grid points, a bilinear interpolation in mass and log-age is performed transparently by `stellarevo._ValueSingle`.
