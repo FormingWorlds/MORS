@@ -3,8 +3,8 @@
 All model behaviour is controlled through a single dictionary (`parameters.paramsDefault`). A modified parameter dictionary can be created with `parameters.NewParams(**kwargs)`, which copies the defaults and overrides the specified keys:
 
 ```python
-import mors.parameters as params
-my_params = params.NewParams(dAgeMax=10.0, CoreEnvelopeDecoupling=False)
+import mors
+my_params = mors.NewParams(dAgeMax=10.0, CoreEnvelopeDecoupling=False)
 star = mors.Star(Mstar=1.0, Omega=1.0, params=my_params)
 ```
 
