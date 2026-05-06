@@ -45,7 +45,7 @@ Real stellar X-ray emission varies around the average relation. The observed sca
 
 Stars with higher X-ray surface fluxes have hotter coronae. The emission-measure-weighted average coronal temperature is estimated from $F_X$ following Johnstone & Güdel (2015) [^johnstone2015]:
 
-$$\bar{T}_\mathrm{cor} = 0.11\, F_X^{0.26} \quad [\mathrm{MK}] \tag{18}$$
+$$\bar{T}_\mathrm{cor} = 0.11\, F_X^{0.26} \quad (\mathrm{MK}) \tag{18}$$
 
 This relation is mass-independent when expressed in surface fluxes. Since coronae dominate emission at wavelengths below $\sim$40 nm, stars with higher $F_X$ emit a larger fraction of their XUV at shorter wavelengths. Implementation: `physicalmodel._Tcor`.
 
@@ -105,7 +105,7 @@ where both fluxes are in erg s$^{-1}$ cm$^{-2}$. Implementation: `physicalmodel.
 
 ## 5. Habitable zone fluxes
 
-$F_X$, $F_\mathrm{EUV,1}$, $F_\mathrm{EUV,2}$, $F_\mathrm{EUV}$, and $F_\mathrm{Ly\alpha}$ are all also computed at the habitable zone distance (`FxHZ`, `Feuv1HZ`, `Feuv2HZ`, `FeuvHZ`, `FlyHZ`) and stored on every evolutionary track. The habitable zone distance is defined as half-way between the moist and maximum greenhouse limits, calculated at 5 Gyr stellar properties. See [Habitable Zone](habitable_zone.md) for details.
+$F_X$, $F_\mathrm{EUV,1}$, $F_\mathrm{EUV,2}$, $F_\mathrm{EUV}$, and $F_\mathrm{Ly\alpha}$ are all also computed at the habitable zone distance (`FxHZ`, `Feuv1HZ`, `Feuv2HZ`, `FeuvHZ`, `FlyHZ`) and stored on every evolutionary track. The habitable zone distance is defined as half-way between the moist and maximum greenhouse limits, calculated at 5 Gyr stellar properties. See [Habitable Zone](habitablezone.md) for details.
 
 ---
 

@@ -19,7 +19,7 @@ $$a_\mathrm{HZ} = \frac{1}{2}\left(a_\mathrm{MoistGreenhouse} + a_\mathrm{Maximu
 
 Each boundary distance is computed from the stellar flux factor $S_\mathrm{eff}$ following Kopparapu et al. (2013), eq. 3 [^kopparapu]:
 
-$$a = \left(\frac{L_\mathrm{bol}}{L_\odot \cdot S_\mathrm{eff}}\right)^{1/2} \quad [\mathrm{AU}]$$
+$$a = \left(\frac{L_\mathrm{bol}}{L_\odot \cdot S_\mathrm{eff}}\right)^{1/2} \quad (\mathrm{AU})$$
 
 where $S_\mathrm{eff}$ depends on the stellar effective temperature $T_\mathrm{eff}$ via a fourth-order polynomial anchored to solar values.
 
