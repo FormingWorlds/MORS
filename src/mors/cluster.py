@@ -20,13 +20,6 @@ import mors.star as star
 
 class Cluster:
     """A class for star objects that hold all information about a star.
-
-    Attributes
-    ------------
-
-    Methods
-    ------------
-
     """
 
     def __init__(self,Mstar=None,Age=None,Omega=None,OmegaEnv=None,OmegaCore=None,AgesOut=None,starEvoDir=None,evoModels=None,params=params.paramsDefault,verbose=False):
