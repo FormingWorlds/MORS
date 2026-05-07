@@ -32,6 +32,7 @@ nav:
         - High-energy emission and activity model: Explanations/activity.md
         - Habitable zone boundaries: Explanations/habitablezone.md
         - Spectral synthesis: Explanations/spectral_synthesis.md
+      - Coupling to PROTEUS: Explanations/proteus.md
 
   - Reference:
       - Publications and bibliography: Reference/publications.md
