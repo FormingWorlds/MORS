@@ -37,9 +37,25 @@ Here is the quickest path to getting started:
 
     [Go to stellar evolution](How-to/evolution.md)
 
+-  :fontawesome-solid-fire-alt: **Find rotation and activity quantities**
+
+    [Go to activity quantities](How-to/activity_quantities.md)
+
 -  :fontawesome-solid-leaf: **Find habitable zone boundaries**
 
     [Go to habitable zone](How-to/habitablezone.md)
+
+-  :material-library: **Understand the model**
+
+    [Go to model overview](Explanations/structure.md)
+
+-  :octicons-file-code-16: **Browse the API**
+
+    [Go to API reference](Reference/api/index.md)
+
+-  :material-bookshelf: **Check publications**
+
+    [Go to publications and bibliography](Reference/publications.md)
 
 -   :material-github: **Contribute / browse code**
 
