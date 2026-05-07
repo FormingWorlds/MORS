@@ -28,15 +28,15 @@ def WhichBand(wl:float):
 
     Parameters
     ----------
-        wl : float
-            Wavelength to query [nm]
+    wl : float
+        Wavelength to query [nm]
 
     Returns
-    ----------
-        bands : list | None
-            List of band names (strings) which this band is inside of. Bands
-            can overlap, so this list may have a length greater than one.
-            If `wl` is outside all bandpasses, then this value is None.
+    -------
+    bands : list | None
+        List of band names (strings) which this band is inside of. Bands
+        can overlap, so this list may have a length greater than one.
+        If `wl` is outside all bandpasses, then this value is None.
 
     """
 
@@ -123,10 +123,10 @@ class Spectrum():
 
         Parameters
         ----------
-            spec_wl : np.ndarray
-                Array of wavelengths [nm]
-            spec_fl : np.ndarray
-                Array of fluxes [erg s-1 cm-2 nm-1]
+        spec_wl : np.ndarray
+            Array of wavelengths [nm]
+        spec_fl : np.ndarray
+            Array of fluxes [erg s-1 cm-2 nm-1]
         """
 
 
@@ -169,8 +169,8 @@ class Spectrum():
 
         Parameters
         ----------
-            fp : str
-                Path to file
+        fp : str
+            Path to file
         """
 
         log.debug("Loading stellar spectrum from TSV file")
@@ -202,8 +202,8 @@ class Spectrum():
 
         Parameters
         ----------
-            wl_min : float
-                New minimum wavelength [nm]
+        wl_min : float
+            New minimum wavelength [nm]
         """
 
         # Already extended
@@ -230,12 +230,12 @@ class Spectrum():
 
         Parameters
         ----------
-            Teff : float
-                Effective temperature of star
-            R_star : float
-                Radius of star [m]
-            wl_max : float
-                New maximum wavelength [nm]
+        Teff : float
+            Effective temperature of star
+        R_star : float
+            Radius of star [m]
+        wl_max : float
+            New maximum wavelength [nm]
         """
 
 
@@ -266,8 +266,8 @@ class Spectrum():
 
         Parameters
         ----------
-            fp : str
-                Path to file
+        fp : str
+            Path to file
         """
 
         log.debug("Writing stellar spectrum to TSV file")
@@ -286,15 +286,15 @@ def PlanckFunction_surf(wl:np.ndarray, Teff:float):
 
     Parameters
     ----------
-        wl : np.ndarray
-            Wavelength array [nm]
-        Teff : float
-            Effective temperature of the object
+    wl : np.ndarray
+        Wavelength array [nm]
+    Teff : float
+        Effective temperature of the object
 
     Returns
-    ----------
-        yp : float
-            Flux at stellar surface [erg s-1 cm-2 nm-1]
+    -------
+    yp : float
+        Flux at stellar surface [erg s-1 cm-2 nm-1]
     """
 
     yp = np.zeros(np.shape(wl))
@@ -317,15 +317,15 @@ def ScaleToSurf(fl:np.ndarray, R_star:float):
 
     Parameters
     ----------
-        fl : np.ndarray
-            Spectrum at 1 AU
-        R_star : float
-            Star radius in [m]
+    fl : np.ndarray
+        Spectrum at 1 AU
+    R_star : float
+        Star radius in [m]
 
     Returns
-    ----------
-        fl_surf : np.ndarray
-            Flux at stellar surface (same units as `fl`)
+    -------
+    fl_surf : np.ndarray
+        Flux at stellar surface (same units as `fl`)
     """
 
     return fl * (const.AU_SI/R_star)**2
@@ -336,16 +336,15 @@ def ScaleTo1AU(fl:np.ndarray, R_star:float):
 
     Parameters
     ----------
-        fl : np.ndarray
-            Spectrum at surface
-        R_star : float
-            Star radius in [m]
+    fl : np.ndarray
+        Spectrum at surface
+    R_star : float
+        Star radius in [m]
 
     Returns
-    ----------
-        fl_1AU : np.ndarray
-            Flux at 1 AU (same units as `fl`)
+    -------
+    fl_1AU : np.ndarray
+        Flux at 1 AU (same units as `fl`)
     """
 
     return fl * (R_star/const.AU_SI)**2
-

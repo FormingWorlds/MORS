@@ -1,4 +1,3 @@
-
 """Module for loading the stellar evolution tracks and retrieving basic stellar properties."""
 
 import copy
@@ -36,12 +35,9 @@ class StarEvo:
     single stellar mass and holds evolutionary tracks for a bunch of important quantities.
 
     Attributes
-    ------------
+    ----------
     ModelData : dict
         This is a dictionary of dictionaries, holding evolution tracks for each stellar mass.
-
-    Methods
-    ------------
 
     """
 
@@ -73,7 +69,7 @@ class StarEvo:
             If set to True, all other stellar masses will be removed from the ModelData dictionary.
 
         Returns
-        ----------
+        -------
         None
             None
 
@@ -88,23 +84,23 @@ class StarEvo:
 
         The set of models should have already been loaded. With this function, the user can ask for a value
         of one of the parameters for a specific stellar mass and age. All three of these can be input as multiple
-        values and an array of values will be returned if this is the case. For example, if MstarIn is input as
+        values and an array of values will be returned if this is the case. For example, if Mstar is input as
         a 1D array, the function will return a 1D array giving the value for each of these masses. ParamString
         can be input as a list of strings and values for each parameter in that list will be returned in a 1D
         array. If two are given as arrays or lists, then a 2D array will be returned. If all three then a 3D
-        array with dimensions len(MstarIn)xlen(AgeIn)xlen(ParamString) will be returned.
+        array with dimensions len(Mstar)xlen(Age)xlen(ParamString) will be returned.
 
         Parameters
         ----------
-        MstarIn : float or int or numpy.ndarray
+        Mstar : float or int or numpy.ndarray
             Mass of star in Msun.
-        AgeIn : float or int or numpy.ndarray
+        Age : float or int or numpy.ndarray
             Age in Myr.
         ParamString : str
             String holding name of parameter to get value for.
 
         Returns
-        ----------
+        -------
         value : float or numpy.ndarray
             Value of parameter at this mass and age.
 
@@ -441,9 +437,9 @@ def LoadTrack(Mstar,ModelData=None,ClearData=False):
         If set to True, all other stellar masses will be removed from the ModelData dictionary.
 
     Returns
-    ----------
-    None
-        None
+    -------
+    ModelData : dict
+        Updated dictionary of stellar evolution models.
     """
 
     # Use default model data if nothing was specified
@@ -585,7 +581,7 @@ def Value(MstarIn,AgeIn,ParamString,ModelData=ModelDataDefault):
         Dictionary of dictionaries holding set of stellar evolution models.
 
     Returns
-    ----------
+    -------
     value : float or numpy.ndarray
         Value of parameter at this mass and age.
 
