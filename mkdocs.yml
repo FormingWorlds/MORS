@@ -36,6 +36,21 @@ nav:
   - Reference:
       - Publications and bibliography: Reference/publications.md
       - Parameter reference: Reference/parameters.md
+      - API reference:
+        - Overview: Reference/api/index.md
+        - mors.star: Reference/api/star.md
+        - mors.cluster: Reference/api/cluster.md
+        - mors.physicalmodel: Reference/api/physicalmodel.md
+        - mors.rotevo: Reference/api/rotevo.md
+        - mors.stellarevo: Reference/api/stellarevo.md
+        - mors.baraffe: Reference/api/baraffe.md
+        - mors.spectrum: Reference/api/spectrum.md
+        - mors.synthesis: Reference/api/synthesis.md
+        - mors.miscellaneous: Reference/api/miscellaneous.md
+        - mors.parameters: Reference/api/parameters.md
+        - mors.constants: Reference/api/constants.md
+        - mors.data: Reference/api/data.md
+        - mors.cli: Reference/api/cli.md
     
   - Community:
       - Contact: Community/contact.md
@@ -60,7 +75,7 @@ nav:
       - 🔗 Atmodeller: https://atmodeller.readthedocs.io/en/latest/
       - 🔗 FastChem: https://newstrangeworlds.github.io/FastChem/
       - 🔗 PLATON: https://platon.readthedocs.io/en/latest/
-      - SOCRATES: https://github.com/FormingWorlds/SOCRATES/
+      - 🔗 SOCRATES: https://github.com/FormingWorlds/SOCRATES/
 
 # footer:
 extra:
@@ -164,7 +179,7 @@ plugins:
           show_root_toc_entry: true
           show_docstring_attributes: true
           show_root_full_path: false
-          docstring_section_style: list
+          docstring_section_style: table
           members_order: alphabetical
           merge_init_into_class: yes
           filters: ["!^_"]
