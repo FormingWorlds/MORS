@@ -31,9 +31,6 @@ Here is the quickest path to getting started:
 
     [Go to tutorial](Tutorials/first_run.md)
 
--   :material-tune: **Use custom parameters**
-
-    [Go to parameter setting](How-to/set_parameters.md)
 
 </div>
 
@@ -75,6 +72,9 @@ Here is the quickest path to getting started:
 
     [Go to publications and bibliography](Reference/publications.md)
 
+-  :fontawesome-solid-earth: **Understand the use in PROTEUS**
+
+    [Go to coupling in PROTEUS](Explanations/proteus.md)
 </div>
 
 ### Trouble and contact
