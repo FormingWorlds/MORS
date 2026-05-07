@@ -91,13 +91,13 @@ class BaraffeTrack:
 
         Parameters
         ----------
-            tstar : float
-                Star's age [yr]
+        tstar : float
+            Star's age [yr]
 
         Returns
-        ----------
-            Lstar : float
-                Luminosity Flux in units of solar luminosity
+        -------
+        Lstar : float
+            Luminosity Flux in units of solar luminosity
         """
 
         # Get time and check that it is in range
@@ -122,15 +122,15 @@ class BaraffeTrack:
 
         Parameters
         ----------
-            tstar : float
-                Star's age [yr]
-            mean_distance : float
-                Star-planet distance [AU]
+        tstar : float
+            Star's age [yr]
+        mean_distance : float
+            Star-planet distance [AU]
 
         Returns
-        ----------
-            inst : float
-                Flux at planet's orbital separation (solar constant) in W/m^2
+        -------
+        inst : float
+            Flux at planet's orbital separation (solar constant) in W/m^2
         """
 
         Lstar = self.BaraffeLuminosity(tstar)
@@ -146,13 +146,13 @@ class BaraffeTrack:
 
         Parameters
         ----------
-            tstar : float
-                Star's age [yr]
+        tstar : float
+            Star's age [yr]
 
         Returns
-        ----------
-            Rstar : float
-                Radius of star in units of solar radius
+        -------
+        Rstar : float
+            Radius of star in units of solar radius
         """
 
         # Get time and check that it is in range
@@ -174,13 +174,13 @@ class BaraffeTrack:
 
         Parameters
         ----------
-            tstar : float
-                Star's age [yr]
+        tstar : float
+            Star's age [yr]
 
         Returns
-        ----------
-            Teff : float
-                Temperature of star [K]
+        -------
+        Teff : float
+            Temperature of star [K]
         """
 
         # Get time and check that it is in range
@@ -202,16 +202,17 @@ class BaraffeTrack:
 
         Parameters
         ----------
-            tstar : float
-                Star's age [yr]
-            Lstar_modern : float
-                Modern star luminosity in units of solar luminosity
-            spec_fl : list
-                Modern spectrum flux array at 1 AU
+        tstar : float
+            Star's age [yr]
+        Lstar_modern : float
+            Modern star luminosity in units of solar luminosity
+        spec_fl : list
+            Modern spectrum flux array at 1 AU
+
         Returns
-        ----------
-            hspec_fl : np.array(float)
-                Numpy array of flux at 1 AU
+        -------
+        hspec_fl : np.array(float)
+            Numpy array of flux at 1 AU
         """
 
         # Get luminosity data from track
@@ -227,20 +228,20 @@ def BaraffeLoadTrack(Mstar, pre_interp = True, tmin = None, tmax = None):
 
     Parameters
     ----------
-        Mstar : float
-            Star mass (in unit of solar mass)
-            It assumes the value has been checked and matches with the mass grid.
-        pre_interp : bool
-            Pre-interpolate the tracks onto a higher resolution time-grid
-        tmin : float
-            Minimum value of the temporal grid
-        tmax : float
-            Maximum value of the temporal grid
+    Mstar : float
+        Star mass (in unit of solar mass)
+        It assumes the value has been checked and matches with the mass grid.
+    pre_interp : bool
+        Pre-interpolate the tracks onto a higher resolution time-grid
+    tmin : float
+        Minimum value of the temporal grid
+    tmax : float
+        Maximum value of the temporal grid
 
     Returns
-    ----------
-        track : dict
-            Dictionary containing track data
+    -------
+    track : dict
+        Dictionary containing track data
     """
 
     # Load data
@@ -304,17 +305,17 @@ def ModernSpectrumLoad(input_spec_file: str, output_spec_file: str):
 
     Parameters
     ----------
-        input_spec_file : str
-            Path to input spectral file
-        output_spec_file : str
-            Path to copied spectral file
+    input_spec_file : str
+        Path to input spectral file
+    output_spec_file : str
+        Path to copied spectral file
 
     Returns
-    ----------
-        spec_wl : np.array[float]
-            Wavelength [nm]
-        spec_fl : np.array[float]
-            Flux [erg s-1 cm-2 nm-1]
+    -------
+    spec_wl : np.array[float]
+        Wavelength [nm]
+    spec_fl : np.array[float]
+        Flux [erg s-1 cm-2 nm-1]
     """
 
     if os.path.isfile(input_spec_file):
