@@ -1,3 +1,5 @@
+# mors.synthesis
+
 ::: mors.synthesis
     options:
       members: true

@@ -1,3 +1,5 @@
+# mors.spectrum
+
 ::: mors.spectrum
     options:
       members: true
