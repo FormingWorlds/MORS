@@ -1,4 +1,4 @@
-::: mors.star
+::: mors.rotevo
     options:
       members: true
       inherited_members: false

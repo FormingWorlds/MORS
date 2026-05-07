@@ -1,4 +1,4 @@
-::: mors.star
+::: mors.physicalmodel
     options:
       members: true
       inherited_members: false

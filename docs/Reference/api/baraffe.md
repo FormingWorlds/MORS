@@ -1,4 +1,4 @@
-::: mors.star
+::: mors.baraffe
     options:
       members: true
       inherited_members: false

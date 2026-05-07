@@ -1,4 +1,4 @@
-::: mors.star
+::: mors.cluster
     options:
       members: true
       inherited_members: false

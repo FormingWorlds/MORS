@@ -1,4 +1,4 @@
-::: mors.star
+::: mors.miscellaneous
     options:
       members: true
       inherited_members: false
