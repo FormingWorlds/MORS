@@ -17,4 +17,4 @@ If you plan to contribute to MORS, please read our [Code of Conduct](Community/C
 
 ## Citation and licence
 
- When publishing results that were calculated using this code, both the Johnstone et al.  ([2021](Reference/publications.md#mors-publications)) paper and Spada et al. ([2013](Reference/publications.md#bibliography)) should be cited. Please also see the included [license](https://github.com/FormingWorlds/MORS/blob/main/LICENSE.txt).
+ When publishing results that were calculated using this code, both the Johnstone et al.  ([2021](Reference/publications.md#mors-publications)) paper and Spada et al. ([2013](Reference/publications.md#bibliography)) should be cited. Please also see the included [license](https://github.com/FormingWorlds/MORS/blob/main/LICENSE.md).
