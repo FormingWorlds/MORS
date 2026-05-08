@@ -46,10 +46,12 @@ develop = [
   "pytest"
 ]
 docs = [
-  "markdown-include",
-  "mkdocs",
-  "mkdocs-material",
-  "mkdocstrings[python]",
+    "zensical",
+    "mkdocs-material",
+    "markdown-include",
+    "mkdocs",
+    "mkdocstrings[python]",
+    "pymdown-extensions"
 ]
 publishing = [
   "twine",
