@@ -75,7 +75,7 @@ MORS requires a set of pre-computed stellar evolution tracks. After installation
 mors download all
 ```
 
-This fetches both the [Spada](https://zenodo.org/records/15729101) and [Baraffe](https://zenodo.org/records/15729114) track sets from two Zenodo records, with an automatic fallback to [OSF]((https://osf.io/9u3fb/)) if Zenodo is unavailable. If you only need one set, you can download them individually:
+This fetches both the [Spada](https://zenodo.org/records/15729101) and [Baraffe](https://zenodo.org/records/15729114) track sets from two Zenodo records, with an automatic fallback to [OSF](https://osf.io/9u3fb/) if Zenodo is unavailable. If you only need one set, you can download them individually:
 
 ```sh
 mors download spada
