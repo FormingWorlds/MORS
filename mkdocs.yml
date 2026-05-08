@@ -12,14 +12,16 @@ nav:
 
   - How-to guides:
       - Installation: How-to/installation.md
-      - Calculate stellar evolution: How-to/evolution.md
-      - Calculate cluster evolution: How-to/clusters.md
-      - Using model percentiles for initial rotation: How-to/distribution_percentile.md
-      - Setting custom simulation parameters: How-to/set_parameters.md
-      - Find stellar rotation and activity quantities: How-to/activity_quantities.md
-      - Find stellar quantities with stellar evolution tracks: How-to/track_quantities.md
-      - Find habitable zone boundaries: How-to/habitablezone.md
-      - Find stellar activity timelines: How-to/activity_timelines.md
+      - Basic usage:
+        - Calculate stellar evolution: How-to/evolution.md
+        - Find stellar quantities with stellar evolution tracks: How-to/track_quantities.md
+        - Find stellar rotation and activity quantities: How-to/activity_quantities.md
+        - Find habitable zone boundaries: How-to/habitablezone.md
+        - Using model percentiles for initial rotation: How-to/distribution_percentile.md
+      - Advanced usage:
+        - Calculate cluster evolution: How-to/clusters.md
+        - Setting custom simulation parameters: How-to/set_parameters.md
+        - Find stellar activity timelines: How-to/activity_timelines.md
       - Troubleshooting: How-to/troubleshooting.md
 
   - Tutorials:
