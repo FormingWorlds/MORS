@@ -66,4 +66,4 @@ Ages are passed in years to Baraffe methods and in Myr to Spada methods.
 
 ## Spectral synthesis during the simulation
 
-For Spada tracks, historical spectra are computed by scaling the modern reference spectrum band-by-band using `mors.synthesis.CalcScaledSpectrumFromProps`.For Baraffe tracks, spectral synthesis uses `BaraffeTrack.BaraffeSpectrumCalc`, which scales the modern spectrum by the ratio of historical to modern bolometric luminosity. No band-resolved scaling is available.
+For Spada tracks, historical spectra are computed by scaling the modern reference spectrum band-by-band using `mors.synthesis.CalcScaledSpectrumFromProps`. For Baraffe tracks, spectral synthesis uses `BaraffeTrack.BaraffeSpectrumCalc`, which scales the modern spectrum by the ratio of historical to modern bolometric luminosity. No band-resolved scaling is available.
