@@ -5,4 +5,3 @@
       members: true
       inherited_members: false
       show_source: true
-      docstring_style: numpy
