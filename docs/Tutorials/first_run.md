@@ -1,33 +1,23 @@
-# Tutorial: First run 
+# Tutorial: First run
 
-## What you’ll do
-By the end of this tutorial you will:
+By the end of this tutorial you will have installed MORS, computed your first stellar evolutionary track, plotted a quantity, queried values at specific ages, and saved the result for reuse.
 
-1. Install MORS and download the required data
-2. Create a `Star` and compute evolutionary tracks
-3. Inspect available tracks + units
-4. Plot one track
-5. Find stellar values at specific ages
-6. Save and reload the result
+!!! info "Units"
+    `Age` is in **Myr**, `Prot` is in **days**, and `Omega` is in units of the **current solar rotation rate** ($\Omega_\odot = 2.67 \times 10^{-6}$ rad s$^{-1}$).
 
-!!! Units
-    `Mstar` in **M☉**, `Age` in **Myr**, `Prot` in **days**, `Omega` in **Ω☉**.
+## Prerequisites
 
----
+You need a Python 3 environment with `pip` and a working internet connection for the one-time data download.
 
-## 0. Prerequisites
-You need:
+Optionally, create and activate an isolated environment first. With Conda:
 
-- Python 3 environment with `pip`
-- A working internet connection (for downloading data once)
-
-**Optional**: Create and activate a Conda environment (requires `conda` installed):
 ```bash
 conda create -n mors python=3.11 -y
 conda activate mors
 ```
 
-No `conda`? create and activate a virtual environment (venv):
+Or with a standard virtual environment:
+
 ```bash
 python -m venv .venv
 source .venv/bin/activate
@@ -35,119 +25,150 @@ source .venv/bin/activate
 
 ---
 
-## 1. Install MORS
+## Step 1: Install MORS
+
 ```bash
 pip install fwl-mors
 ```
 
-Quick sanity check:
+Verify the installation:
+
 ```bash
-python -c "import mors; print('mors imported:', mors.__version__ if hasattr(mors,'__version__') else 'ok')"
+python -c "import mors; print('ok')"
 ```
 
 ---
 
-## 2. Download stellar evolution data
-MORS requires stellar evolution tracks (downloaded once):
+## Step 2: Download stellar evolution data
+
+MORS requires stellar evolution tracks, downloaded once:
+
 ```bash
 mors download all
 ```
 
-See where data are stored:
+To check where the data are stored:
+
 ```bash
 mors env
 ```
 
-If you want to place data somewhere else, set `FWL_DATA` (optional):
+If you want to store data somewhere specific, set the `FWL_DATA` environment variable before downloading:
+
 ```bash
 export FWL_DATA=/path/to/your/data
+mors download all
 ```
 
 ---
 
-## 3. Create your first star
-Create a 1 M☉ star with an initial rotation period of 2.7 days (at ~1 Myr):
+## Step 3: Create your first star
+
+Create a 1 Msun star with an initial rotation period of 2.7 days at ~1 Myr:
+
 ```python
 import mors
+
 star = mors.Star(Mstar=1.0, Prot=2.7)
 ```
 
-Alternative: specify initial rotation as Ω/Ω☉:
+You can also specify the initial rotation rate as a multiple of the solar rotation rate:
+
 ```python
 star = mors.Star(Mstar=1.0, Omega=10.0)
 ```
 
 ---
 
-## 4. Inspect what tracks exist
-Print track names and units:
+## Step 4: Inspect available tracks
+
+Print all available track names and their units:
+
 ```python
 star.PrintAvailableTracks()
-print("Lx units:", star.Units.get("Lx"))
+print(star.Units['Lx'])
 ```
 
-You can access arrays either via the `Tracks` dict:
+!!! note
+    `PrintAvailableTracks` uses the logging system. If you see no output, configure logging first:
+    ```python
+    from mors.logs import setup_logger
+    setup_logger("INFO")
+    star.PrintAvailableTracks()
+    ```
+
+Track arrays are accessible via the `Tracks` dictionary or as `<Quantity>Track` attributes directly on the star:
+
 ```python
-age = star.Tracks["Age"]
-lx  = star.Tracks["Lx"]
-```
-or via convenience attributes:
-```python
-age = star.AgeTrack
-lx  = star.LxTrack
+age = star.Tracks['Age']   # or: star.AgeTrack
+lx  = star.Tracks['Lx']   # or: star.LxTrack
 ```
 
 ---
 
-## 5. Plot a track
+## Step 5: Plot a track
+
 ```python
 import matplotlib.pyplot as plt
 
-plt.plot(star.AgeTrack, star.LxTrack)
-plt.xlabel(f"Age [{star.Units['Age']}]")
-plt.ylabel(f"Lx [{star.Units['Lx']}]")
+fig, ax = plt.subplots()
+ax.plot(star.AgeTrack, star.LxTrack)
+ax.set_xlabel(f"Age [{star.Units['Age']}]")
+ax.set_ylabel(f"Lx [{star.Units['Lx']}]")
+ax.set_xscale('log')
+ax.set_yscale('log')
 plt.show()
 ```
 
-If you see a plot and no errors, your installation + data are working.
+If you see a plot with no errors, your installation and data download are working correctly.
 
 ---
 
-## 6. Find stellar values at specific ages
-Use the generic accessor:
+## Step 6: Query values at specific ages
+
+Use the generic `Value` method:
+
 ```python
-print(star.Value(Age=150.0, Quantity="Lx"))
+lx = star.Value(Age=150.0, Quantity='Lx')
+print(lx)
 ```
 
-Or a convenience method (when available):
+Or the quantity accessor directly:
+
 ```python
-print(star.Lx(150.0))
+lx = star.Lx(150.0)
+print(lx)
+```
+
+Both return a linearly interpolated scalar at the requested age.
+
+---
+
+## Step 7: Compare slow, medium, and fast rotators (optional)
+
+MORS includes a built-in 1 Myr rotation distribution. You can create stars at the 5th, 50th, and 95th percentiles using string shortcuts:
+
+```python
+slow   = mors.Star(Mstar=1.0, percentile='slow')    # 5th percentile
+medium = mors.Star(Mstar=1.0, percentile='medium')  # 50th percentile
+fast   = mors.Star(Mstar=1.0, percentile='fast')    # 95th percentile
+
+print(slow.percentile, medium.percentile, fast.percentile)
 ```
 
 ---
 
-## 7. (Optional) Try percentiles: slow/medium/fast rotators
-This uses the built-in model distribution:
-```python
-slow   = mors.Star(Mstar=1.0, percentile="slow")    # 5th percentile
-medium = mors.Star(Mstar=1.0, percentile="medium")  # 50th percentile
-fast   = mors.Star(Mstar=1.0, percentile="fast")    # 95th percentile
+## Step 8: Save and reload
 
-print("slow percentile:", slow.percentile)
-print("fast percentile:", fast.percentile)
+Saving avoids recomputing the tracks next time:
+
+```python
+star.Save(filename='star.pickle')
 ```
 
----
+Reload with `mors.Load` rather than `pickle.load` directly, as it re-attaches the quantity accessor functions:
 
-## 8. Save and reload (recommended)
-Save:
 ```python
-star.Save(filename="star.pickle")
-```
-
-Reload later:
-```python
-import mors
-star2 = mors.Load("star.pickle")
+star2 = mors.Load('star.pickle')
 print(star2.Lx(150.0))
 ```
