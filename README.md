@@ -1,7 +1,8 @@
 # MODEL FOR ROTATION OF STARS (MORS)
 
 [![MORS CI Test Suite](https://github.com/FormingWorlds/MORS/actions/workflows/tests.yaml/badge.svg)](https://github.com/FormingWorlds/MORS/actions)
-[![License](https://img.shields.io/github/license/FormingWorlds/MORS?label=License)](https://github.com/FormingWorlds/MORS/blob/main/LICENSE)
+![Coverage](https://gist.githubusercontent.com/lsoucasse/a25c37a328839edd00bb32d8527aec30/raw/covbadge.svg)
+[![License](https://img.shields.io/github/license/FormingWorlds/MORS?label=License)](https://github.com/FormingWorlds/MORS/blob/main/LICENSE.md)
 [![PyPI](https://img.shields.io/pypi/v/fwl-mors?label=PyPI)](https://pypi.org/project/fwl-mors/)
 
 MORS is a Python package for modelling the rotational spin-down and high-energy (X-ray, EUV, Ly-α) emission evolution of low-mass stars. It implements the model of [Johnstone, Bartel & Güdel (2021)](https://www.aanda.org/articles/aa/abs/2021/05/aa38407-20/aa38407-20.html) and is the stellar evolution model integrated into the [PROTEUS](https://proteus-framework.org/PROTEUS) framework.
