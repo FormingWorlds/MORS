@@ -70,7 +70,6 @@ The current `docs/` folder structure is shown below:
 ├── overrides               # HTML overrides on top of the Zensical configurable style
 ├── Reference               # Reference pages, such as an API reference
 │    └──  api
-reference
 ├── stylesheets             # CSS overrides on top of the Zensical configurable style
 ├── proteus_framework.md    # Overview of PROTEUS and links to other modules
 └── Tutorials               # MORS tutorials 
