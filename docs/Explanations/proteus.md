@@ -28,7 +28,8 @@ PROTEUS supports two sets of stellar evolution tracks through MORS, selected via
 | `'spada'` | Spada et al. (2013) | 0.10–1.25 Msun | Myr | Yes |
 | `'baraffe'` | Baraffe et al. (2015) | 0.01–1.40 Msun | yr | No |
 
-If the configured stellar mass falls outside the valid range for the chosen tracks, it is silently clipped to the nearest limit.
+!!! warning "Mass clipped outside valid range"
+    If the configured stellar mass falls outside the valid range for the chosen tracks, it is **silently clipped** to the nearest limit.
 
 ## Rotation (Spada tracks only)
 
