@@ -7,7 +7,7 @@
     </a>
 </h1>
 
-MORS is the stellar rotation and evolution module of <b>PROTEUS</b> (/ˈproʊtiəs, PROH-tee-əs), a modular Python framework that simulates the coupled evolution of the atmospheres and interiors of rocky planets and exoplanets. A schematic of PROTEUS components and corresponding modules can be found below.
+MORS is the stellar rotation and evolution module of <b>PROTEUS</b> (/ˈproʊtiəs, PROH-tee-əs), a modular Python framework that simulates the coupled evolution of the atmospheres and interiors of rocky planets and exoplanets. A schematic of PROTEUS components and corresponding modules can be found below. Its coupling to MORS is explained [here](Explanations/proteus.md).
 <br>
 <br>
 You can find the <b>documentation of each PROTEUS module</b> in the sidebar.
