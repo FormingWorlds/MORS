@@ -193,5 +193,5 @@ watch:
   - src/
   - docs/
   - README.md
-  - Community/CONTRIBUTING.md
-  - Community/CODE_OF_CONDUCT.md
+  - CONTRIBUTING.md
+  - CODE_OF_CONDUCT.md
