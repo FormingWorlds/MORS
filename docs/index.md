@@ -1,5 +1,7 @@
-[![Tests](https://github.com/FormingWorlds/MORS/actions/workflows/tests.yaml/badge.svg?branch=main)](https://github.com/FormingWorlds/MORS/actions/workflows/tests.yaml?query=branch%3Amain)
+[![MORS CI Test Suite](https://github.com/FormingWorlds/MORS/actions/workflows/tests.yaml/badge.svg)](https://github.com/FormingWorlds/MORS/actions)
 ![Coverage](https://gist.githubusercontent.com/lsoucasse/a25c37a328839edd00bb32d8527aec30/raw/covbadge.svg)
+[![License](https://img.shields.io/github/license/FormingWorlds/MORS?label=License)](https://github.com/FormingWorlds/MORS/blob/main/LICENSE.md)
+[![PyPI](https://img.shields.io/pypi/v/fwl-mors?label=PyPI)](https://pypi.org/project/fwl-mors/)
 
 
 # MODEL FOR ROTATION OF STARS (MORS)
