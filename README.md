@@ -1,60 +1,34 @@
 # MODEL FOR ROTATION OF STARS (MORS)
 
-MORS is a Python package (distributed as `fwl-mors`) used in the [PROTEUS framework](https://github.com/FormingWorlds/PROTEUS) to model **stellar rotation** and **high-energy emission (X-ray, EUV, Ly-α)** evolution.  
-It implements the model of **Johnstone et al. (2021)** and provides stellar evolution quantities based on **Spada et al. (2013)** (plus optional Baraffe tracks).
+[![MORS CI Test Suite](https://github.com/FormingWorlds/MORS/actions/workflows/tests.yaml/badge.svg)](https://github.com/FormingWorlds/MORS/actions)
+[![License](https://img.shields.io/github/license/FormingWorlds/MORS?label=License)](https://github.com/FormingWorlds/MORS/blob/main/LICENSE)
+[![PyPI](https://img.shields.io/pypi/v/fwl-mors?label=PyPI)](https://pypi.org/project/fwl-mors/)
 
-> **Note:** This version includes the fix for the EUV1 → EUV2 conversion.
+MORS is a Python package for modelling the rotational spin-down and high-energy (X-ray, EUV, Ly-α) emission evolution of low-mass stars. It implements the model of [Johnstone, Bartel & Güdel (2021)](https://www.aanda.org/articles/aa/abs/2021/05/aa38407-20/aa38407-20.html) and is the stellar evolution model integrated into the [PROTEUS](https://proteus-framework.org/PROTEUS) framework.
+
+**Documentation:** https://proteus-framework.org/MORS/
 
 ## Install
 
 ```bash
 pip install fwl-mors
-```
-
-### Required data: stellar evolution tracks
-Download the stellar evolution tracks (stored on OSF):
-
-```bash
 mors download all
-mors env
-```
-
-By default, data follow the XDG base directory convention. You can override the data root with:
-
-```bash
-export FWL_DATA=/path/to/data
-```
-
-Or set a per-script directory:
-
-```python
-import mors
-star_evo = mors.StarEvo(starEvoDir="path/to/evolution-tracks")
 ```
 
 ## Quickstart
 
 ```python
 import mors
-import matplotlib.pyplot as plt
 
-star = mors.Star(Mstar=1.0, Prot=2.7)     # 1 Msun star, initial rotation period in days (at age ~1 Myr)
-print(star.Lx(150.0))                    # X-ray luminosity at 150 Myr
-
-plt.plot(star.AgeTrack, star.LxTrack)
-plt.xlabel(f"Age [{star.Units['Age']}]")
-plt.ylabel(f"Lx [{star.Units['Lx']}]")
-plt.show()
+star = mors.Star(Mstar=1.0, Prot=2.7)  # 1 Msun, initial rotation period at 1 Myr
+print(star.Lx(150.0))                  # X-ray luminosity at 150 Myr [erg s-1]
 ```
-
-## Documentation 
-
-You can find the complete documentation [here](https://proteus-framework.org/MORS/). 
 
 ## Citation
 
-When publishing results computed with MORS, please cite:
-- **Johnstone et al. (2021)** for the rotation/XUV evolution model
-- **Spada et al. (2013)** for the stellar evolution tracks used for stellar properties
+If you use MORS in published work, please cite:
 
-If you use the model cluster distribution/percentiles, also cite the rotation-measurement sources referenced in **Johnstone et al. (2020)** (Table 1, ~150 Myr bin).
+- [Johnstone, Bartel & Güdel (2021)](https://www.aanda.org/articles/aa/abs/2021/05/aa38407-20/aa38407-20.html), *A&A*, 649, A96 (rotation and XUV evolution model)
+- [Spada et al. (2013)](https://iopscience.iop.org/article/10.1088/0004-637X/776/2/87/meta), *ApJ*, 776, 87 (stellar evolution tracks)
+
+If you use the model cluster distribution or percentiles, also cite the rotation-measurement sources in Table 1 of Johnstone et al. (2021).
