@@ -43,7 +43,8 @@ develop = [
   "bump-my-version",
   "coverage[toml]",
   "pip-tools",
-  "pytest"
+  "pytest",
+  "pytest-cov"
 ]
 docs = [
     "zensical",
@@ -72,6 +73,12 @@ source = ["mors"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+markers = [
+    "unit: fast isolated tests, no mors.Star call",
+    "smoke: one full mors.Star call end-to-end",
+    "integration: validated against published reference values",
+    "slow: long-running tests, excluded from routine CI",
+]
 
 [tool.bumpversion]
 # https://callowayproject.github.io/bump-my-version/howtos/calver/
