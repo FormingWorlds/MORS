@@ -112,4 +112,4 @@ print(age_saturated)  # Myr
 
 - The threshold must be in the same units as the chosen quantity (`Lx` in erg s⁻¹, `Fx` in erg s⁻¹ cm⁻², `Rx` dimensionless, etc.).
 - The function always returns the **final** crossing age when there are multiple crossings.
-- `Threshold='sat'` is only available on `star.ActivityLifetime`, not on the standalone `mors.ActivityLifetime`.
+- `Threshold='sat'` is available on `Star.ActivityLifetime` and `Cluster.ActivityLifetime`, but not on the standalone `mors.ActivityLifetime`.
