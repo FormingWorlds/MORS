@@ -23,7 +23,7 @@ nav:
         - Setting custom simulation parameters: How-to/set_parameters.md
         - Find stellar activity timelines: How-to/activity_timelines.md
       - Development:
-        - Run tests: How-to/tests.md
+        - Run tests: How-to/run_tests.md
         - Build documentation: How-to/documentation.md
       - Troubleshooting: How-to/troubleshooting.md
 
