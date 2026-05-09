@@ -1,5 +1,8 @@
 # How to build tests
 
+!!! Note "This page is not yet online"
+    This page is not yet online and should be updated based on the new MORS test suite. Do not yet publish this page! 
+
 This page is about *writing* a new test, by hand or with an LLM. For running
 the existing suite see [running tests](run_tests.md).
 
