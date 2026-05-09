@@ -74,7 +74,7 @@ Here is the quickest path to getting started:
 
 -  :fontawesome-solid-earth: **Understand the use in PROTEUS**
 
-    [Go to coupling in PROTEUS](Explanations/proteus.md)
+    [Go to coupling to PROTEUS](Explanations/proteus.md)
 </div>
 
 ### Trouble and contact
