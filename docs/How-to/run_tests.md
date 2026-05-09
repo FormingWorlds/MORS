@@ -1,6 +1,6 @@
 # Testing suite
 
-This page describes the current MORS test suite and how to run it.
+This page describes the current MORS test suite and how to run it. The suite covers the spectral synthesis pipeline in full, the Spectrum class, and regression tests for the Spada and Baraffe stellar evolution tracks with two ODE solvers. The physical model (`physicalmodel.py`), rotational evolution solver (`rotevo.py`), and parameter handling are not yet covered by dedicated tests.
 
 ## Running the tests
 
@@ -49,7 +49,7 @@ coverage report
 
 ## Current test files
 
-### `test_spada_FE.py` — Spada tracks, Forward Euler solver
+### `test_spada_FE.py`: Spada tracks, Forward Euler solver
 
 Runs four parametrised integration tests using the Forward Euler ODE solver. Each test creates a `mors.Star` at a given mass and initial rotation rate and checks three quantities at a given age against regression values from a known-good run:
 
@@ -63,27 +63,27 @@ Tolerance: `rtol=1e-6`. The test calls `mors.DownloadEvolutionTracks('Spada')` t
 
 ---
 
-### `test_spada_RB.py` — Spada tracks, Rosenbrock solver
+### `test_spada_RB.py`: Spada tracks, Rosenbrock solver
 
 Identical structure to `test_spada_FE.py` but uses the default `RosenbrockFixed` solver. The expected values differ from the Forward Euler test because the two solvers produce slightly different numerical results at the same tolerance settings.
 
 ---
 
-### `test_baraffe.py` — Baraffe tracks
+### `test_baraffe.py`: Baraffe tracks
 
 Runs two parametrised integration tests using Baraffe et al. (2015) tracks. Each test creates a `mors.BaraffeTrack` at a given mass and checks three quantities at a given age against regression values:
 
 | Quantity | Description |
 |---|---|
-| `BaraffeLuminosity` | Bolometric luminosity (L☉) |
-| `BaraffeStellarRadius` | Stellar radius (R☉) |
+| `BaraffeLuminosity` | Bolometric luminosity (Lsun) |
+| `BaraffeStellarRadius` | Stellar radius (Rsun) |
 | `BaraffeSolarConstant` | Bolometric flux at given distance (W m⁻²) |
 
 Tolerance: `rtol=1e-5`. Note that Baraffe tracks use time in **years**, not Myr.
 
 ---
 
-### `test_spectrum.py` — Spectrum class and helpers
+### `test_spectrum.py`: Spectrum class and helpers
 
 Unit tests for `mors.spectrum`. No stellar evolution data required. Covers:
 
@@ -98,14 +98,14 @@ Unit tests for `mors.spectrum`. No stellar evolution data required. Covers:
 
 ---
 
-### `test_synthesis.py` — Spectral synthesis
+### `test_synthesis.py`: Spectral synthesis
 
 Unit tests for `mors.synthesis`. Uses `monkeypatch` to replace `Value`, `Percentile`, `Lxuv`, `Lbol`, and `PlanckFunction_surf` with lightweight fakes, so no stellar evolution data are required. Covers:
 
-- `GetProperties` — flux budget consistency: $F = L / (4\pi \, \mathrm{AU}^2)$, UV remainder definition, Planck band integral
-- `CalcBandScales` — scale factor $Q_k = F_k^\mathrm{hist} / F_k^\mathrm{modern}$ for each band
-- `CalcScaledSpectrumFromProps` — correct band scale factor applied per wavelength, including overlap regions
-- `FitModernProperties` — correct initial guess shape, correct unpacking of the `minimize` result for both fixed-age and free-age cases
+- `GetProperties`: flux budget consistency: $F = L / (4\pi \, \mathrm{AU}^2)$, UV remainder definition, Planck band integral
+- `CalcBandScales`: scale factor $Q_k = F_k^\mathrm{hist} / F_k^\mathrm{modern}$ for each band
+- `CalcScaledSpectrumFromProps`: correct band scale factor applied per wavelength, including overlap regions
+- `FitModernProperties`: correct initial guess shape, correct unpacking of the `minimize` result for both fixed-age and free-age cases
 
 ---
 
