@@ -66,6 +66,6 @@ jobs:
           filename: covbadge.svg
           label: Coverage
           message: ${{ env.total }}%
-          minColorRange: 10
-          maxColorRange: 90
+          minColorRange: 50
+          maxColorRange: 100
           valColorRange: ${{ env.total }}
