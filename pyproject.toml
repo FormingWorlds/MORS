@@ -10,7 +10,7 @@ readme = "README.md"
 authors = [
     {name = "Colin P. Johnstone", email = "colinjohnstone@gmail.com" },
     {name = "Harrison Nicholls",  email = "contact@h-nicholls.space"},
-    {name = "Laurent Soucasse",   email = "l.soucasse@esciencecenter.nl"}
+    {name = "Laurent Soucasse",   email = "l.soucasse@esciencecenter.nl"},
     {name = "Karen Stuitje",      email = "stuitje@proton.me"}
 ]
 license = {text = "MIT License"}
