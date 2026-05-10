@@ -9,8 +9,9 @@ description = "Stellar rotation and activity evolution model"
 readme = "README.md"
 authors = [
     {name = "Colin P. Johnstone", email = "colinjohnstone@gmail.com" },
-    {name = "Harrison Nicholls",  email = "harrison.nicholls@physics.ox.ac.uk"},
+    {name = "Harrison Nicholls",  email = "contact@h-nicholls.space"},
     {name = "Laurent Soucasse",   email = "l.soucasse@esciencecenter.nl"}
+    {name = "Karen Stuitje",      email = "stuitje@proton.me"}
 ]
 license = {text = "MIT License"}
 classifiers = [
@@ -73,12 +74,6 @@ source = ["mors"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-markers = [
-    "unit: fast isolated tests, no mors.Star call",
-    "smoke: one full mors.Star call end-to-end",
-    "integration: validated against published reference values",
-    "slow: long-running tests, excluded from routine CI",
-]
 
 [tool.bumpversion]
 # https://callowayproject.github.io/bump-my-version/howtos/calver/
