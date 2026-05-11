@@ -1,4 +1,3 @@
-
 """Module for holding functions for calculating physical quantities for the physical rotation and activity model."""
 
 # Imports for standard stuff needed here
@@ -36,7 +35,7 @@ def dOmegadt(Mstar=None,Age=None,OmegaEnv=None,OmegaCore=None,params=params.para
         Instance of StarEvo class holding stellar evolution model data.
 
     Returns
-    ----------
+    -------
     dOmegaEnvdt : float
         Rate of change of envelope rotation rate in OmegaSun Myr^-1.
     dOmegaCoredt : float
@@ -87,7 +86,7 @@ def RotationQuantities(Mstar=None,Age=None,OmegaEnv=None,OmegaCore=None,params=p
         Instance of StarEvo class holding stellar evolution model data.
 
     Returns
-    ----------
+    -------
     StarState : dict
         Set of rotation quantities.
 
@@ -259,7 +258,7 @@ def ExtendedQuantities(StarState=None,Mstar=None,Age=None,OmegaEnv=None,OmegaCor
         Instance of StarEvo class holding stellar evolution model data.
 
     Returns
-    ----------
+    -------
     StarState : dict
         Set of extended quantities.
 
@@ -334,7 +333,7 @@ def QuantitiesUnits(StarState=None):
         Set of quantities already calculated by RotationQuantities() and possibly ExtendedQuantities().
 
     Returns
-    ----------
+    -------
     StarStateUnits : dict
         Dictionary of strings holding units for quantities.
 
@@ -433,8 +432,6 @@ def Lxuv(Mstar=None,Age=None,Omega=None,OmegaEnv=None,Prot=None,params=params.pa
 
     Parameters
     ----------
-    Band : str
-        Wavelength band to calculate.
     Mstar : float
         Mass of star in Msun.
     Age : float
@@ -451,9 +448,9 @@ def Lxuv(Mstar=None,Age=None,Omega=None,OmegaEnv=None,Prot=None,params=params.pa
         Instance of StarEvo class holding stellar evolution model data.
 
     Returns
-    ----------
+    -------
     LxuvDict : dict
-        Dictionary of luminositie in erg s^-1.
+        Dictionary of luminosities in erg s^-1.
 
     """
 
@@ -560,7 +557,7 @@ def Lx(Mstar=None,Age=None,Omega=None,OmegaEnv=None,Prot=None,params=params.para
         Instance of StarEvo class holding stellar evolution model data.
 
     Returns
-    ----------
+    -------
     Lx : float
         X-ray luminosity in erg s^-1.
 
@@ -606,7 +603,7 @@ def XrayScatter(XrayAverage,params=params.paramsDefault):
         Dictionary holding model parameters.
 
     Returns
-    ----------
+    -------
     deltaXray : float or numpy.ndarray
         Values for stellar deltaLx, deltaFx, or deltaRx in input units.
 
@@ -648,7 +645,7 @@ def XUVScatter(XUVAverage,params=params.paramsDefault):
         Dictionary holding model parameters.
 
     Returns
-    ----------
+    -------
     deltaXUV : dict
         Values for deltaLx, deltaFx, etc. for all quantities calculated by Lxuv().
 
@@ -754,7 +751,7 @@ def Leuv(Mstar=None,Age=None,Omega=None,OmegaEnv=None,Prot=None,band=0,params=pa
         Instance of StarEvo class holding stellar evolution model data.
 
     Returns
-    ----------
+    -------
     Leuv : float
         EUV luminosity in erg s^-1.
 
@@ -840,7 +837,7 @@ def Lly(Mstar=None,Age=None,Omega=None,OmegaEnv=None,Prot=None,params=params.par
         Instance of StarEvo class holding stellar evolution model data.
 
     Returns
-    ----------
+    -------
     Lly : float
         Lyman-alpha luminosity in erg s^-1.
 
@@ -1032,7 +1029,7 @@ def OmegaBreak(Mstar,Rstar):
         Radius of star in Rsun.
 
     Returns
-    ----------
+    -------
     OmegaBreak : float
         Breakup angular velocity in OmegaSun.
 
@@ -1052,7 +1049,7 @@ def _vEsc(Mstar,Rstar):
         Radius of star in Rsun.
 
     Returns
-    ----------
+    -------
     vEsc : float
         Surface escape velocity in cm s^-1.
 
@@ -1108,7 +1105,7 @@ def OmegaSat(Mstar=None,Age=None,param='XUV',params=params.paramsDefault,StarEvo
         Instance of StarEvo class holding stellar evolution model data.
 
     Returns
-    ----------
+    -------
     Omega : float
         Saturation rotation rate in OmegaSun.
 
@@ -1151,7 +1148,7 @@ def ProtSat(Mstar=None,Age=None,param='XUV',params=params.paramsDefault,StarEvo=
         Instance of StarEvo class holding stellar evolution model data.
 
     Returns
-    ----------
+    -------
     Prot : float
         Saturation rotation period in days.
 
@@ -1200,8 +1197,9 @@ def aOrbHZ(Mstar=None,Age=None,params=params.paramsDefault):
         Age to get stellar parameters in Myr (default = 5000 Myr).
     params : dict , optional
         Dictionary holding model parameters.
+
     Returns
-    ----------
+    -------
     aOrbHZAll : dict
         Values of HZ boundary orbital distances in AU.
     """

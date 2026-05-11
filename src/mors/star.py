@@ -23,13 +23,6 @@ MstarMax = 1.25
 
 class Star:
     """A class for star objects that hold all information about a star.
-
-    Attributes
-    ------------
-
-    Methods
-    ------------
-
     """
 
     #---------------------------------------------------------------------------------------
@@ -38,14 +31,18 @@ class Star:
         """Initialises instance of Star class.
 
         This is the main function that is run when creating an instance of the Star class and it sets up all
-        the things needed including calculating evolutionary tracks for the star. The function requires that
-        the arguments Mstar (the star's mass in Msun) and Omega (in OmegaSun=2.67e-6 rad s^-1) are specified
+        the things needed including calculating evolutionary tracks for the star. 
+        
+        The function requires that the arguments Mstar (the star's mass in Msun) and Omega (in OmegaSun=2.67e-6 rad s^-1) are specified
         in the call. Alternatively, OmegaEnv and OmegaCore can be set, in which case Omega does not need to
         be specified. If the argument Age (in Myr) is also specified, then the code will find the evolutionary
         track that passes through this rotation rate at this age, otherwise if Age is not set then it will
-        calculate evolutionary tracks assuming this Omega as the initial (1 Myr) rotation rate. The user should
-        not specify OmegaCore and Age simultaneously, and if Age is set then either Omega or OmegaEnv can be
-        used to specify the surface rotation rate. The user can also specify the initial rotation rate using
+        calculate evolutionary tracks assuming this Omega as the initial (1 Myr) rotation rate. 
+        
+        The user should not specify OmegaCore and Age simultaneously, and if Age is set then either Omega or OmegaEnv can be
+        used to specify the surface rotation rate. 
+        
+        The user can also specify the initial rotation rate using using a percentile of the 1 Myr rotation distribution via the ``percentile`` keyword argument.
 
         Parameters
         ----------

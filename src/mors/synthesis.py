@@ -23,17 +23,17 @@ def GetProperties(Mstar:float, pctle:float, age:float):
 
     Parameters
     ----------
-        Mstar : float
-            Mass of star [M_sun]
-        pctle : float
-            Rotation percentile
-        age : float
-            Stellar age  [Myr]
+    Mstar : float
+        Mass of star [M_sun]
+    pctle : float
+        Rotation percentile
+    age : float
+        Stellar age  [Myr]
 
     Returns
-    ----------
-        out : dict
-            Dictionary of radius [m], Teff [K], and band fluxes at 1 AU [erg s-1 cm-2]
+    -------
+    out : dict
+        Dictionary of radius [m], Teff [K], and band fluxes at 1 AU [erg s-1 cm-2]
     """
 
     # Get star radius [m]
@@ -85,15 +85,15 @@ def CalcBandScales(modern_dict:dict, historical_dict):
 
     Parameters
     ----------
-        modern_dict : dict
-            Dictionary output of `GetProperties` call for modern spectrum
-        historical_dict : dict
-            Dictionary output of `GetProperties` call for historical spectrum
+    modern_dict : dict
+        Dictionary output of `GetProperties` call for modern spectrum
+    historical_dict : dict
+        Dictionary output of `GetProperties` call for historical spectrum
 
     Returns
-    ----------
-        Q_dict : dict
-            Dictionary of band scale factors
+    -------
+    Q_dict : dict
+        Dictionary of band scale factors
     """
 
     # Get scale factors
@@ -110,17 +110,17 @@ def CalcScaledSpectrumFromProps(modern_spec:spec.Spectrum, modern_dict:dict, his
 
     Parameters
     ----------
-        modern_spec : Spectrum object
-            Spectrum object containing data for a modern fluxes
-        modern_dict : dict
-            Dictionary output of `GetProperties` call for modern spectrum
-        historical_dict : dict
-            Dictionary output of `GetProperties` call for historical spectrum
+    modern_spec : Spectrum object
+        Spectrum object containing data for a modern fluxes
+    modern_dict : dict
+        Dictionary output of `GetProperties` call for modern spectrum
+    historical_dict : dict
+        Dictionary output of `GetProperties` call for historical spectrum
 
     Returns
-    ----------
-        historical_spec : Spectrum object
-            Spectrum object containing data for historical fluxes
+    -------
+    historical_spec : Spectrum object
+        Spectrum object containing data for historical fluxes
     """
 
     log.debug("Calculating scaled spectrum from properties")
@@ -151,19 +151,19 @@ def FitModernProperties(modern_spec:spec.Spectrum, Mstar:float, age:float=-1):
 
     Parameters
     ----------
-        modern_spec : Spectrum object
-            Spectrum object containing data for a modern fluxes
-        Mstar : float
-            Stellar mass [M_sun]
-        age : float
-            Optional guess for current age. Will be estimated if not provided.
+    modern_spec : Spectrum object
+        Spectrum object containing data for a modern fluxes
+    Mstar : float
+        Stellar mass [M_sun]
+    age : float
+        Optional guess for current age. Will be estimated if not provided.
 
     Returns
-    ----------
-        best_pctle : float
-            Best estimate of rotation percentile
-        best_age : float
-            Best estimate of star's age (equal to `age` if `age` is provided)
+    -------
+    best_pctle : float
+        Best estimate of rotation percentile
+    best_age : float
+        Best estimate of star's age (equal to `age` if `age` is provided)
     """
 
     log.debug("Fitting properties to modern spectrum")
@@ -216,5 +216,3 @@ def FitModernProperties(modern_spec:spec.Spectrum, Mstar:float, age:float=-1):
 
     # Return
     return best_pctle, best_age
-
-

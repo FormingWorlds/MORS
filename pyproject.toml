@@ -9,8 +9,10 @@ description = "Stellar rotation and activity evolution model"
 readme = "README.md"
 authors = [
     {name = "Colin P. Johnstone", email = "colinjohnstone@gmail.com" },
-    {name = "Harrison Nicholls",  email = "harrison.nicholls@physics.ox.ac.uk"},
-    {name = "Laurent Soucasse",   email = "l.soucasse@esciencecenter.nl"}
+    {name = "Harrison Nicholls",  email = "contact@h-nicholls.space"},
+    {name = "Laurent Soucasse",   email = "l.soucasse@esciencecenter.nl"},
+    {name = "Tim Lichtenberg",    email = "tim.lichtenberg@rug.nl"},
+    {name = "Karen Stuitje",      email = "stuitje@proton.me"}
 ]
 license = {text = "MIT License"}
 classifiers = [
@@ -43,13 +45,16 @@ develop = [
   "bump-my-version",
   "coverage[toml]",
   "pip-tools",
-  "pytest"
+  "pytest",
+  "pytest-cov"
 ]
 docs = [
-  "markdown-include",
-  "mkdocs",
-  "mkdocs-material",
-  "mkdocstrings[python]",
+    "zensical",
+    "mkdocs-material",
+    "markdown-include",
+    "mkdocs",
+    "mkdocstrings[python]",
+    "pymdown-extensions"
 ]
 publishing = [
   "twine",

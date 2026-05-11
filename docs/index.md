@@ -1,24 +1,22 @@
-[![Tests](https://github.com/FormingWorlds/MORS/actions/workflows/tests.yaml/badge.svg?branch=main)](https://github.com/FormingWorlds/MORS/actions/workflows/tests.yaml?query=branch%3Amain)
+[![MORS CI Test Suite](https://github.com/FormingWorlds/MORS/actions/workflows/tests.yaml/badge.svg)](https://github.com/FormingWorlds/MORS/actions)
 ![Coverage](https://gist.githubusercontent.com/lsoucasse/a25c37a328839edd00bb32d8527aec30/raw/covbadge.svg)
+[![License](https://img.shields.io/github/license/FormingWorlds/MORS?label=License)](https://github.com/FormingWorlds/MORS/blob/main/LICENSE.md)
+[![PyPI](https://img.shields.io/pypi/v/fwl-mors?label=PyPI)](https://pypi.org/project/fwl-mors/)
 
 
 # MODEL FOR ROTATION OF STARS (MORS)
 
-**This code is distributed as a python package for the purpose of the [PROTEUS framework](https://proteus-framework.org/PROTEUS/), a coupled simulation tool for the long-term evolution of atmospheres and interiors of rocky planets.
-The MORS package solves specifically the stellar rotation and evolution. It is based on the [original code](https://www.aanda.org/articles/aa/pdf/2021/05/aa38407-20.pdf) and model developed by Colin P. Johnstone.**
+**MORS** is a program designed to model stellar rotation and evolution. The package can be used to calculate evolutionary tracks for stellar rotation and X-ray, EUV, and Ly-alpha emission for stars with masses between 0.1 and 1.25 solar masses. It also allows the user to get basic stellar parameters, such as stellar radius and luminosity, as functions of mass and age using the stellar evolution models of Spada et al. ([2013](Reference/publications.md#bibliography)). 
 
-This code solves the stellar rotation and XUV evolution model presented in [Johnstone et al. (2021)](Reference/publications.md#mors-publication). The package can be used to calculate evolutionary tracks for stellar rotaton and X-ray, EUV, and Ly-alpha emission for stars with masses between 0.1 and 1.25 Msun and has additional functionality such as allowing the user to get basic stellar parameters such as stellar radius and luminosity as functions of mass and age using the stellar evolution models of [Spada et al. (2013)](Reference/publications.md#bibliography). When publishing results that were calculated using this code, both the [Johnstone et al. (2021)](Reference/publications.md#mors-publication) paper and [Spada et al. (2013)](Reference/publications.md#bibliography) should be cited.
+!!! info "PROTEUS framework"
+    MORS is the stellar rotation and XUV evolution model integrated into the PROTEUS framework,  a modular Python framework that simulates the coupled evolution of the atmospheres and interiors of rocky planets and exoplanets. The documentation for PROTEUS can be found [here](https://proteus-framework.org/PROTEUS). 
 
-!!! note
-    This version contains the fix for the error in the equation converting EUV1 to EUV2.
+If you plan to contribute to MORS, please read our [Code of Conduct](Community/CODE_OF_CONDUCT.md). If you are running into problems, please do not hesitate to raise an [Issue](https://github.com/FormingWorlds/MORS/issues).
 
-## Getting started
 
-- [Installation guide](How-to/installation.md) 
-- [First-run tutorial](Tutorials/first_run.md)
-- [Publications and bibliography](Reference/publications.md)
-- [Source code](https://github.com/FormingWorlds/MORS)
-- [Contact](contact.md)
+!!! tip "New to MORS?"
+    Go to [getting started](getting_started.md) for a quick path and basic usage. 
 
-If you plan to contribute to MORS, please read our [Code of Conduct](CODE_OF_CONDUCT.md).
-If you are running into problems, please do not hesitate to raise an [Issue](https://github.com/FormingWorlds/MORS/issues).
+## Citation and licence
+
+ When publishing results that were calculated using this code, both the Johnstone et al.  ([2021](Reference/publications.md#mors-publications)) paper and Spada et al. ([2013](Reference/publications.md#bibliography)) should be cited. Please also see the included [license](https://github.com/FormingWorlds/MORS/blob/main/LICENSE.md).

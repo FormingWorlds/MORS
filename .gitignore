@@ -55,3 +55,6 @@ fs255_grid*
 # Debug 
 #*.png
 nogit*
+
+#zensical site
+site/

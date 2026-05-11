@@ -1,4 +1,4 @@
-name: Tests for MORS
+name: MORS CI Test Suite
 
 on:
   push:
@@ -66,6 +66,6 @@ jobs:
           filename: covbadge.svg
           label: Coverage
           message: ${{ env.total }}%
-          minColorRange: 10
-          maxColorRange: 90
+          minColorRange: 40
+          maxColorRange: 100
           valColorRange: ${{ env.total }}
