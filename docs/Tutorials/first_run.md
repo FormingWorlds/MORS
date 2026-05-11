@@ -3,7 +3,7 @@
 By the end of this tutorial you will have installed MORS, computed your first stellar evolutionary track, plotted a quantity, queried values at specific ages, and saved the result for reuse.
 
 !!! info "Units"
-    `Mstar` in **M☉**, `Age` in **Myr**, `Prot` in **days**, `Omega` in **Ω☉**.
+    `Age` is in **Myr**, `Prot` is in **days**, and `Omega` is in units of the **current solar rotation rate** ($\Omega_\odot = 2.67 \times 10^{-6}$ rad s$^{-1}$).
 
 ## Prerequisites
 
