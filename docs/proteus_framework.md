@@ -15,6 +15,6 @@ You can find the <b>documentation of each PROTEUS module</b> in the sidebar.
 <br>
 
 <p align="center">
-      <img src="https://raw.githubusercontent.com/FormingWorlds/PROTEUS/main/docs/assets/schematic_round.png" style="max-width: 90%; height: auto;"></br>
-      <b>Schematic of PROTEUS components and corresponding modules.</b> </br>
+    <img src="assets/PROTEUS_schematic_lightmode.png#only-light" style="max-width: 90%; height: auto;" alt="PROTEUS schematic"><img src="assets/PROTEUS_schematic_darkmode.png#only-dark" style="max-width: 90%; height: auto;" alt="PROTEUS schematic"><br>
+    <b>Schematic of PROTEUS components and corresponding modules.</b>
 </p>

@@ -49,7 +49,7 @@ develop = [
   "pytest-cov"
 ]
 docs = [
-    "zensical",
+    "zensical==0.0.39",
     "mkdocs-material",
     "markdown-include",
     "mkdocs",
