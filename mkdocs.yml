@@ -78,10 +78,9 @@ nav:
       - 🔗 Zalmoxis: https://proteus-framework.org/Zalmoxis/
       - 🔗 Aragog: https://proteus-framework.org/aragog/
       - 🔗 SPIDER:  https://proteus-framework.org/SPIDER/
-      - 🔗 Atmodeller: https://atmodeller.readthedocs.io/en/latest/
-      - 🔗 FastChem: https://newstrangeworlds.github.io/FastChem/
-      - 🔗 PLATON: https://platon.readthedocs.io/en/latest/
-      - 🔗 SOCRATES: https://github.com/FormingWorlds/SOCRATES/
+      - 🔗 Atmodeller: https://github.com/FormingWorlds/Atmodeller/
+      - 🔗 FastChem: https://github.com/FormingWorlds/FastChem/
+      - 🔗 SOCRATES: https://proteus-framework.org/SOCRATES/
 
 # footer:
 extra:
@@ -139,6 +138,7 @@ theme:
 extra_css:
   - stylesheets/proteus_theme.css
   - stylesheets/footnotes.css
+  - stylesheets/extra.css
  
 markdown_extensions:
   - admonition
