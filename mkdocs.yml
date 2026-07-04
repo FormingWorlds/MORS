@@ -38,6 +38,7 @@ nav:
         - Habitable zone boundaries: Explanations/habitablezone.md
         - Spectral synthesis: Explanations/spectral_synthesis.md
       - Coupling to PROTEUS: Explanations/proteus.md
+      - Testing suite: Explanations/testing.md
 
   - Reference:
       - Publications and bibliography: Reference/publications.md
