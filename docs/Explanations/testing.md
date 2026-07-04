@@ -1,7 +1,7 @@
 # Testing suite
 
 ![coverage](https://gist.githubusercontent.com/lsoucasse/a25c37a328839edd00bb32d8527aec30/raw/covbadge.svg)
-[![Tests](https://github.com/FormingWorlds/MORS/actions/workflows/tests.yaml/badge.svg)](https://github.com/FormingWorlds/MORS/actions/workflows/tests.yaml)
+[![Tests](https://img.shields.io/github/actions/workflow/status/FormingWorlds/MORS/tests.yaml?branch=main&label=Tests)](https://github.com/FormingWorlds/MORS/actions/workflows/tests.yaml)
 [![tests](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/FormingWorlds/MORS/badges/tests-total.json)](https://proteus-framework.org/testing)
 
 The badge shows the number of tests in the suite. It reads a small JSON file on the repository's `badges` branch that the `Refresh test count badges` workflow regenerates whenever the test suite or source changes on `main`, so the count stays current without hand editing. The same file backs the module's row on the central [PROTEUS testing dashboard](https://proteus-framework.org/testing).
