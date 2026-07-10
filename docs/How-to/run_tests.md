@@ -1,6 +1,27 @@
 # Testing suite
 
-This page describes the current MORS test suite and how to run it. The suite covers the spectral synthesis pipeline in full, the Spectrum class, and regression tests for the Spada and Baraffe stellar evolution tracks with two ODE solvers. The physical model (`physicalmodel.py`), rotational evolution solver (`rotevo.py`), and parameter handling are not yet covered by dedicated tests.
+This page describes the MORS test suite and how to run it. The suite is
+organised into tiers so that fast, mocked tests run on every pull request while
+the slower tests that run the real evolutionary-track model run nightly. It
+covers the spectral synthesis pipeline, the `Spectrum` class, the Baraffe and
+Spada track interpolation, and the coupled `Star` model. The high-energy
+emission model (`physicalmodel.py`), the rotation-evolution solver
+(`rotevo.py`), and the `Cluster` class do not yet have dedicated test files.
+
+## Test tiers
+
+Every test file declares a tier marker that decides where and how often it runs:
+
+| Marker | What it tests | Runs |
+|---|---|---|
+| `unit` | Python logic with the track lookups mocked, under 100 ms each | Every pull request |
+| `smoke` | A real track lookup on a single star and age | Every pull request |
+| `integration` | The real Baraffe / Spada evolution model | Nightly |
+| `slow` | Full physics validation | Nightly |
+
+The `integration` tests download and run the real tracks, so they need
+`FWL_DATA` set and take minutes; keeping them in the nightly tier keeps the
+pull-request feedback fast.
 
 ## Running the tests
 
@@ -12,110 +33,112 @@ Install MORS with the development dependencies:
 pip install -e .[develop]
 ```
 
-Download the stellar evolution data (required for Spada and Baraffe track tests):
+Download the stellar evolution data (required for the `integration` tier):
 
 ```bash
 export FWL_DATA=/path/to/your/data
 mors download all
 ```
 
-### Run the full suite
+### Run the pull-request tiers
 
 ```bash
-coverage run -m pytest
+pytest -m "(unit or smoke) and not skip"
 ```
 
-### Run a specific file
+### Run the full suite (including the real-track tiers)
 
 ```bash
-pytest tests/test_spada_RB.py
+pytest -m "(unit or smoke or integration or slow) and not skip"
+```
+
+### Run a specific file or tier
+
+```bash
 pytest tests/test_spectrum.py
+pytest -m unit
+pytest -m integration
 ```
 
-### Run with verbose output
+### View coverage
 
 ```bash
-pytest -v
-```
-
-### View coverage report
-
-```bash
-coverage run -m pytest
+coverage run -m pytest -m "(unit or smoke or integration or slow) and not skip"
 coverage report
 ```
 
----
+## Test-quality tooling
+
+Two checks run on every pull request alongside the tests:
+
+```bash
+# Confirm every test carries a tier marker
+bash tools/validate_test_structure.sh
+
+# Enforce the test-quality rules against a locked baseline
+python tools/check_test_quality.py --check
+```
+
+The quality check rejects new happy-path tests: each test needs a docstring, an
+edge case, more than one meaningful assertion, and, on a physics source, a
+physical invariant. Two advisory reports list follow-up work:
+
+```bash
+python tools/check_test_quality.py --reference-pinned-status
+python tools/check_test_quality.py --physics-invariant-status
+```
 
 ## Current test files
 
-### `test_spada_FE.py`: Spada tracks, Forward Euler solver
+### `test_spectrum.py`: Spectrum class and helpers (`unit`)
 
-Runs four parametrised integration tests using the Forward Euler ODE solver. Each test creates a `mors.Star` at a given mass and initial rotation rate and checks three quantities at a given age against regression values from a known-good run:
+Mocked unit tests for `mors.spectrum`, no stellar evolution data required.
+Covers the wavelength-to-band lookup, the surface / 1 AU flux-scaling
+round-trip, the Planck surface-flux monotonicity with temperature, the loader's
+wavelength ordering and flux floor, the constant-integrand band integral, the
+short-wave and Planck extensions, and the TSV round-trip.
 
-| Quantity | Description |
-|---|---|
-| `Rstar` | Stellar radius (Rsun) |
-| `Lbol` | Bolometric luminosity (erg s⁻¹) |
-| `Leuv` | Total EUV luminosity (erg s⁻¹) |
+### `test_synthesis.py`: spectral synthesis (`unit`)
 
-Tolerance: `rtol=1e-6`. The test calls `mors.DownloadEvolutionTracks('Spada')` to ensure data are present.
+Mocked unit tests for `mors.synthesis`. Replaces `Value`, `Percentile`, `Lxuv`,
+`Lbol`, and `PlanckFunction_surf` with lightweight fakes, so no stellar
+evolution data are required. Covers the flux-budget closure, the band-scale
+factors, the per-band rescaling, and the modern-property fit.
 
----
+### `test_baraffe.py`: Baraffe tracks (`integration`)
 
-### `test_spada_RB.py`: Spada tracks, Rosenbrock solver
+Runs the Baraffe et al. (2015) track interpolation, pinning luminosity, radius,
+and insolation at two stellar masses and asserting luminosity rises with mass.
+Baraffe tracks use time in **years**, not Myr.
 
-Identical structure to `test_spada_FE.py` but uses the default `RosenbrockFixed` solver. The expected values differ from the Forward Euler test because the two solvers produce slightly different numerical results at the same tolerance settings.
+### `test_stellarevo.py`: Spada structure tracks (`integration`)
 
----
+Runs the Spada et al. (2013) structure-track interpolation, pinning the solar
+calibration (a 1 Msun star at the solar age reproduces the Sun) and asserting
+the main-sequence luminosity-mass monotonicity.
 
-### `test_baraffe.py`: Baraffe tracks
+### `test_star.py`: coupled Star model (`integration`)
 
-Runs two parametrised integration tests using Baraffe et al. (2015) tracks. Each test creates a `mors.BaraffeTrack` at a given mass and checks three quantities at a given age against regression values:
+Runs the coupled rotation and activity `Star` model. Pins the solar luminosity
+in cgs units for a solar-mass star at the solar age, and pins the model output
+for both time-integration methods.
 
-| Quantity | Description |
-|---|---|
-| `BaraffeLuminosity` | Bolometric luminosity (Lsun) |
-| `BaraffeStellarRadius` | Stellar radius (Rsun) |
-| `BaraffeSolarConstant` | Bolometric flux at given distance (W m⁻²) |
+## Validation anchors
 
-Tolerance: `rtol=1e-5`. Note that Baraffe tracks use time in **years**, not Myr.
+Each physics source has a validation page listing the published benchmark,
+analytical limit, or self-consistency identity that anchors its
+reference-pinned test: [Baraffe tracks](../Validation/baraffe.md),
+[stellar evolution tracks](../Validation/stellarevo.md),
+[Star model](../Validation/star.md), [Spectrum](../Validation/spectrum.md),
+and [spectral synthesis](../Validation/synthesis.md).
 
----
+## Continuous integration
 
-### `test_spectrum.py`: Spectrum class and helpers
+| Pipeline | Trigger | What it runs |
+|---|---|---|
+| Pull-request checks | Every pull request | The `unit` and `smoke` tiers, the marker validator, the test-quality check, and the coverage ratchet guard, under a 10-minute cap |
+| Nightly | 03:00 UTC daily | The full suite with coverage, uploaded to [Codecov](https://app.codecov.io/gh/FormingWorlds/MORS) |
 
-Unit tests for `mors.spectrum`. No stellar evolution data required. Covers:
-
-- `WhichBand`: wavelength-to-band lookup, including overlap regions
-- `ScaleToSurf` / `ScaleTo1AU`: round-trip scaling consistency
-- `PlanckFunction_surf`: monotonically increasing with temperature, positive values
-- `Spectrum.LoadDirectly`: ascending wavelength ordering, NaN/zero flux sanitisation, binwidth length
-- `Spectrum.CalcBandFluxes`: band integration with constant flux (analytically verifiable)
-- `Spectrum.ExtendShortwave`: extension length, wavelength bounds, constant flux value
-- `Spectrum.ExtendPlanck`: extension length, wavelength bounds, positive flux
-- TSV round-trip: write and reload with tolerance matching the `%1.4e` format
-
----
-
-### `test_synthesis.py`: Spectral synthesis
-
-Unit tests for `mors.synthesis`. Uses `monkeypatch` to replace `Value`, `Percentile`, `Lxuv`, `Lbol`, and `PlanckFunction_surf` with lightweight fakes, so no stellar evolution data are required. Covers:
-
-- `GetProperties`: flux budget consistency: $F = L / (4\pi \, \mathrm{AU}^2)$, UV remainder definition, Planck band integral
-- `CalcBandScales`: scale factor $Q_k = F_k^\mathrm{hist} / F_k^\mathrm{modern}$ for each band
-- `CalcScaledSpectrumFromProps`: correct band scale factor applied per wavelength, including overlap regions
-- `FitModernProperties`: correct initial guess shape, correct unpacking of the `minimize` result for both fixed-age and free-age cases
-
----
-
-## CI matrix
-
-Tests run automatically on every push and pull request to `main` via GitHub Actions:
-
-| OS | Python versions |
-|---|---|
-| Ubuntu | 3.11, 3.12, 3.13 |
-| macOS | 3.11, 3.12, 3.13 |
-
-Coverage is reported in the GitHub Actions summary. A coverage badge is generated from the `ubuntu-latest` + Python 3.12 run on `main`.
+Coverage gates ratchet upward toward the 90% ecosystem target and are never
+lowered. The pull-request tier covers the mocked unit surface; the nightly tier
+adds the real-track coverage.
