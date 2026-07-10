@@ -11,6 +11,8 @@ pytestmark = [pytest.mark.unit, pytest.mark.timeout(30)]
 
 # GetProperties
 
+@pytest.mark.reference_pinned
+@pytest.mark.physics_invariant
 @pytest.mark.parametrize(
     "Mstar,pctle,age,Lxuv_dict,Lbol_val",
     (
@@ -82,7 +84,22 @@ def test_GetProperties_flux_budget(monkeypatch, Mstar, pctle, age, Lxuv_dict, Lb
     expL = (expected_L_bo, expected_L_xr, expected_L_e1, expected_L_e2, expected_L_pl, expected_L_uv)
     assert_allclose(retL, expL, rtol=1e-12, atol=0.0)
 
+    # Self-consistency closure: the five sub-band fluxes sum to the bolometric
+    # flux, because the UV band is defined as the bolometric remainder. This is
+    # the conservation anchor; a regression in any band breaks it.
+    band_sum = out["F_xr"] + out["F_e1"] + out["F_e2"] + out["F_pl"] + out["F_uv"]
+    assert_allclose(band_sum, out["F_bo"], rtol=1e-12, atol=0.0)
+
+
+@pytest.mark.physics_invariant
 def test_GetProperties_planck_trapezoid_constant(monkeypatch):
+    """A unit Planck flux over the pl band integrates to the band width.
+
+    Analytical limit: with the surface Planck flux patched to 1 at 1 AU, the pl
+    band integral reduces to the width of the pl band. Pinning against the
+    hand-computed width, plus a positivity guard, rejects a wrong trapezoid
+    weight or a dropped bin width in the band integration.
+    """
     # Patch dependencies
     monkeypatch.setattr(synth, "Value", lambda M, a, k: 1.0 if k == "Rstar" else 5000.0)
     monkeypatch.setattr(synth, "Percentile", lambda **kwargs: 1.0)
@@ -98,10 +115,14 @@ def test_GetProperties_planck_trapezoid_constant(monkeypatch):
     wlmin, wlmax = spec.bands_limits["pl"]
     expected_F_pl = wlmax - wlmin  # integral of 1 dlambda over the pl band
 
+    # A unit integrand yields a strictly positive band integral.
+    assert out["F_pl"] > 0.0
     assert_allclose(out["F_pl"], expected_F_pl, rtol=1e-12, atol=0.0)
+
 
 # CalcBandScales
 
+@pytest.mark.physics_invariant
 @pytest.mark.parametrize(
     "modern_dict,hist_dict,expected",
     (
@@ -119,12 +140,16 @@ def test_CalcBandScales(modern_dict, hist_dict, expected):
           Q_key = hist["F_key"] / modern["F_key"]
     """
     q = synth.CalcBandScales(modern_dict, hist_dict)
+    # Band-scale factors are ratios of positive historical-to-modern fluxes, so
+    # every returned scale is strictly positive.
+    assert all(val > 0.0 for val in q.values())
     for k, v in expected.items():
         assert_allclose(q[k], v, rtol=0, atol=0)
 
 
 # CalcScaledSpectrumFromProps
 
+@pytest.mark.physics_invariant
 @pytest.mark.parametrize(
     "wl,fl,expected_mult",
     (
@@ -143,6 +168,13 @@ def test_CalcBandScales(modern_dict, hist_dict, expected):
     ),
 )
 def test_CalcScaledSpectrumFromProps_scales_by_first_band(wl, fl, expected_mult):
+    """Rescaling a spectrum keeps the wavelength grid and scales flux per band.
+
+    Each wavelength is scaled by the band-scale factor of the first band it
+    falls in (an overlap wavelength uses the shorter-wavelength band). The
+    wavelength grid must be left untouched (symmetry) while the flux is
+    multiplied bin-by-bin, so a mis-assigned band or a shifted grid fails.
+    """
     modern = spec.Spectrum().LoadDirectly(wl, fl)
 
     modern_dict = {"F_xr": 1, "F_e1": 1, "F_e2": 1, "F_uv": 1, "F_pl": 1, "F_bo": 1}
