@@ -2,11 +2,12 @@
 
 This page describes the MORS test suite and how to run it. The suite is
 organised into tiers so that fast, mocked tests run on every pull request while
-the slower tests that run the real evolutionary-track model run nightly. It
-covers the spectral synthesis pipeline, the `Spectrum` class, the Baraffe and
-Spada track interpolation, and the coupled `Star` model. The high-energy
-emission model (`physicalmodel.py`), the rotation-evolution solver
-(`rotevo.py`), and the `Cluster` class do not yet have dedicated test files.
+the slower tests that run the real evolutionary-track model run nightly. Every
+source file has a companion test file: the spectral synthesis pipeline, the
+`Spectrum` class, the rotation, activity, and high-energy emission model, the
+rotation-evolution solver, the `Cluster` class, the Baraffe and Spada track
+interpolation, the coupled `Star` model, and the command-line, logging, and
+data-download utilities.
 
 ## Test tiers
 
@@ -90,47 +91,58 @@ python tools/check_test_quality.py --physics-invariant-status
 
 ## Current test files
 
-### `test_spectrum.py`: Spectrum class and helpers (`unit`)
+The suite runs about 270 tests and covers roughly 99% of the source. The mocked
+unit tier runs on every pull request; the real-model integration tier runs
+nightly.
 
-Mocked unit tests for `mors.spectrum`, no stellar evolution data required.
-Covers the wavelength-to-band lookup, the surface / 1 AU flux-scaling
-round-trip, the Planck surface-flux monotonicity with temperature, the loader's
-wavelength ordering and flux floor, the constant-integrand band integral, the
-short-wave and Planck extensions, and the TSV round-trip.
+### Unit tier
 
-### `test_synthesis.py`: spectral synthesis (`unit`)
+- `test_spectrum.py`: the `Spectrum` class and band helpers. Wavelength-to-band
+  lookup, surface / 1 AU flux scaling, Planck surface flux, spectrum
+  sanitisation, band integration, spectral extensions, and TSV round-trip.
+- `test_synthesis.py`: spectral synthesis. Flux-budget closure, band-scale
+  factors, per-band rescaling, and the modern-property fit, with the stellar
+  model mocked.
+- `test_physicalmodel.py`: rotation, activity, and high-energy emission. The
+  X-ray, EUV, and Lyman-alpha luminosities, the Rossby number and convective
+  turnover time, the core and envelope torques, the mass-loss and escape
+  relations, and the habitable-zone boundaries, with the structure model mocked.
+- `test_rotevo.py`: rotation-evolution integration. The forward-Euler,
+  Runge-Kutta, Runge-Kutta-Fehlberg, and Rosenbrock steppers and the spin-down
+  invariants, with the rate law and structure mocked.
+- `test_cluster.py`: the `Cluster` orchestration and percentile statistics, with
+  the member stars mocked.
+- `test_miscellaneous.py`: shared helpers. Index lookups, array loading, the
+  activity lifetime, and the integrated-emission fluence.
+- `test_data.py`: evolutionary-track download, with the network and filesystem
+  mocked.
+- `test_cli.py`: the command-line interface, with the downloads mocked.
+- `test_logs.py`: the logger setup and the exception hook.
 
-Mocked unit tests for `mors.synthesis`. Replaces `Value`, `Percentile`, `Lxuv`,
-`Lbol`, and `PlanckFunction_surf` with lightweight fakes, so no stellar
-evolution data are required. Covers the flux-budget closure, the band-scale
-factors, the per-band rescaling, and the modern-property fit.
+### Integration tier
 
-### `test_baraffe.py`: Baraffe tracks (`integration`)
-
-Runs the Baraffe et al. (2015) track interpolation, pinning luminosity, radius,
-and insolation at two stellar masses and asserting luminosity rises with mass.
-Baraffe tracks use time in **years**, not Myr.
-
-### `test_stellarevo.py`: Spada structure tracks (`integration`)
-
-Runs the Spada et al. (2013) structure-track interpolation, pinning the solar
-calibration (a 1 Msun star at the solar age reproduces the Sun) and asserting
-the main-sequence luminosity-mass monotonicity.
-
-### `test_star.py`: coupled Star model (`integration`)
-
-Runs the coupled rotation and activity `Star` model. Pins the solar luminosity
-in cgs units for a solar-mass star at the solar age, and pins the model output
-for both time-integration methods.
+- `test_baraffe.py`: the Baraffe et al. (2015) track interpolation. Pins
+  luminosity, radius, and insolation at two masses and asserts luminosity rises
+  with mass. Baraffe tracks use time in **years**, not Myr.
+- `test_stellarevo.py`: the Spada et al. (2013) structure-track interpolation.
+  Pins the solar calibration and asserts the main-sequence mass-luminosity
+  monotonicity.
+- `test_star.py`: the coupled `Star` model. Pins the solar luminosity in cgs for
+  a solar-mass star at the solar age and the model output for both
+  time-integration methods, and exercises the full quantity-getter surface.
 
 ## Validation anchors
 
-Each physics source has a validation page listing the published benchmark,
-analytical limit, or self-consistency identity that anchors its
-reference-pinned test: [Baraffe tracks](../Validation/baraffe.md),
+Each physics source has a validation page naming the published benchmark or
+analytical limit that anchors its reference-pinned test:
+[Baraffe tracks](../Validation/baraffe.md),
 [stellar evolution tracks](../Validation/stellarevo.md),
-[Star model](../Validation/star.md), [Spectrum](../Validation/spectrum.md),
-and [spectral synthesis](../Validation/synthesis.md).
+[Star model](../Validation/star.md),
+[rotation evolution](../Validation/rotevo.md),
+[activity and habitable zone](../Validation/physicalmodel.md),
+[cluster percentiles](../Validation/cluster.md),
+[Spectrum](../Validation/spectrum.md), and
+[spectral synthesis](../Validation/synthesis.md).
 
 ## Continuous integration
 

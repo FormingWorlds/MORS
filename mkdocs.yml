@@ -62,6 +62,9 @@ nav:
         - Baraffe tracks: Validation/baraffe.md
         - Stellar evolution tracks: Validation/stellarevo.md
         - Star model: Validation/star.md
+        - Rotation evolution: Validation/rotevo.md
+        - Activity and habitable zone: Validation/physicalmodel.md
+        - Cluster percentiles: Validation/cluster.md
         - Spectrum: Validation/spectrum.md
         - Spectral synthesis: Validation/synthesis.md
 
