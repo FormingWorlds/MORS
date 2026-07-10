@@ -1,21 +1,23 @@
 
 """Module holding the Star class and related functions."""
 
+from __future__ import annotations
+
 # Imports for standard stuff needed here
-import sys
-import inspect
-import numpy as np
+import copy
+import logging
 import pickle
 
-import logging
-log = logging.getLogger("fwl."+__name__)
+import numpy as np
 
-# Imports for nors modules
+# Imports for mors modules
 import mors.miscellaneous as misc
-import mors.stellarevo as SE
 import mors.parameters as params
-import mors.rotevo as RE
 import mors.physicalmodel as phys
+import mors.rotevo as RE
+import mors.stellarevo as SE
+
+log = logging.getLogger("fwl." + __name__)
 
 # Limits on various input values
 MstarMin = 0.1
@@ -31,17 +33,17 @@ class Star:
         """Initialises instance of Star class.
 
         This is the main function that is run when creating an instance of the Star class and it sets up all
-        the things needed including calculating evolutionary tracks for the star. 
-        
+        the things needed including calculating evolutionary tracks for the star.
+
         The function requires that the arguments Mstar (the star's mass in Msun) and Omega (in OmegaSun=2.67e-6 rad s^-1) are specified
         in the call. Alternatively, OmegaEnv and OmegaCore can be set, in which case Omega does not need to
         be specified. If the argument Age (in Myr) is also specified, then the code will find the evolutionary
         track that passes through this rotation rate at this age, otherwise if Age is not set then it will
-        calculate evolutionary tracks assuming this Omega as the initial (1 Myr) rotation rate. 
-        
+        calculate evolutionary tracks assuming this Omega as the initial (1 Myr) rotation rate.
+
         The user should not specify OmegaCore and Age simultaneously, and if Age is set then either Omega or OmegaEnv can be
-        used to specify the surface rotation rate. 
-        
+        used to specify the surface rotation rate.
+
         The user can also specify the initial rotation rate using using a percentile of the 1 Myr rotation distribution via the ``percentile`` keyword argument.
 
         Parameters
@@ -78,8 +80,10 @@ class Star:
         # (if Omega is set, OmegaEnv and OmegaCore will both be set to that value)
         Omega , OmegaEnv , OmegaCore = _InputRotation(Mstar,Age,Omega,OmegaEnv,OmegaCore,Prot,percentile,params)
 
-        # Set parameters
-        self.params = params
+        # Set parameters. Copy the passed dictionary so enabling ExtendedTracks
+        # below stays local to this star and does not mutate the shared default
+        # dictionary that other stars read from.
+        self.params = copy.deepcopy(params)
 
         # Set the ExtendedTracks parameter to True so we get all parameters
         self.params['ExtendedTracks'] = True
@@ -124,7 +128,7 @@ class Star:
         self.AgeMax = self.StarEvo.ModelData[self.Mstar]['Age'][-1]
 
         # If needing to get initial rotation rate then get it
-        if not Age is None:
+        if Age is not None:
 
             # Get initial rotation
             Omega0 = RE.FitRotation( Mstar=self.Mstar , Age=Age , Omega=OmegaEnv0 ,
@@ -351,7 +355,7 @@ class Star:
         def nAge(self,Age):
             return self.Value(Age=Age, Quantity="nAge")
         setattr(self.__class__, "nAge", nAge)
-        
+
         return
 
     def Value(self,Age=None,Quantity=None):
@@ -374,7 +378,7 @@ class Star:
             raise Exception("Quantity must be string")
 
         # Make sure Quantity is a valid quantity with a track
-        if not Quantity in self.Tracks:
+        if Quantity not in self.Tracks:
             raise Exception("no available track for "+Quantity)
 
         return self.Tracks[Quantity]
@@ -455,7 +459,7 @@ class Star:
             raise Exception("Quantity must be string")
 
         # Check input Quantity is valid
-        if not Quantity in QuantitiesAllowed:
+        if Quantity not in QuantitiesAllowed:
             QuantitiesString = ''
             for quantity in QuantitiesAllowed:
                 QuantitiesString += quantity + " , "
@@ -522,7 +526,7 @@ class Star:
             raise Exception("Band must be string")
 
         # Check input Band is valid
-        if not Band in BandsAllowed:
+        if Band not in BandsAllowed:
             BandsString = ''
             for band in BandsAllowed:
                 BandsString += band + " , "
@@ -553,7 +557,7 @@ class Star:
             aOrbAllowed = [ 'RecentVenus' , 'RunawayGreenhouse' , 'MoistGreenhouse' , 'MaximumGreenhouse' , 'EarlyMars' , 'HZ' ]
 
             # Check input is valid
-            if not aOrb in aOrbAllowed:
+            if aOrb not in aOrbAllowed:
                 aOrbString = ''
                 for a in aOrbAllowed:
                     aOrbString += a + " , "
@@ -597,18 +601,18 @@ def _InputRotation(Mstar,Age,Omega,OmegaEnv,OmegaCore,Prot,percentile,params):
     """Takes input rotation values, checks sets up values correctly."""
 
     # Make sure percentile and rotation are not both set
-    if not percentile is None:
-        if not Omega is None :
+    if percentile is not None:
+        if Omega is not None :
             raise Exception( "cannot set both percentile and Omega as arguments of Star" )
-        if not OmegaEnv is None :
+        if OmegaEnv is not None :
             raise Exception( "cannot set both percentile and OmegaEnv as arguments of Star" )
-        if not OmegaCore is None :
+        if OmegaCore is not None :
             raise Exception( "cannot set both percentile and OmegaCore as arguments of Star" )
-        if not Prot is None :
+        if Prot is not None :
             raise Exception( "cannot set both percentile and Prot as arguments of Star" )
 
     # Make sure percentile and OmegaEnv are not both set
-    if ( not percentile is None ) and ( not OmegaEnv is None ):
+    if ( percentile is not None ) and ( OmegaEnv is not None ):
         raise Exception( "cannot set both percentile and OmegaEnv as arguments of Star" )
 
     # If percentile was set to a string, get float version
@@ -623,26 +627,26 @@ def _InputRotation(Mstar,Age,Omega,OmegaEnv,OmegaCore,Prot,percentile,params):
             raise Exception( "invalid percentile string (options are 'slow', 'medium', or 'fast')" )
 
     # If percentile was set, get Omega
-    if not percentile is None:
+    if percentile is not None:
         Omega = Percentile(Mstar=Mstar,percentile=percentile,params=params)
 
     # Make sure if Age is set that OmegaCore is not set
-    if ( not Age is None ) and ( not OmegaCore is None ):
+    if ( Age is not None ) and ( OmegaCore is not None ):
         raise Exception( "cannot set both Age and OmegaCore as arguments of Star" )
 
     # Make sure not both Omega and Prot were set
-    if ( not Omega is None ) and ( not Prot is None ):
+    if ( Omega is not None ) and ( Prot is not None ):
         raise Exception( "cannot set both Omega and Prot as arguments of Star" )
 
     # If Prot is set, get Omega
-    if not Prot is None:
+    if Prot is not None:
         Omega = phys._Omega(Prot)
 
     # Make sure at least one rotation rate is set
     if ( Omega is None ):
 
         # If Age is set then make sure OmegaEnv is set, otherwise make sure both OmegaEnv and OmegaCore are set
-        if ( not Age is None ):
+        if ( Age is not None ):
             if ( OmegaEnv is None ):
                 raise Exception( "if Age is set then must set either Omega or OmegaEnv as argument of Star" )
         elif ( OmegaEnv is None ) or ( OmegaCore is None ):
@@ -706,8 +710,8 @@ def Percentile(Mstar=None,Omega=None,Prot=None,percentile=None,MstarDist=None,Om
     # If percentile is not set, make sure rotation rate is set
     if percentile is None:
         # Not both
-        if not Omega is None:
-            if not Prot is None:
+        if Omega is not None:
+            if Prot is not None:
                 raise Exception( "keyword arguments Omega and Prot cannot both be set" )
         # At least one
         if ( Omega is None ) and ( Prot is None ):
@@ -726,19 +730,19 @@ def Percentile(Mstar=None,Omega=None,Prot=None,percentile=None,MstarDist=None,Om
             raise Exception( "one of keyword arguments OmegaDist and ProtDist must be set" )
 
         # Check that OmegaDist and ProtDist are not both set
-        if ( not OmegaDist is None ) and ( not ProtDist is None ):
+        if ( OmegaDist is not None ) and ( ProtDist is not None ):
             raise Exception( "keyword arguments OmegaDist and ProtDist cannot both be set" )
 
         # Setup OmegaDist if ProtDist was set
         if OmegaDist is None:
-            OmegaDist = misc._Omega(ProtDist)
+            OmegaDist = phys._Omega(ProtDist)
 
         # Make sure arrays are same length
         if not ( len(MstarDist) == len(OmegaDist) ):
             raise Exception( "MstarDist and OmegaDist (or ProtDist) must be same length" )
 
     # Work out which one to do
-    if not percentile is None:
+    if percentile is not None:
 
         # percentile was set, so get corresponding rotation rates
         result = _OmegaPercentile(Mstar,percentile,MstarDist,OmegaDist,params)
@@ -811,4 +815,3 @@ def _PerPercentile(Mstar,Omega,MstarDist,OmegaDist,params):
     # If we get here, not converged
     raise Exception(
         f"did not find percentile for Omega={Omega} (Mstar={Mstar}) after {nIterMax} iterations; last bracket=({perMin},{perMax}), last mid={perMid}")
-

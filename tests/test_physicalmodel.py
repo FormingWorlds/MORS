@@ -895,6 +895,37 @@ class TestHabitableZone:
         # Sign / scale guard: a solar inner HZ edge is near 1 AU, not 0.1 or 10 AU.
         assert 0.5 < hz['RunawayGreenhouse'] < 1.5
 
+    @pytest.mark.reference_pinned
+    @pytest.mark.physics_invariant
+    def test_runaway_greenhouse_limit_for_a_cool_star(self, monkeypatch):
+        """For a cool star the runaway greenhouse limit follows the Kopparapu polynomial.
+
+        Reference: Kopparapu et al. (2013), Table 3. At Teff = 4000 K the shifted
+        temperature Tstar = Teff - 5780 = -1780 K drives the full
+        a*Tstar + b*Tstar**2 + c*Tstar**3 + d*Tstar**4 correction, unlike the
+        solar case where every temperature term vanishes. The boundary distance
+        is (Lbol / Seff)**0.5 with Seff from the published coefficients.
+        """
+        monkeypatch.setattr('mors.stellarevo.Lbol', lambda M, A: 0.1)
+        monkeypatch.setattr('mors.stellarevo.Teff', lambda M, A: 4000.0)
+        hz = pm.aOrbHZ(Mstar=0.5, Age=1000.0)
+        # Kopparapu runaway-greenhouse coefficients at Tstar = -1780 K.
+        tstar = 4000.0 - 5780.0
+        seff = (1.0385 + 1.2456e-4 * tstar + 1.4612e-8 * tstar**2
+                - 7.6345e-12 * tstar**3 - 1.7511e-15 * tstar**4)
+        expected = (0.1 / seff) ** 0.5
+        assert_allclose(hz['RunawayGreenhouse'], expected, rtol=1e-9)
+        # Discrimination guard: a linear cubic term (c*Tstar instead of
+        # c*Tstar**3) shifts the boundary by more than two percent at this
+        # temperature, so an exponent slip fails here even though it is invisible
+        # at the solar anchor where Tstar is zero.
+        seff_linear = (1.0385 + 1.2456e-4 * tstar + 1.4612e-8 * tstar**2
+                       - 7.6345e-12 * tstar * 3.0 - 1.7511e-15 * tstar**4)
+        wrong = (0.1 / seff_linear) ** 0.5
+        assert abs(hz['RunawayGreenhouse'] - wrong) > 0.02 * expected
+        # Positivity and scale guard for a cool, faint star.
+        assert 0.2 < hz['RunawayGreenhouse'] < 0.5
+
     @pytest.mark.physics_invariant
     def test_habitable_zone_boundaries_are_ordered(self, monkeypatch):
         """The habitable-zone boundaries increase from the hottest to the coolest limit.
