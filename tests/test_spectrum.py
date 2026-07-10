@@ -49,17 +49,21 @@ def test_WhichBand_classifies_wavelengths(wl, expected):
     """
     result = specmod.WhichBand(wl)
     assert result == expected
-    lo = min(limits[0] for limits in specmod.bands_limits.values())
-    hi = max(limits[1] for limits in specmod.bands_limits.values())
+    # WhichBand only classifies against the ascending band set (xr..pl); the
+    # wide bolometric band is excluded, so the range guard is built from the
+    # same set the function iterates.
+    lo = min(specmod.bands_limits[b][0] for b in specmod.bands_ascending)
+    hi = max(specmod.bands_limits[b][1] for b in specmod.bands_ascending)
     if result is None:
-        # None is returned only outside the union of all band limits; the
-        # upper edge is exclusive, so the top of the pl band maps to None too.
+        # None is returned only outside the ascending bands; the upper edge is
+        # exclusive, so the top of the pl band maps to None too.
         assert wl < lo or wl >= hi
     else:
-        # Every returned band names a real key and actually brackets wl.
-        assert all(band in specmod.bands_limits for band in result)
+        # Every returned band is one of the ascending bands and brackets wl
+        # with an inclusive lower and exclusive upper edge.
+        assert all(band in specmod.bands_ascending for band in result)
         assert all(
-            specmod.bands_limits[band][0] <= wl <= specmod.bands_limits[band][1]
+            specmod.bands_limits[band][0] <= wl < specmod.bands_limits[band][1]
             for band in result
         )
 

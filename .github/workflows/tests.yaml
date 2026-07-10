@@ -98,52 +98,55 @@ jobs:
           base = tomllib.loads(out.stdout)
           head = tomllib.loads(pathlib.Path('pyproject.toml').read_text())
 
-          def fail_under(d):
+          ECOSYSTEM_CEILING = 90.0
+
+          # Both coverage gates are one-way: the full nightly gate and the fast
+          # PR gate. Each may ratchet down to the 90% ecosystem ceiling but not
+          # below its base value, and may not be raised above 90%.
+          GATES = {
+              'full [tool.coverage.report]': ('coverage', 'report'),
+              'fast [tool.mors.coverage_fast]': ('mors', 'coverage_fast'),
+          }
+
+          def fail_under(d, keypath):
               try:
-                  return float(d['tool']['coverage']['report']['fail_under'])
-              except KeyError:
+                  node = d['tool'][keypath[0]][keypath[1]]
+                  return float(node['fail_under'])
+              except (KeyError, TypeError):
                   return None
 
-          base_v = fail_under(base)
-          head_v = fail_under(head)
-          print(f'fail_under: base={base_v} head={head_v}')
+          failed = False
+          for label, keypath in GATES.items():
+              base_v = fail_under(base, keypath)
+              head_v = fail_under(head, keypath)
+              print(f'{label} fail_under: base={base_v} head={head_v}')
 
-          # Base has no [tool.coverage.report].fail_under: nothing to ratchet
-          # against. The first PR that introduces the gate is allowed
-          # regardless of head_v.
-          if base_v is None:
-              print(
-                  f'origin/{base_ref} has no [tool.coverage.report].fail_under; '
-                  'no ratchet to enforce. PASS.'
-              )
-              sys.exit(0)
+              # Base has no gate yet: the PR that introduces it is allowed.
+              if base_v is None:
+                  print(f'  origin/{base_ref} has no {label} gate; nothing to enforce. PASS.')
+                  continue
+              # Head removed a gate the base had: that is a decrease.
+              if head_v is None:
+                  print(f'  ERROR: head removed the {label} gate (base had {base_v}).')
+                  failed = True
+                  continue
+              floor = min(base_v, ECOSYSTEM_CEILING)
+              if head_v < floor:
+                  print(
+                      f'  ERROR: {label} fail_under {head_v} < floor {floor} '
+                      f'(base={base_v}, ceiling={ECOSYSTEM_CEILING}).'
+                  )
+                  failed = True
+              elif head_v > ECOSYSTEM_CEILING:
+                  print(
+                      f'  ERROR: {label} fail_under {head_v} exceeds the '
+                      f'{ECOSYSTEM_CEILING}% ceiling.'
+                  )
+                  failed = True
+              else:
+                  print(f'  OK: {label} fail_under {head_v} within [{floor}, {ECOSYSTEM_CEILING}].')
 
-          # Head removed the gate that base had: that is a decrease.
-          if head_v is None:
-              print(
-                  f'ERROR: head removed [tool.coverage.report].fail_under '
-                  f'(base had {base_v}). The gate is one-way only.'
-              )
-              sys.exit(1)
-
-          ECOSYSTEM_CEILING = 90.0
-          floor = min(base_v, ECOSYSTEM_CEILING)
-          if head_v < floor:
-              print(
-                  f'ERROR: fail_under {head_v} < floor {floor} '
-                  f'(base={base_v}, ceiling={ECOSYSTEM_CEILING}). '
-                  'The gate may ratchet down to the 90% ecosystem ceiling '
-                  'but not below.'
-              )
-              sys.exit(1)
-          if head_v > ECOSYSTEM_CEILING:
-              print(
-                  f'ERROR: fail_under {head_v} exceeds the '
-                  f'{ECOSYSTEM_CEILING}% ecosystem ceiling. The gate may '
-                  f'not be raised above 90%.'
-              )
-              sys.exit(1)
-          print(f'OK: fail_under {head_v} within [{floor}, {ECOSYSTEM_CEILING}].')
+          sys.exit(1 if failed else 0)
           PY
 
       - name: Run unit + smoke tests

@@ -139,6 +139,7 @@ and [spectral synthesis](../Validation/synthesis.md).
 | Pull-request checks | Every pull request | The `unit` and `smoke` tiers, the marker validator, the test-quality check, and the coverage ratchet guard, under a 10-minute cap |
 | Nightly | 03:00 UTC daily | The full suite with coverage, uploaded to [Codecov](https://app.codecov.io/gh/FormingWorlds/MORS) |
 
-Coverage gates ratchet upward toward the 90% ecosystem target and are never
-lowered. The pull-request tier covers the mocked unit surface; the nightly tier
+Coverage gates move one way: a pull-request check blocks any change that lowers
+them, and the thresholds are raised toward the 90% ecosystem target as coverage
+improves. The pull-request tier covers the mocked unit surface; the nightly tier
 adds the real-track coverage.

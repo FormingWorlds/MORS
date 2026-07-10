@@ -78,11 +78,10 @@ source = ["mors"]
 
 [tool.coverage.report]
 # Full coverage gate: unit + smoke + integration + slow tests, enforced by
-# the nightly workflow. Auto-ratcheted toward the 90% PROTEUS-ecosystem
+# the nightly workflow. Raised one-way toward the 90% PROTEUS-ecosystem
 # ceiling by tools/update_coverage_threshold.py; never manually decrease.
 # Most MORS code paths run only under the real-track integration tier, so
-# this gate climbs as that tier deepens. See
-# .github/.claude/rules/mors-tests.md section 15.
+# this gate climbs as that tier deepens.
 fail_under = 52.0
 show_missing = true
 exclude_lines = [
@@ -93,11 +92,10 @@ exclude_lines = [
 
 [tool.mors.coverage_fast]
 # Fast PR gate: unit + smoke coverage only, enforced on every PR via
-# .github/workflows/tests.yaml. Auto-ratcheted toward the 90% ceiling by
+# .github/workflows/tests.yaml. Raised one-way toward the 90% ceiling by
 # tools/update_coverage_threshold.py; never manually decrease. The PR tier
 # exercises the mocked unit surface (band math, synthesis, spectrum) only,
-# so it starts well below 90 and climbs as unit coverage grows. See
-# .github/.claude/rules/mors-tests.md section 15.
+# so it starts well below 90 and climbs as unit coverage grows.
 fail_under = 18.0
 
 [tool.pytest.ini_options]
@@ -107,8 +105,8 @@ markers = [
     "smoke: real-track lookup on a single star / age (< 30 s each)",
     "integration: real evolution-track model runs (nightly)",
     "slow: full physics validation, run in nightly only",
-    "physics_invariant: marks tests that assert a physical invariant (conservation, positivity, boundedness, monotonicity, symmetry). See .github/.claude/rules/mors-tests.md section 3.",
-    "reference_pinned: marks tests that pin behavior against a published benchmark, analytical limit, or cross-implementation cross-check. Cite the source in the test docstring. Each physics source should contain at least one. See .github/.claude/rules/mors-tests.md section 3.",
+    "physics_invariant: marks tests that assert a physical invariant (conservation, positivity, boundedness, monotonicity, symmetry).",
+    "reference_pinned: marks tests that pin behavior against a published benchmark, analytical limit, or cross-implementation cross-check. Cite the source in the test docstring. Each physics source should contain at least one.",
 ]
 
 [tool.ruff]

@@ -83,7 +83,7 @@ coverage report
 coverage html
 ```
 
-**Coverage thresholds** (in `pyproject.toml`; auto-ratcheting, never manually decreased, capped at 90 by `tools/update_coverage_threshold.py`):
+**Coverage thresholds** (in `pyproject.toml`; one-way, never manually decreased, raised toward 90 by `tools/update_coverage_threshold.py` as coverage improves):
 
 - Fast gate (`[tool.mors.coverage_fast]`, unit + smoke, every PR): ratcheting toward **90%** (the PROTEUS-ecosystem ceiling). Because most of MORS is exercised only by the real-track `integration` tier, the fast gate starts well below 90 and ratchets up as mocked unit coverage grows.
 - Full gate (`[tool.coverage.report]`, unit + smoke + integration + slow, nightly): ratcheting toward **90%**.
@@ -126,11 +126,11 @@ Pre-commit runs on the files a commit touches. Legacy modules carry lint debt th
 2. **Fast coverage gate**: `[tool.mors.coverage_fast].fail_under` checked against the unit + smoke coverage.
 3. **Test structure**: `bash tools/validate_test_structure.sh`.
 4. **Test quality**: `python tools/check_test_quality.py --check` (blocking).
-5. **Coverage ratchet guard**: rejects any PR that lowers `[tool.coverage.report].fail_under` below `min(base_ref, 90.0)`.
+5. **Coverage ratchet guard**: rejects any PR that lowers either `[tool.coverage.report].fail_under` (full gate) or `[tool.mors.coverage_fast].fail_under` (fast gate) below `min(base_ref, 90.0)`.
 
 `.github/workflows/code-style.yaml` runs pre-commit (ruff) on the files a PR changes.
 
-**All must pass** before merge. Coverage thresholds auto-ratchet upward (never decrease).
+**All must pass** before merge. Coverage thresholds move one way: the guard blocks lowering, and they are raised as coverage improves (never decrease).
 
 **Nightly CI** (`.github/workflows/nightly.yml`):
 

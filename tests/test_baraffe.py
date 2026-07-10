@@ -19,9 +19,10 @@ import mors
 pytestmark = [pytest.mark.integration, pytest.mark.timeout(300)]
 
 # (Mstar [Msun], age [yr], aOrb [AU]) -> (Luminosity [Lsun], Rstar [Rsun],
-# insolation [W/m^2]) pinned against the Baraffe et al. (2015) tracks. The two
-# masses span a factor ~24 so a wrong track index moves the luminosity by
-# orders of magnitude, well outside the 1e-5 tolerance.
+# insolation [W/m^2]) pinned against the interpolation of the Baraffe et al.
+# (2015) tracks. The two cases sit at different ages, so the pins are regression
+# checks of the track interpolation; the same-age mass discrimination lives in
+# the companion monotonicity test below.
 TEST_DATA = (
     ((0.047, 8.5e7, 0.75), (0.74306071e-3, 0.14300000, 1.79809587)),
     ((1.113, 3.2e9, 1.05), (1.65441005, 1.18216231, 2.04256380e3)),
@@ -34,10 +35,11 @@ TEST_DATA = (
 def test_baraffe_track_matches_published_values(inp, expected):
     """Pin Baraffe luminosity, radius, and insolation against the tracks.
 
-    Reference: Baraffe et al. (2015), A&A 577, A42. A regression that shifts
-    the interpolation onto the wrong track or drops a unit conversion moves the
-    result far outside the tolerance. The positivity guard catches a sign flip
-    or a zeroed lookup that a pure numeric pin could miss.
+    Reference: the Baraffe et al. (2015), A&A 577, A42 evolutionary tracks. The
+    pinned values are the interpolation of the published tracks; a regression
+    that shifts the interpolation onto the wrong track or drops a unit
+    conversion moves the result far outside the tolerance. The positivity guard
+    catches a sign flip or a zeroed lookup that a pure numeric pin could miss.
     """
     mors.DownloadEvolutionTracks('Baraffe')
     baraffe = mors.BaraffeTrack(inp[0])
@@ -55,19 +57,19 @@ def test_baraffe_track_matches_published_values(inp, expected):
 
 @pytest.mark.physics_invariant
 def test_baraffe_luminosity_increases_with_mass():
-    """A more massive main-sequence star is more luminous at fixed age.
+    """Luminosity rises steeply with mass at a fixed age across the Baraffe grid.
 
-    Compares the 0.047 and 1.113 Msun Baraffe tracks at a common 3.2 Gyr age:
-    the luminosity must rise steeply with mass, so a swapped track index or a
-    mass-independent lookup fails loudly rather than passing on a plausible
-    single-mass value.
+    Compares the 0.047 Msun (substellar, below the hydrogen-burning limit) and
+    1.113 Msun tracks at a common 3.2 Gyr age: the luminosity must rise steeply
+    with mass, so a swapped track index or a mass-independent lookup fails
+    loudly rather than passing on a plausible single-mass value.
     """
     mors.DownloadEvolutionTracks('Baraffe')
-    age = 3.2e9  # yr, on the main sequence for both masses
+    age = 3.2e9  # yr, an age both tracks cover
     low = mors.BaraffeTrack(0.047).BaraffeLuminosity(age)
     high = mors.BaraffeTrack(1.113).BaraffeLuminosity(age)
     assert low > 0.0
     assert high > 0.0
-    # A 1.113 Msun star outshines a 0.047 Msun star by well over two orders of
+    # A 1.113 Msun star outshines a 0.047 Msun object by well over two orders of
     # magnitude; the factor-100 floor is far above interpolation noise.
     assert high > 100.0 * low

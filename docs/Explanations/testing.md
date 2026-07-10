@@ -26,8 +26,9 @@ Every test declares a tier. The `unit` and `smoke` tiers run on every pull
 request under a ten-minute cap; the `integration` and `slow` tiers run the real
 Baraffe and Spada tracks nightly. Line coverage is measured on the full suite
 nightly and uploaded to [Codecov](https://app.codecov.io/gh/FormingWorlds/MORS),
-where the coverage badge above is served. The coverage gates ratchet upward
-toward the 90% ecosystem target and are never lowered.
+where the coverage badge above is served. The coverage gates move one way: a
+pull-request check blocks any change that lowers them, and the thresholds are
+raised toward the 90% ecosystem target as coverage improves.
 
 ## Badge system
 
