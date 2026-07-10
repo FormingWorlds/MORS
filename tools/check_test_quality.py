@@ -62,6 +62,20 @@ BASELINE_PATH = REPO_ROOT / 'tools' / 'test_quality_baseline.json'
 
 TIER_MARKERS = {'unit', 'smoke', 'integration', 'slow'}
 
+# numpy.testing assertion helpers that MORS tests commonly import by name
+# (``from numpy.testing import assert_allclose``) and call bare rather than as
+# ``np.testing.assert_*``. A bare call to one of these is a real assertion and
+# is counted as such by _count_implicit_assertions.
+NUMPY_TESTING_HELPERS = {
+    'assert_allclose',
+    'assert_array_equal',
+    'assert_array_almost_equal',
+    'assert_almost_equal',
+    'assert_approx_equal',
+    'assert_array_less',
+    'assert_equal',
+}
+
 # Optional dependencies. Any test module that imports one of these MUST
 # precede the import with ``pytest.importorskip('<name>')`` at module
 # scope, otherwise CI's ``pip install --no-deps`` build fails collection.
@@ -345,6 +359,13 @@ def _count_implicit_assertions(node: ast.AST) -> int:
             elif isinstance(child.func.value, ast.Name) and child.func.value.id == 'pytest':
                 if attr == 'fail':
                     count += 1
+        elif isinstance(child, ast.Call) and isinstance(child.func, ast.Name):
+            # Bare-imported numpy.testing helper, e.g.
+            # ``from numpy.testing import assert_allclose`` then
+            # ``assert_allclose(...)``. This is an assertion even though it is
+            # called as a plain name rather than ``np.testing.assert_*``.
+            if child.func.id in NUMPY_TESTING_HELPERS:
+                count += 1
     return count
 
 
