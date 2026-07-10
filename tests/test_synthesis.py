@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import logging
+
 import numpy as np
 import pytest
 from numpy.testing import assert_allclose
@@ -220,7 +222,7 @@ def test_FitModernProperties_returns_minimize_solution(monkeypatch, age_in, mini
             self.x = x
 
     def fake_minimize(func, x0, method=None):
-        # check x0 shape matches code’s logic
+        # check x0 shape matches code's logic
         if age_in > 0:
             assert len(x0) == 2
             assert_allclose(x0[0], 1.0, rtol=0, atol=0)
@@ -244,3 +246,145 @@ def test_FitModernProperties_returns_minimize_solution(monkeypatch, age_in, mini
 
     best_pctle, best_age = synth.FitModernProperties(modern_spec, Mstar=1.0, age=age_in)
     assert_allclose((best_pctle, best_age), expected, rtol=0, atol=0)
+
+
+@pytest.mark.physics_invariant
+def test_CalcScaledSpectrumFromProps_skips_out_of_band_wavelengths():
+    """A wavelength outside every bandpass keeps its modern flux unchanged.
+
+    The X-ray band starts at 0.517 nm, so a bin at 0.1 nm lies below all
+    bandpasses and WhichBand returns None; that bin must be passed through
+    unscaled while in-band bins are multiplied by their band-scale factor.
+    This exercises the None-band guard and confirms the grid is preserved.
+    """
+    # 0.1 nm is below the X-ray lower edge (0.517 nm) so it is in no band; the
+    # remaining bins sit inside xr / e1 / uv respectively.
+    wl = np.array([0.1, 1.0, 5.0, 9.0, 11.0, 20.0, 31.0, 100.0, 200.0, 300.0])
+    fl = np.ones(10) * 10.0
+    modern = spec.Spectrum().LoadDirectly(wl, fl)
+
+    modern_dict = {"F_xr": 1, "F_e1": 1, "F_e2": 1, "F_uv": 1, "F_pl": 1, "F_bo": 1}
+    hist_dict = {"F_xr": 2, "F_e1": 3, "F_e2": 4, "F_uv": 5, "F_pl": 6, "F_bo": 1}
+
+    hist = synth.CalcScaledSpectrumFromProps(modern, modern_dict, hist_dict)
+
+    # Grid untouched.
+    assert_allclose(hist.wl, modern.wl, rtol=0, atol=0)
+
+    # The 0.1 nm bin is out of band and keeps its modern flux (scale factor 1).
+    assert_allclose(hist.fl[0], modern.fl[0], rtol=0, atol=0)
+
+    # The in-band bins are scaled by their band factor; the 1.0 nm bin is X-ray
+    # (Q_xr = 2), so it must differ from the untouched out-of-band bin.
+    assert_allclose(hist.fl[1], modern.fl[1] * 2.0, rtol=0, atol=0)
+    assert hist.fl[1] > hist.fl[0]
+
+
+@pytest.mark.physics_invariant
+@pytest.mark.parametrize(
+    "age_in,x0_expected_len",
+    (
+        (-1.0, 1),      # age <= 0 => fit_age False => single-parameter objective
+        (1000.0, 2),    # age > 0 => fit_age True => two-parameter objective
+    ),
+)
+def test_FitModernProperties_objective_residual_is_nonnegative(monkeypatch, age_in, x0_expected_len):
+    """The fit objective returns the root-sum-square band-flux mismatch.
+
+    Driving the real objective once (via a minimize stub that evaluates the
+    initial guess) exercises both the fit_age and fixed-age branches and the
+    residual accumulation. GetProperties is stubbed, so the age argument it
+    receives is not observed and the clamp value is not asserted here. With the
+    model band fluxes fixed and the measured band fluxes set to zero, the
+    residual reduces to the RSS of the width-normalised model fluxes, which is
+    strictly positive here.
+    """
+    wl = np.linspace(1.0, 900.0, 50)
+    fl = np.ones_like(wl)
+    modern_spec = spec.Spectrum().LoadDirectly(wl, fl)
+
+    # Fix the measured per-band integrated fluxes to zero so the residual is a
+    # closed-form function of the (mocked) model band fluxes only.
+    def fake_calc_band_fluxes():
+        modern_spec.fl_integ = {"xr": 0.0, "e1": 0.0, "e2": 0.0, "uv": 0.0}
+
+    monkeypatch.setattr(modern_spec, "CalcBandFluxes", fake_calc_band_fluxes)
+
+    # Model band fluxes [erg s-1 cm-2]; distinct per band so a dropped term shows.
+    model_props = {"F_xr": 1.0, "F_e1": 2.0, "F_e2": 3.0, "F_uv": 4.0}
+    monkeypatch.setattr(
+        synth,
+        "GetProperties",
+        lambda Mstar, pctle, age: dict(model_props),
+    )
+
+    captured = {}
+
+    class FakeResult:
+        def __init__(self, x):
+            self.success = True
+            self.x = x
+
+    def fake_minimize(func, x0, method=None):
+        assert len(x0) == x0_expected_len
+        captured["residual"] = func(x0)
+        return FakeResult(np.atleast_1d(x0).astype(float))
+
+    monkeypatch.setattr(synth, "minimize", fake_minimize)
+
+    synth.FitModernProperties(modern_spec, Mstar=1.0, age=age_in)
+
+    # Closed-form residual: sqrt(sum_k (F_k / width_k)^2) with zero measured flux.
+    expected = 0.0
+    for k in ("xr", "e1", "e2", "uv"):
+        lim = spec.bands_limits[k]
+        wid = lim[1] - lim[0]
+        expected += (model_props["F_" + k] / wid) ** 2
+    expected = np.sqrt(expected)
+
+    residual = captured["residual"]
+
+    # The objective is a Euclidean distance, so it is non-negative.
+    assert residual >= 0.0
+
+    # Pin the width-normalised value. A wrong formula that skips the per-band
+    # width normalisation would instead give sqrt(1 + 4 + 9 + 16) ~ 5.48, which
+    # differs from the correct ~0.13 by far more than the tolerance.
+    assert_allclose(residual, expected, rtol=1e-12, atol=0.0)
+    wrong_no_width = np.sqrt(1.0 + 4.0 + 9.0 + 16.0)
+    assert abs(residual - wrong_no_width) > 1.0
+
+
+def test_FitModernProperties_logs_error_on_failed_fit(monkeypatch, caplog):
+    """A non-converged optimisation is reported without raising.
+
+    When scipy.optimize.minimize returns success=False, the routine logs an
+    error and still returns the best available parameters rather than crashing,
+    so a failed fit does not abort the calling evolution step.
+    """
+    wl = np.linspace(1.0, 900.0, 50)
+    fl = np.ones_like(wl)
+    modern_spec = spec.Spectrum().LoadDirectly(wl, fl)
+
+    monkeypatch.setattr(
+        synth,
+        "GetProperties",
+        lambda Mstar, pctle, age: {"F_xr": 1.0, "F_e1": 1.0, "F_e2": 1.0, "F_uv": 1.0},
+    )
+
+    class FailedResult:
+        success = False
+        x = np.array([0.42])
+
+    monkeypatch.setattr(synth, "minimize", lambda func, x0, method=None: FailedResult())
+
+    with caplog.at_level(logging.ERROR, logger="fwl.mors.synthesis"):
+        best_pctle, best_age = synth.FitModernProperties(modern_spec, Mstar=1.0, age=-1.0)
+
+    # The failure is surfaced as an error-level log record.
+    assert any(rec.levelno == logging.ERROR for rec in caplog.records)
+
+    # Despite the failure the routine returns the reported solution and the
+    # unchanged input age (fit_age False), not a raised exception.
+    assert_allclose(best_pctle, 0.42, rtol=0, atol=0)
+    assert_allclose(best_age, -1.0, rtol=0, atol=0)

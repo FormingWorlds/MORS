@@ -80,9 +80,9 @@ source = ["mors"]
 # Full coverage gate: unit + smoke + integration + slow tests, enforced by
 # the nightly workflow. Raised one-way toward the 90% PROTEUS-ecosystem
 # ceiling by tools/update_coverage_threshold.py; never manually decrease.
-# Most MORS code paths run only under the real-track integration tier, so
-# this gate climbs as that tier deepens.
-fail_under = 52.0
+# The full suite measures about 99% line coverage; the gate is held at the
+# 90% ecosystem ceiling (the guard rejects a value above it).
+fail_under = 90.0
 show_missing = true
 exclude_lines = [
     "pragma: no cover",
@@ -93,10 +93,10 @@ exclude_lines = [
 [tool.mors.coverage_fast]
 # Fast PR gate: unit + smoke coverage only, enforced on every PR via
 # .github/workflows/tests.yaml. Raised one-way toward the 90% ceiling by
-# tools/update_coverage_threshold.py; never manually decrease. The PR tier
-# exercises the mocked unit surface (band math, synthesis, spectrum) only,
-# so it starts well below 90 and climbs as unit coverage grows.
-fail_under = 18.0
+# tools/update_coverage_threshold.py; never manually decrease. The mocked
+# unit tier measures about 63% line coverage (the real-track model paths run
+# only in the nightly integration tier), so the gate sits below the full gate.
+fail_under = 60.0
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

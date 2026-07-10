@@ -132,7 +132,7 @@ def test_planck_surface_flux_increases_with_temperature(wl, T1, T2):
 def test_Spectrum_LoadDirectly_sanitizes_and_orders(wl, fl):
     """Loading a raw spectrum sorts wavelengths and floors the flux positive.
 
-    The input is intentionally adversarial: wavelengths in descending order and
+    The input is deliberately hostile: wavelengths in descending order and
     a flux array containing nan, zero, and a negative value. After loading, the
     wavelength grid must be strictly ascending (monotonicity) and every flux
     finite and at or above the 1e-20 floor (positivity / boundedness), so the
@@ -149,6 +149,15 @@ def test_Spectrum_LoadDirectly_sanitizes_and_orders(wl, fl):
     # Flux must be finite and floored above zero; no nan / zero / negative.
     assert np.all(np.isfinite(s.fl))
     assert np.min(s.fl) >= 1e-20
+
+    # The floor alone is satisfied even if every flux were over-clamped down
+    # to 1e-20, so pin that the finite, above-floor input values survive intact.
+    valid_inputs = fl[np.isfinite(fl) & (fl > 1e-20)]
+    for v in valid_inputs:
+        assert np.any(np.isclose(s.fl, v, rtol=0.0, atol=1e-15))
+    # Exactly the three hostile entries (nan, zero, negative) land on the floor;
+    # an over-flooring regression would push this count above three.
+    assert np.count_nonzero(s.fl > 1e-20) == len(valid_inputs)
 
     # binwidth has one fewer entry than the grid.
     assert len(s.binwidth) == s.nbins - 1
@@ -188,8 +197,10 @@ def test_Spectrum_CalcBandFluxes_constant_integrand(wl, fl, expected):
     Analytical limit: the integral of a constant integrand of value 1 over a
     band is exactly the band width. Feeding a flat spectrum therefore pins each
     band integral to a hand-computed width, and the bolometric integral to the
-    full wavelength span. A wrong integration weight (trapezoid vs rectangle),
-    a dropped bin width, or a units slip fails against the 1e-12 tolerance.
+    full wavelength span. For a constant integrand every Riemann sum telescopes
+    to the same total, so this does not separate trapezoid from rectangle
+    weighting; what it does catch is a dropped bin width, a wavelength-unit
+    slip, or a wrong band boundary, each of which fails the 1e-12 tolerance.
     """
     if fl is None:
         fl = np.ones_like(wl)
@@ -301,3 +312,144 @@ def test_Spectrum_tsv_roundtrip(tmp_path, wl, fl):
     # WriteTSV uses fmt='%1.4e' so allow four-significant-figure error.
     assert_allclose(s2.wl, s1.wl, rtol=1e-4, atol=0.0)
     assert_allclose(s2.fl, s1.fl, rtol=1e-4, atol=0.0)
+
+
+# Guard and edge branches
+
+
+@pytest.mark.physics_invariant
+def test_Spectrum_CalcBandFluxes_skips_out_of_range_bins():
+    """Wavelengths below every band are skipped, leaving band integrals clean.
+
+    The grid deliberately opens with two bins shortward of the X-ray lower edge
+    (0.517 nm), where WhichBand returns None. Those bins must be dropped from the
+    band accumulation rather than folded into the X-ray integral, so each band
+    integral stays positive and the X-ray integral equals the width of only its
+    in-band segment (the sub-0.517 nm bins do not inflate it).
+    """
+    # Two bins below the xr lower edge (0.517 nm) map to no band (WhichBand None),
+    # followed by clean, non-overlapping per-band segments at unit flux.
+    wl = np.concatenate(
+        [
+            np.array([0.1, 0.3]),             # below all bands, WhichBand -> None
+            np.linspace(0.6, 9.9, 40),        # xr (avoid 10..12.5 overlap)
+            np.linspace(12.6, 31.9, 40),      # e1
+            np.linspace(32.1, 91.9, 40),      # e2
+            np.linspace(92.1, 399.9, 60),     # uv
+            np.linspace(400.1, 900.0, 60),    # pl
+        ]
+    )
+    fl = np.ones_like(wl)
+
+    s = specmod.Spectrum().LoadDirectly(wl, fl)
+    integ = s.CalcBandFluxes()
+
+    # Every band integral remains strictly positive despite the leading None bins.
+    assert all(integ[b] > 0.0 for b in ('xr', 'e1', 'e2', 'uv', 'pl'))
+
+    # The xr integral equals its in-band width only; the sub-0.517 nm bins are
+    # excluded, so a wrong branch that folded them in would exceed 9.9 - 0.6.
+    assert_allclose(integ['xr'], 9.9 - 0.6, rtol=1e-12, atol=0.0)
+    # A branch that swallowed the out-of-range bins would push xr past its width.
+    assert integ['xr'] < (9.9 - 0.1)
+
+
+def test_Spectrum_LoadDirectly_rejects_length_mismatch():
+    """Loading arrays of unequal length raises and leaves the object unloaded.
+
+    The wavelength and flux arrays are the coupling contract; a size mismatch is
+    a caller error that must abort before any state is written. The object must
+    stay in its unloaded default (loaded False, zero bins) so a caught exception
+    cannot leave a half-populated spectrum behind.
+    """
+    wl = np.linspace(1.0, 10.0, 12)
+    fl = np.linspace(1.0, 2.0, 11)  # one shorter than wl
+
+    s = specmod.Spectrum()
+    with pytest.raises(Exception, match='size mismatch'):
+        s.LoadDirectly(wl, fl)
+
+    assert s.loaded is False
+    assert s.nbins == 0
+
+
+def test_Spectrum_LoadDirectly_rejects_too_few_bins():
+    """A spectrum with fewer than ten bins raises and leaves the object unloaded.
+
+    The interpolation and extension routines assume a resolved grid; the source
+    refuses inputs below the ten-bin floor. The guard must fire before any state
+    is written, so the object stays unloaded with zero bins.
+    """
+    # Nine equal-length bins: below the ten-bin floor but not a length mismatch.
+    wl = np.linspace(1.0, 9.0, 9)
+    fl = np.linspace(1.0, 2.0, 9)
+
+    s = specmod.Spectrum()
+    with pytest.raises(Exception, match='too small'):
+        s.LoadDirectly(wl, fl)
+
+    assert s.loaded is False
+    assert s.nbins == 0
+
+
+def test_Spectrum_LoadTSV_missing_file_raises(tmp_path):
+    """Loading from a non-existent path raises and leaves the object unloaded.
+
+    LoadTSV resolves and checks the path before reading; a missing file is a
+    caller error that must abort with an informative message. The object must
+    stay unloaded (loaded False, zero bins) so no partial state survives.
+    """
+    missing = tmp_path / 'does_not_exist.tsv'
+
+    s = specmod.Spectrum()
+    with pytest.raises(Exception, match='Cannot find TSV file'):
+        s.LoadTSV(str(missing))
+
+    assert s.loaded is False
+    assert s.nbins == 0
+
+
+def test_Spectrum_ExtendShortwave_noop_when_target_above_grid():
+    """Requesting a shortwave extension above the grid start is a no-op.
+
+    When the requested minimum wavelength already exceeds the grid's first bin,
+    there is nothing to prepend and the routine returns without touching the
+    data. The grid must be left unchanged (same bin count, same first wavelength)
+    and the extension index must stay at its unset default.
+    """
+    wl = np.linspace(1.0, 10.0, 200)  # nm; grid starts at 1.0
+    fl = np.linspace(2.0, 3.0, 200)
+
+    s = specmod.Spectrum().LoadDirectly(wl, fl)
+    old_n = s.nbins
+    old_first = s.wl[0]
+
+    # wl_min above the current grid start: nothing shortward to add.
+    s.ExtendShortwave(wl_min=5.0)
+
+    assert s.nbins == old_n
+    assert s.ext_short == -1
+    assert_allclose(s.wl[0], old_first, rtol=1e-12, atol=0.0)
+
+
+def test_Spectrum_ExtendPlanck_noop_when_target_below_grid():
+    """Requesting a Planck extension below the grid end is a no-op.
+
+    When the requested maximum wavelength is already inside the grid, there is
+    nothing to append and the routine returns without evaluating the Planck tail.
+    The grid must be unchanged (same bin count, same final wavelength) and the
+    long-extension index must stay at its unset default.
+    """
+    wl = np.linspace(100.0, 1000.0, 300)  # nm; grid ends at 1000.0
+    fl = np.ones_like(wl) * 1e-5
+
+    s = specmod.Spectrum().LoadDirectly(wl, fl)
+    old_n = s.nbins
+    old_last = s.wl[-1]
+
+    # wl_max below the current grid end: nothing longward to add.
+    s.ExtendPlanck(Teff=5800.0, R_star=6.96e8, wl_max=500.0)
+
+    assert s.nbins == old_n
+    assert s.ext_long == -1
+    assert_allclose(s.wl[-1], old_last, rtol=1e-12, atol=0.0)
