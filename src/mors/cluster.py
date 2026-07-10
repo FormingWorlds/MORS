@@ -1,22 +1,19 @@
 """Module holding the Cluster class and related functions."""
 
+from __future__ import annotations
+
 # Imports for standard stuff needed here
-import sys
-import inspect
-import numpy as np
-import os
+import logging
 import pickle
 
-import logging
-log = logging.getLogger("fwl."+__name__)
+import numpy as np
 
 # Imports for mors modules
-import mors.miscellaneous as misc
-import mors.stellarevo as SE
 import mors.parameters as params
-import mors.rotevo as RE
 import mors.physicalmodel as phys
 import mors.star as star
+
+log = logging.getLogger("fwl." + __name__)
 
 class Cluster:
     """A class for star objects that hold all information about a star.
@@ -124,12 +121,13 @@ class Cluster:
     def _setupQuantityFunctions(self):
         """Makes functions for each quantity that return this quantity at a given age as attributes of class."""
 
-        # A description of how the code below works is given in the star class function with the same name
-        # as this function. In this case, the code does it based on the quantities held in the first star.
+        # One accessor per tracked quantity is attached to the class; each forwards
+        # to Values() with its own quantity name. The function is built in an explicit
+        # namespace so its name resolves when it is read back out for setattr.
         for track in self.stars[0].Tracks:
-
-            exec( "def "+track+"(self,Age):\n  return self.Values(Age=Age,Quantity='"+track+"')" )
-            exec( "setattr( self.__class__ , '"+track+"' , "+track+" )" )
+            ns = {}
+            exec(f"def {track}(self,Age): return self.Values(Age=Age,Quantity='{track}')", ns)
+            setattr(self.__class__, track, ns[track])
 
         return
 
@@ -332,7 +330,7 @@ def _CheckInputRotation(Age,Omega,OmegaEnv,OmegaCore):
   """Takes input rotation, checks if values are setup correctly."""
 
   # Make sure if Age is set that OmegaCore is not set
-  if ( not Age is None ) and ( not OmegaCore is None ):
+  if ( Age is not None ) and ( OmegaCore is not None ):
     raise Exception( "cannot set both Age and OmegaCore as arguments of Cluster" )
 
   # Make sure at least one rotation rate is set

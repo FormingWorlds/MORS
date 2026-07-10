@@ -1,0 +1,19 @@
+coverage:
+  # Badge colour gradient anchored on the current full-suite floor and the
+  # 90% PROTEUS-ecosystem ceiling. Widen the lower bound upward as the
+  # coverage ratchet climbs.
+  range: "50...90"
+  status:
+    project:
+      default:
+        # Track the ratcheting full-suite gate rather than a fixed 90%:
+        # coverage may not drop, but the target rises with the suite.
+        target: auto
+        threshold: 1%
+    patch:
+      default:
+        target: 80%
+        threshold: 1%
+comment:
+  layout: "reach, diff, flags, files"
+  require_changes: true

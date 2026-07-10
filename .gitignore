@@ -49,12 +49,18 @@ coverage.xml
 # Sphinx documentation
 docs/_build/
 
-# Data files 
+# Data files
 fs255_grid*
 
-# Debug 
+# Debug
 #*.png
 nogit*
 
 #zensical site
 site/
+
+# Personal Claude-Code session state at the repo root is not shared. The
+# tracked .github/.claude/rules/ directory and the CLAUDE.md symlink are the
+# shared, collaborator-facing rule files; anything under a top-level .claude/
+# is per-user and stays out of git.
+/.claude/

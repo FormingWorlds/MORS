@@ -31,7 +31,7 @@ nav:
       - First run: Tutorials/first_run.md
 
   - Explanations:
-      - Model overview: 
+      - Model overview:
         - Introduction:  Explanations/structure.md
         - Rotational evolution model:   Explanations/rotation.md
         - High-energy emission and activity model: Explanations/activity.md
@@ -58,7 +58,16 @@ nav:
         - mors.constants: Reference/api/constants.md
         - mors.data: Reference/api/data.md
         - mors.cli: Reference/api/cli.md
-    
+      - Validation anchors:
+        - Baraffe tracks: Validation/baraffe.md
+        - Stellar evolution tracks: Validation/stellarevo.md
+        - Star model: Validation/star.md
+        - Rotation evolution: Validation/rotevo.md
+        - Activity and habitable zone: Validation/physicalmodel.md
+        - Cluster percentiles: Validation/cluster.md
+        - Spectrum: Validation/spectrum.md
+        - Spectral synthesis: Validation/synthesis.md
+
   - Community:
       - Contact: Community/contact.md
       - Contributing: Community/CONTRIBUTING.md
@@ -140,7 +149,7 @@ extra_css:
   - stylesheets/proteus_theme.css
   - stylesheets/footnotes.css
   - stylesheets/extra.css
- 
+
 markdown_extensions:
   - admonition
   - attr_list
