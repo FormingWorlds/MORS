@@ -1,8 +1,12 @@
-import pytest
+from __future__ import annotations
+
 import numpy as np
+import pytest
 from numpy.testing import assert_allclose
 
 import mors.spectrum as specmod
+
+pytestmark = [pytest.mark.unit, pytest.mark.timeout(30)]
 
 
 # WhichBand

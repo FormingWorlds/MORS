@@ -1,0 +1,68 @@
+name: MORS nightly
+
+on:
+  schedule:
+    # 03:00 UTC daily.
+    - cron: '0 3 * * *'
+  # Manual trigger for ad-hoc runs via
+  # ``gh workflow run "MORS nightly" -r <branch>``.
+  workflow_dispatch:
+
+# Least-privilege token: only read access to the repo contents. Coverage
+# upload uses the CODECOV_TOKEN secret directly, not the default GITHUB_TOKEN.
+permissions:
+  contents: read
+
+# Nightly: full test suite (unit + smoke + integration + slow) with coverage
+# instrumentation. The PR gate runs only the unit + smoke tiers; the
+# integration and slow tiers run the real Baraffe / Spada evolution model,
+# which needs the track data under FWL_DATA and takes minutes. Coverage is
+# reported to the Codecov dashboard via codecov-action.
+jobs:
+  nightly:
+    name: MORS-nightly (ubuntu-latest)
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install MORS
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[develop]"
+
+      - name: Cache evolution-track data
+        uses: actions/cache@v4
+        with:
+          path: ${{ github.workspace }}/fwl_data
+          key: mors-fwl-data-1
+
+      - name: Run unit + smoke + integration + slow tests with coverage
+        env:
+          FWL_DATA: ${{ github.workspace }}/fwl_data
+        run: |
+          FULL_FAIL_UNDER=$(python -c "import tomllib; print(tomllib.load(open('pyproject.toml','rb'))['tool']['coverage']['report']['fail_under'])")
+          echo "Full gate fail_under: ${FULL_FAIL_UNDER}%"
+          pytest -m "(unit or smoke or integration or slow) and not skip" \
+            --cov=mors \
+            --cov-report=term-missing \
+            --cov-report=xml \
+            --cov-fail-under=${FULL_FAIL_UNDER}
+
+      - name: Upload coverage to Codecov
+        if: ${{ !cancelled() }}
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          slug: FormingWorlds/MORS
+          files: coverage.xml
+          flags: nightly
+          fail_ci_if_error: false

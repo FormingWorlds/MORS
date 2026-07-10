@@ -46,7 +46,10 @@ develop = [
   "coverage[toml]",
   "pip-tools",
   "pytest",
-  "pytest-cov"
+  "pytest-cov",
+  "pytest-timeout",
+  "ruff",
+  "tomlkit"
 ]
 docs = [
     "zensical==0.0.39",
@@ -73,8 +76,64 @@ include-package-data = true
 branch = true
 source = ["mors"]
 
+[tool.coverage.report]
+# Full coverage gate: unit + smoke + integration + slow tests, enforced by
+# the nightly workflow. Auto-ratcheted toward the 90% PROTEUS-ecosystem
+# ceiling by tools/update_coverage_threshold.py; never manually decrease.
+# Most MORS code paths run only under the real-track integration tier, so
+# this gate climbs as that tier deepens. See
+# .github/.claude/rules/mors-tests.md section 15.
+fail_under = 52.0
+show_missing = true
+exclude_lines = [
+    "pragma: no cover",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+]
+
+[tool.mors.coverage_fast]
+# Fast PR gate: unit + smoke coverage only, enforced on every PR via
+# .github/workflows/tests.yaml. Auto-ratcheted toward the 90% ceiling by
+# tools/update_coverage_threshold.py; never manually decrease. The PR tier
+# exercises the mocked unit surface (band math, synthesis, spectrum) only,
+# so it starts well below 90 and climbs as unit coverage grows. See
+# .github/.claude/rules/mors-tests.md section 15.
+fail_under = 18.0
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+markers = [
+    "unit: fast in-process unit tests (mocked track lookups, < 100 ms each)",
+    "smoke: real-track lookup on a single star / age (< 30 s each)",
+    "integration: real evolution-track model runs (nightly)",
+    "slow: full physics validation, run in nightly only",
+    "physics_invariant: marks tests that assert a physical invariant (conservation, positivity, boundedness, monotonicity, symmetry). See .github/.claude/rules/mors-tests.md section 3.",
+    "reference_pinned: marks tests that pin behavior against a published benchmark, analytical limit, or cross-implementation cross-check. Cite the source in the test docstring. Each physics source should contain at least one. See .github/.claude/rules/mors-tests.md section 3.",
+]
+
+[tool.ruff]
+line-length = 96
+target-version = "py311"
+extend-exclude = ["*.ipynb"]
+
+[tool.ruff.lint]
+select = [
+    "F",  # Pyflakes
+    "E",  # pycodestyle (error)
+    "W",  # pycodestyle (warning)
+    "I",  # isort
+]
+ignore = [
+    "E501",  # Line too long
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["mors"]
+required-imports = ["from __future__ import annotations"]
+
+[tool.ruff.format]
+quote-style = "single"
+indent-style = "space"
 
 [tool.bumpversion]
 # https://callowayproject.github.io/bump-my-version/howtos/calver/

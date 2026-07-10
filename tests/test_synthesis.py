@@ -1,9 +1,13 @@
+from __future__ import annotations
+
 import numpy as np
 import pytest
 from numpy.testing import assert_allclose
 
 import mors.spectrum as spec
 import mors.synthesis as synth
+
+pytestmark = [pytest.mark.unit, pytest.mark.timeout(30)]
 
 # GetProperties
 
@@ -28,7 +32,7 @@ def test_GetProperties_flux_budget(monkeypatch, Mstar, pctle, age, Lxuv_dict, Lb
 
     def fake_Value(Mstar_in, age_in, key):
         if key == "Rstar":
-            return 1.0  # Rsun 
+            return 1.0  # Rsun
         if key == "Teff":
             return 5000.0
         raise KeyError(key)
@@ -62,7 +66,7 @@ def test_GetProperties_flux_budget(monkeypatch, Mstar, pctle, age, Lxuv_dict, Lb
     expected_F_e1 = expected_L_e1 / area
     expected_F_e2 = expected_L_e2 / area
 
-    # Planck patched to zero 
+    # Planck patched to zero
     expected_F_pl = 0.0
     expected_L_pl = 0.0
 
@@ -196,7 +200,7 @@ def test_FitModernProperties_returns_minimize_solution(monkeypatch, age_in, mini
 
     monkeypatch.setattr(synth, "minimize", fake_minimize)
 
-    # Patch GetProperties 
+    # Patch GetProperties
     monkeypatch.setattr(
         synth,
         "GetProperties",

@@ -6,10 +6,20 @@ directory in the shields.io endpoint-badge schema:
 
     {"schemaVersion": 1, "label": "<text>", "message": "<count>", "color": "blue"}
 
-Output is a single file, ``tests-total.json`` (label "tests"), holding the
-count of ``not skip`` tests. The suite carries no unit/integration marker
-split, so the badge reports one total. A marker split can be added later by
-extending ``_BADGES`` with the extra expressions.
+Public-surface output (three files, two categories):
+
+- ``tests-total.json`` (label "tests"): count of ``not skip`` tests.
+- ``tests-unit.json`` (label "unit tests"): count of ``unit and not skip``.
+- ``tests-integration.json`` (label "integration tests"): count of
+  ``(smoke or integration or slow) and not skip``.
+
+The internal pytest marker scheme has four tiers (``unit``, ``smoke``,
+``integration``, ``slow``); the public badge surface intentionally
+collapses ``smoke + integration + slow`` into a single
+"Integration Tests" category because a four-way taxonomy is confusing to
+non-developer readers. Internal CI granularity is unaffected; the four
+markers are still registered in ``pyproject.toml`` and used by
+``tests.yaml`` and ``nightly.yml`` directly.
 
 Usage
 -----
@@ -38,7 +48,20 @@ from pathlib import Path
 
 _COLLECT_RE = re.compile(r'^(\d+)(?:/\d+)?\s+tests?\s+collected\b', re.MULTILINE)
 
-_BADGES: tuple[tuple[str, str, str], ...] = (('total', 'tests', 'not skip'),)
+_BADGES: tuple[tuple[str, str, str], ...] = (
+    ('total', 'tests', 'not skip'),
+    ('unit', 'unit tests', 'unit and not skip'),
+    (
+        'integration',
+        'integration tests',
+        '(smoke or integration or slow) and not skip',
+    ),
+)
+
+# Filenames not in the public-surface set; removed from the output
+# directory at the end of every run so the badges branch stays in sync
+# with the three-file scheme above.
+_PRUNE_FILES: tuple[str, ...] = ('tests-smoke.json', 'tests-slow.json')
 
 
 def count_tests(marker_expr: str) -> int:
@@ -115,6 +138,28 @@ def write_badge(out_dir: Path, name: str, label: str, count: int) -> Path:
     return out_path
 
 
+def prune_extra_files(out_dir: Path) -> list[str]:
+    """Remove any badge JSON files outside the public-surface set.
+
+    Parameters
+    ----------
+    out_dir : Path
+        Directory the JSON files live in.
+
+    Returns
+    -------
+    list[str]
+        Names of files that were removed, in the order encountered.
+    """
+    removed: list[str] = []
+    for name in _PRUNE_FILES:
+        path = out_dir / name
+        if path.exists():
+            path.unlink()
+            removed.append(name)
+    return removed
+
+
 def main() -> int:
     """Entry point.
 
@@ -139,6 +184,8 @@ def main() -> int:
         write_badge(out_dir, name, label, count)
         print(f'{label}: {count}')
 
+    for removed_name in prune_extra_files(out_dir):
+        print(f'pruned: {removed_name}')
     return 0
 
 

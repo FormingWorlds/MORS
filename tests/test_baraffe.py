@@ -1,6 +1,11 @@
-import mors
+from __future__ import annotations
+
 import pytest
 from numpy.testing import assert_allclose
+
+import mors
+
+pytestmark = [pytest.mark.integration, pytest.mark.timeout(300)]
 
 TEST_DATA = (
     ((0.047, 8.5e7, 0.75),(0.74306071e-3, 0.14300000, 1.79809587  )),
