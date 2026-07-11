@@ -33,14 +33,14 @@ PROTEUS supports two sets of stellar evolution tracks through MORS, selected via
 !!! warning "Mass clipped outside valid range"
     If the configured stellar mass falls outside the valid range for the chosen tracks, PROTEUS clips it to the nearest limit and logs a warning. Note the difference from standalone MORS: called on its own, `mors.Star` raises for an out-of-range mass. The clipping happens in the PROTEUS star wrapper, before MORS is called.
 
-## Rotation (Spada tracks only)
+## Rotation
 
-For Spada tracks, the initial rotation must be specified using one of two options in the configuration:
+Rotation drives the high-energy evolution on Spada tracks and is set with one of two options in the configuration:
 
 - `star.mors.rot_pcntle`: rotation percentile in the 1 Myr distribution. When set, the reference age is fixed at 1 Myr, consistent with the assumptions in `mors.Percentile()`.
 - `star.mors.rot_period`: rotation period in days at the current stellar age (`star.mors.age_now`).
 
-Only one of these can be set at a time. Baraffe tracks do not use a rotation model.
+Exactly one of the two carries a value; `rot_pcntle` defaults to the 50th (median) percentile, so a configuration that sets neither is accepted and uses the median rotation. Setting both is rejected for any track set. Baraffe tracks have no rotation model, so the value is validated but does not affect the evolution.
 
 ## Stellar spectrum
 

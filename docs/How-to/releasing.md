@@ -59,7 +59,7 @@ python -c "import mors; print(mors.__version__)"
 
 The reported version drops the leading zeros in the month and day, because setuptools-scm emits PEP 440-canonical versions (see the normalisation note below).
 
-The `0.0.0.dev0` fallback lives in `src/mors/__init__.py` and is used when no `_version.py` has been generated, which happens in a source checkout that was never built or installed. setuptools-scm writes `_version.py` at build and install time, and for that it needs the tag history, so a shallow clone with no tags also leaves the fallback in place. Fetch the tags with `git fetch --tags`. In CI the publish workflow checks out with `fetch-depth: 0` for this reason.
+The `0.0.0.dev0` fallback in `src/mors/__init__.py` is reported only when `_version.py` does not exist, which is the case for a source checkout that was never built or installed; the git tag state does not affect it. Any build or install runs setuptools-scm over the git history and writes `_version.py`, so an installed package never reports `0.0.0.dev0`. A shallow clone matters at build time instead: without the tag history setuptools-scm derives the wrong version, so the published package would carry a development version rather than the intended date. In CI the publish workflow checks out with `fetch-depth: 0` to avoid this; for a local build, fetch the tags first with `git fetch --tags`.
 
 ## Multiple releases on the same day
 

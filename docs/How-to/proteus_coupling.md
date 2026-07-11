@@ -35,14 +35,14 @@ Use `"spada"` for a rotation-driven XUV history (the usual choice for escape stu
 !!! warning "Mass is clipped to the track range"
     If `star.mass` falls outside the range for the chosen tracks, PROTEUS clips it to the nearest limit and logs a warning rather than failing. Keep the mass inside the track range to avoid a silent change in the star you simulate.
 
-## Setting the initial rotation (Spada only)
+## Setting the initial rotation
 
-For Spada tracks, specify the rotation in exactly one of two ways:
+Rotation drives the XUV history on Spada tracks. Set it with exactly one of two options:
 
 - `star.mors.rot_pcntle`: a rotation percentile in the 1 Myr distribution (`0` to `100`). The reference age is fixed at 1 Myr, matching `mors.Percentile()`. A percentile of 5 is a slow rotator, 50 the median, 95 a fast rotator.
 - `star.mors.rot_period`: a rotation period in days at the current stellar age `star.mors.age_now`.
 
-Set exactly one of the two. The one-of rule is enforced for every MORS configuration: leaving both unset, or setting both, raises a configuration error regardless of the chosen tracks. Baraffe tracks have no rotation model, so the value does not affect the evolution, but the setting is still validated.
+Exactly one of `rot_pcntle` and `rot_period` must carry a value. `rot_pcntle` defaults to 50 (the median rotator), so leaving both keys out is valid and selects the median rotation without raising an error. Setting both to a value raises a configuration error, and so does nulling `rot_pcntle` (setting `rot_pcntle = "none"`) while leaving `rot_period` unset. This check runs for every MORS configuration regardless of the chosen tracks. Baraffe tracks have no rotation model, so the value does not affect the evolution, but the setting is still validated.
 
 ## Choosing the reference spectrum
 
@@ -58,7 +58,7 @@ For `"solar"` and `"muscles"`, set `star.mors.star_name` to the target star (for
 
 ## Common pitfalls
 
-- **Both `rot_pcntle` and `rot_period` set.** Exactly one initial-rotation setting may be given; setting both, or neither, is rejected for any tracks (including Baraffe).
+- **Both `rot_pcntle` and `rot_period` set.** Setting both to a value is rejected for any tracks (including Baraffe). Because `rot_pcntle` defaults to 50, leaving both keys out is accepted and gives the median rotator; the "neither set" error appears only if you null `rot_pcntle` without setting `rot_period`.
 - **`age_now` missing or non-positive.** The current stellar age must be greater than zero; it is given in Gyr.
 - **Expecting XUV from Baraffe tracks.** Baraffe tracks provide no XUV; the XUV instellation is set to zero. Use Spada tracks for escape-driving XUV.
 - **Mass outside the track range.** The mass is clipped with a warning, so the simulated star may differ from the configured one. Check the log if the star mass is near a track limit.
