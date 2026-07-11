@@ -78,9 +78,10 @@ include-package-data = true
 # "guess-next-dev" would produce 26.1.3.devN+gHASH for commits after
 # the 26.01.02 tag, claiming a future calendar date that will collide
 # with the next daily release tag. "no-guess-dev" produces
-# 26.01.02.post1.devN+gHASH instead, which is honest about the build
+# 26.1.2.post1.devN+gHASH instead, which is honest about the build
 # being a post-tag development commit rather than a pre-release of
-# the next version.
+# the next version. (setuptools-scm emits PEP 440-canonical versions,
+# so the 26.01.02 tag normalises to 26.1.2, dropping the leading zeros.)
 version_scheme = "no-guess-dev"
 version_file = "src/mors/_version.py"
 

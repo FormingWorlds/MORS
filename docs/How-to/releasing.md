@@ -6,7 +6,7 @@ MORS derives its version straight from git tags using [setuptools-scm](https://s
 
 MORS uses [CalVer](https://calver.org/): tags are bare `YY.MM.DD` dates with no leading `v` (for example `26.07.11`). setuptools-scm reads the latest tag on `main` and writes it into `src/mors/_version.py` at build and install time; that file is gitignored and never edited by hand.
 
-Between releases the version is a post-tag development string. With `version_scheme = "no-guess-dev"` a commit made after the `26.07.11` tag reports as `26.07.11.post1.devN+g<hash>`, which is honest about being a development build after that tag rather than a pre-release of a future date. The default `guess-next-dev` scheme would instead invent a next calendar date that could collide with the following day's release tag, which is why `no-guess-dev` is set.
+Between releases the version is a post-tag development string. With `version_scheme = "no-guess-dev"` a commit made after the `26.07.11` tag reports as `26.7.11.post1.devN+g<hash>`, which is honest about being a development build after that tag rather than a pre-release of a future date. The default `guess-next-dev` scheme would instead invent a next calendar date that could collide with the following day's release tag, which is why `no-guess-dev` is set.
 
 ## How to make a release
 
@@ -28,7 +28,7 @@ git push origin 26.07.11
 ```
 
 !!! warning "Tags are bare dates"
-    Use a bare `YY.MM.DD` tag with no leading `v`. setuptools-scm consumes the tag verbatim, and a `v`-prefixed tag produces a non-PEP-440 version that fails the build.
+    Use a bare `YY.MM.DD` tag with no leading `v`, matching MORS's existing release tags. A mixed tag history (some `v`-prefixed, some not) makes the version sequence harder to follow.
 
 ### 3. Create a GitHub release
 
@@ -53,11 +53,13 @@ python -c "import mors; print(mors.__version__)"
 
 | State of the checkout | Reported version |
 |---|---|
-| On the `26.07.11` tag | `26.07.11` |
-| A few commits after the tag | `26.07.11.post1.devN+g<hash>` |
-| No tags found | `0.0.0` fallback |
+| On the `26.07.11` tag | `26.7.11` |
+| A few commits after the tag | `26.7.11.post1.devN+g<hash>` |
+| Source checkout with no generated `_version.py` | `0.0.0.dev0` fallback |
 
-The `0.0.0` fallback means setuptools-scm found no tags, usually because the checkout is shallow. Fetch the tags with `git fetch --tags`. In CI the publish workflow checks out with `fetch-depth: 0` for this reason.
+The reported version drops the leading zeros in the month and day, because setuptools-scm emits PEP 440-canonical versions (see the normalisation note below).
+
+The `0.0.0.dev0` fallback in `src/mors/__init__.py` is reported only when `_version.py` does not exist, which is the case for a source checkout that was never built or installed; the git tag state does not affect it. Any build or install runs setuptools-scm over the git history and writes `_version.py`, so an installed package never reports `0.0.0.dev0`. A shallow clone matters at build time instead: without the tag history setuptools-scm derives the wrong version, so the published package would carry a development version rather than the intended date. In CI the publish workflow checks out with `fetch-depth: 0` to avoid this; for a local build, fetch the tags first with `git fetch --tags`.
 
 ## Multiple releases on the same day
 
@@ -67,8 +69,8 @@ Append a patch number to the date:
 git tag 26.07.11.1
 ```
 
-This produces version `26.07.11.1`.
+This produces version `26.7.11.1`.
 
-## Note on PyPI normalisation
+## Note on version normalisation
 
-PyPI normalises the version to PEP 440, so a `26.07.11` tag is published as `26.7.11` (leading zeros in the month and day are dropped). This is expected and matches earlier MORS releases.
+setuptools-scm emits PEP 440-canonical versions, so a `26.07.11` tag becomes `26.7.11` (leading zeros in the month and day are dropped) in the built package, the wheel filename, and `mors.__version__`. This normalisation happens locally at build time; PyPI applies the same PEP 440 rule, so the published name matches. This is expected and consistent with earlier MORS releases.
