@@ -1,12 +1,12 @@
 # Coupling to PROTEUS
 
-[PROTEUS](https://proteus-framework.org/PROTEUS) is a coupled planetary evolution framework that simulates the long-term evolution of rocky planets, including their interior, atmosphere, and the stellar environment they orbit in. A high-level schematic of PROTEUS components and corresponding modules can be found below. Please find a description of the PROTEUS architecture [here](https://proteus-framework.org/PROTEUS/Explanations/model.html). <br>
+[PROTEUS](https://proteus-framework.org/PROTEUS) is a coupled planetary evolution framework that simulates the long-term evolution of rocky planets, including their interior, atmosphere, and the stellar environment they orbit in. A schematic of PROTEUS components and corresponding modules is shown below; click any module in the diagram to open its documentation. Please find a description of the PROTEUS architecture [here](https://proteus-framework.org/PROTEUS/Explanations/model.html). <br>
 <br>
 
-<p align="center">
-    <img src="../assets/PROTEUS_schematic_lightmode.png#only-light" style="max-width: 90%; height: auto;" alt="PROTEUS schematic"><img src="../assets/PROTEUS_schematic_darkmode.png#only-dark" style="max-width: 90%; height: auto;" alt="PROTEUS schematic"><br>
-    <b>Schematic of PROTEUS components and corresponding modules.</b>
-</p>
+<object type="image/svg+xml" data="https://cdn.jsdelivr.net/gh/FormingWorlds/PROTEUS@main/docs/assets/proteus_modules_schematic.svg" class="mod-diagram mod-diagram--light" aria-label="PROTEUS module schematic (light mode)">PROTEUS module schematic (light mode)</object>
+<object type="image/svg+xml" data="https://cdn.jsdelivr.net/gh/FormingWorlds/PROTEUS@main/docs/assets/proteus_modules_schematic_darkmode.svg" class="mod-diagram mod-diagram--dark" aria-label="PROTEUS module schematic (dark mode)">PROTEUS module schematic (dark mode)</object>
+
+<p style="text-align: center;"><strong>Schematic of PROTEUS components and corresponding modules.</strong></p>
 
 ## MORS in PROTEUS
 
