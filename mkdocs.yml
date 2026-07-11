@@ -22,9 +22,11 @@ nav:
         - Calculate cluster evolution: How-to/clusters.md
         - Setting custom simulation parameters: How-to/set_parameters.md
         - Find stellar activity timelines: How-to/activity_timelines.md
+      - Coupling to PROTEUS: How-to/proteus_coupling.md
       - Development:
         - Testing: How-to/run_tests.md
         - Build documentation: How-to/documentation.md
+        - Releasing: How-to/releasing.md
       - Troubleshooting: How-to/troubleshooting.md
 
   - Tutorials:

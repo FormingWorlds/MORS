@@ -19,17 +19,19 @@ The host star is not static in PROTEUS simulations; its luminosity, radius, temp
 
 MORS is selected by setting `star.module = 'mors'` in the PROTEUS configuration file.
 
+This page explains how MORS behaves inside a coupled run: the track options, the rotation and spectrum inputs, and the quantities it updates each iteration. For the practical configuration recipe, with the exact `[star]` and `[star.mors]` TOML blocks, see [Coupling to PROTEUS (how-to)](../How-to/proteus_coupling.md).
+
 ## Track options
 
 PROTEUS supports two sets of stellar evolution tracks through MORS, selected via `star.mors.tracks`:
 
 | Setting | Tracks | Mass range | Time unit | XUV |
 |---|---|---|---|---|
-| `'spada'` | Spada et al. (2013) | 0.10–1.25 Msun | Myr | Yes |
-| `'baraffe'` | Baraffe et al. (2015) | 0.01–1.40 Msun | yr | No |
+| `'spada'` | Spada et al. (2013) | 0.10 to 1.25 Msun | Myr | Yes |
+| `'baraffe'` | Baraffe et al. (2015) | 0.01 to 1.40 Msun | yr | No |
 
 !!! warning "Mass clipped outside valid range"
-    If the configured stellar mass falls outside the valid range for the chosen tracks, it is **silently clipped** to the nearest limit.
+    If the configured stellar mass falls outside the valid range for the chosen tracks, PROTEUS clips it to the nearest limit and logs a warning. Note the difference from standalone MORS: called on its own, `mors.Star` raises for an out-of-range mass. The clipping happens in the PROTEUS star wrapper, before MORS is called.
 
 ## Rotation (Spada tracks only)
 
@@ -68,3 +70,8 @@ Ages are passed in years to Baraffe methods and in Myr to Spada methods.
 ## Spectral synthesis during the simulation
 
 For Spada tracks, historical spectra are computed by scaling the modern reference spectrum band-by-band using `mors.synthesis.CalcScaledSpectrumFromProps`. For Baraffe tracks, spectral synthesis uses `BaraffeTrack.BaraffeSpectrumCalc`, which scales the modern spectrum by the ratio of historical to modern bolometric luminosity. No band-resolved scaling is available.
+
+## See also
+
+- [Coupling to PROTEUS (how-to)](../How-to/proteus_coupling.md): the practical TOML recipe for configuring MORS inside a PROTEUS run.
+- [PROTEUS documentation](https://proteus-framework.org/PROTEUS): the coupled framework that MORS plugs into.
