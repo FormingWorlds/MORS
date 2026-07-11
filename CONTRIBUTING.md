@@ -34,24 +34,13 @@ coverage html    # to generate html report
 
 ### Making a release
 
-The versioning scheme we use is [CalVer](https://calver.org/).
-
-0. Update requirements files:
+MORS uses [CalVer](https://calver.org/) and derives its version straight from git tags with [setuptools-scm](https://setuptools-scm.readthedocs.io/), so there is no version string to edit by hand. To cut a release, tag the current `main` with today's date and publish a GitHub release:
 
 ```console
-python tools/generate_requirements_txt.py
-pip-compile -o requirements_full.txt pyproject.toml
+git checkout main && git pull
+git tag 26.07.11          # today's date as YY.MM.DD, with no leading "v"
+git push origin 26.07.11
+gh release create 26.07.11 --title "26.07.11" --generate-notes
 ```
 
-1. Bump the version (`release`/`patch`) as needed
-
-```console
-bump-my-version bump release
-# 24.7.11
-```
-
-2. Commit and push your changes.
-
-3. Make a new [release](https://github.com/FormingWorlds/MORS/releases). Make sure to set the tag to the specified version, e.g. `24.7.11`.
-
-4. The [upload to pypi](https://pypi.org/project/fwl-mors) is triggered when a release is published and handled by [this workflow](https://github.com/FormingWorlds/MORS/actions/workflows/publish.yaml).
+Publishing the GitHub release triggers the [publish workflow](https://github.com/FormingWorlds/MORS/actions/workflows/publish.yaml), which builds the package and uploads it to [PyPI](https://pypi.org/project/fwl-mors) via trusted publishing. The full procedure, the version-scheme rationale, and troubleshooting are on the [release how-to](https://proteus-framework.org/MORS/How-to/releasing.html) page.

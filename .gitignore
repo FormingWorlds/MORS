@@ -64,3 +64,6 @@ site/
 # shared, collaborator-facing rule files; anything under a top-level .claude/
 # is per-user and stays out of git.
 /.claude/
+
+# setuptools-scm generated version file
+src/mors/_version.py
