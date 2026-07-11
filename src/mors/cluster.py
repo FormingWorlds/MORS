@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 # Imports for standard stuff needed here
+import copy
 import logging
 import pickle
 
@@ -54,8 +55,10 @@ class Cluster:
         # Set number of stars
         self.nStars = len(Mstar)
 
-        # Set parameters
-        self.params = params
+        # Set parameters. Copy the passed dictionary so enabling ExtendedTracks
+        # below stays local to this cluster and does not mutate the shared
+        # default dictionary that other stars and clusters read from.
+        self.params = copy.deepcopy(params)
 
         # Set the ExtendedTracks parameter to True so we get all parameters
         self.params['ExtendedTracks'] = True

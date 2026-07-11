@@ -1,15 +1,19 @@
 """Module for holding functions for calculating physical quantities for the physical rotation and activity model."""
 
 # Imports for standard stuff needed here
-import numpy as np
-import sys as sys
+from __future__ import annotations
+
 import copy as copy
+import sys as sys
+
+import numpy as np
+
+import mors.constants as const
 
 # Imports for mors modules
-import mors.miscellaneous as misc
-import mors.stellarevo as SE
-import mors.constants as const
 import mors.parameters as params
+import mors.stellarevo as SE
+
 
 def dOmegadt(Mstar=None,Age=None,OmegaEnv=None,OmegaCore=None,params=params.paramsDefault,StarEvo=None):
     """Takes basic stellar parameters, returns rates of change of rotation.
@@ -113,7 +117,6 @@ def RotationQuantities(Mstar=None,Age=None,OmegaEnv=None,OmegaCore=None,params=p
 
     # Start dictionary
     StarState = {}
-    StarStateUnits = {}
 
     # Add basic input parameters
     StarState['Mstar'] = Mstar
@@ -401,7 +404,7 @@ def QuantitiesUnits(StarState=None):
 
     # If StarState was set in call to function then only include units for quantities in StarState and
     # make sure all quantities in StarState have units given (even if the quantity is dimensionless)
-    if not StarState is None:
+    if StarState is not None:
 
         # Make deep copy of StarStateUnits
         StarStateUnitsTemp = copy.deepcopy(StarStateUnits)
@@ -413,7 +416,7 @@ def QuantitiesUnits(StarState=None):
         for quantity in StarState:
 
             # Make sure it is included in list of units above
-            if not ( quantity in StarStateUnitsTemp ):
+            if quantity not in StarStateUnitsTemp:
                 raise Exception("units for "+quantity+" not included in units list")
 
             # Add to dictionary
@@ -470,19 +473,19 @@ def Lxuv(Mstar=None,Age=None,Omega=None,OmegaEnv=None,Prot=None,params=params.pa
 
     # Make sure only one rotation rate is set (add up number of set parameters)
     nSet = 0
-    if not Omega is None:
+    if Omega is not None:
         nSet += 1
-    if not OmegaEnv is None:
+    if OmegaEnv is not None:
         nSet += 1
-    if not Prot is None:
+    if Prot is not None:
         nSet += 1
     if not ( nSet == 1 ):
         raise Exception("can only set one of Omega, OmegaEnv, and Prot in call to function")
 
     # Get Omega not set
-    if not OmegaEnv is None:
+    if OmegaEnv is not None:
         Omega = OmegaEnv
-    if not Prot is None:
+    if Prot is not None:
         Omega = _Omega(Prot)
 
     # The function _Xray needs Ro, Rstar, and Lbol so make a StarState dictionary with these
@@ -1228,7 +1231,7 @@ def aOrbHZ(Mstar=None,Age=None,params=params.paramsDefault):
     b = 3.3954e-9
     c = -7.6364e-12
     d = -1.1950e-15
-    Seff = SeffSun + a*Teff + b*Teff**2.0 + c*Teff*3.0 + d*Teff**4.0
+    Seff = SeffSun + a*Teff + b*Teff**2.0 + c*Teff**3.0 + d*Teff**4.0
     aOrbHZAll['RecentVenus'] = ( Lbol / Seff )**0.5
 
     # Get Runaway Greenhouse limit
@@ -1237,7 +1240,7 @@ def aOrbHZ(Mstar=None,Age=None,params=params.paramsDefault):
     b = 1.4612e-8
     c = -7.6345e-12
     d = -1.7511e-15
-    Seff = SeffSun + a*Teff + b*Teff**2.0 + c*Teff*3.0 + d*Teff**4.0
+    Seff = SeffSun + a*Teff + b*Teff**2.0 + c*Teff**3.0 + d*Teff**4.0
     aOrbHZAll['RunawayGreenhouse'] = ( Lbol / Seff )**0.5
 
     # Get Moist Greenhouse limit
@@ -1246,7 +1249,7 @@ def aOrbHZ(Mstar=None,Age=None,params=params.paramsDefault):
     b = 1.9394e-9
     c = -4.3618e-12
     d = -6.8260e-16
-    Seff = SeffSun + a*Teff + b*Teff**2.0 + c*Teff*3.0 + d*Teff**4.0
+    Seff = SeffSun + a*Teff + b*Teff**2.0 + c*Teff**3.0 + d*Teff**4.0
     aOrbHZAll['MoistGreenhouse'] = ( Lbol / Seff )**0.5
 
     # Get Maximum Greenhouse limit
@@ -1255,7 +1258,7 @@ def aOrbHZ(Mstar=None,Age=None,params=params.paramsDefault):
     b = 1.6707e-9
     c = -3.0058e-12
     d = -5.1925e-16
-    Seff = SeffSun + a*Teff + b*Teff**2.0 + c*Teff*3.0 + d*Teff**4.0
+    Seff = SeffSun + a*Teff + b*Teff**2.0 + c*Teff**3.0 + d*Teff**4.0
     aOrbHZAll['MaximumGreenhouse'] = ( Lbol / Seff )**0.5
 
     # Get Early Mars limit
@@ -1264,7 +1267,7 @@ def aOrbHZ(Mstar=None,Age=None,params=params.paramsDefault):
     b = 1.5275e-9
     c = -2.1709e-12
     d = -3.8282e-16
-    Seff = SeffSun + a*Teff + b*Teff**2.0 + c*Teff*3.0 + d*Teff**4.0
+    Seff = SeffSun + a*Teff + b*Teff**2.0 + c*Teff**3.0 + d*Teff**4.0
     aOrbHZAll['EarlyMars'] = ( Lbol / Seff )**0.5
 
     # Now get value of center of moist and maximum greenhouse

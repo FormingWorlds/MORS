@@ -154,28 +154,30 @@ def test_shouldappend_no_output_list_always_true():
     assert returned is None
 
 
-def test_shouldappend_scalar_pins_present_behaviour():
-    """Pins the present scalar-branch behaviour of the output-cadence check.
+def test_shouldappend_scalar_proximity_contract():
+    """The scalar output-cadence check flags only ages within the relative tolerance.
 
-    This does NOT assert a proximity contract. The scalar branch evaluates
-    ``abs(Age / AgesOut) - 1.0 < 1e-6`` (operator precedence groups the
-    subtraction before the comparison), so it flags any Age at or below the
-    target rather than only ages within 1e-6 of it, and rejects an Age that
-    overshoots the target by more than a factor of ~1e-6. The assertions below
-    record that actual behaviour; see the flagged source bug for the intended
-    proximity form.
+    The scalar branch emits an age when ``abs(Age / AgesOut - 1) < 1e-6``, i.e.
+    only when Age lies within one part in 1e6 of the target output age. Ages away
+    from the target on either side are rejected, so the branch is a genuine
+    two-sided proximity test rather than a one-sided "at or below" filter.
     """
-    # Age well below the target: the present branch flags it True even though it
-    # is nowhere near the target, which is the non-proximity behaviour.
-    _, flag_far_below = rotevo._shouldAppend(5.0, 10.0)
-    # Age above the target by more than the ~1e-6 margin: rejected.
-    _, flag_above = rotevo._shouldAppend(10.0, 5.0)
-    assert flag_far_below is True
-    assert flag_above is False
-    # A genuine proximity check would reject an Age three orders of magnitude
-    # below the target; the present branch flags it, confirming it is not one.
+    target = 10.0
+    # Exact hit and a hit just inside the 1e-6 relative window are flagged.
+    _, flag_exact = rotevo._shouldAppend(target, target)
+    _, flag_inside = rotevo._shouldAppend(target * (1.0 + 5.0e-7), target)
+    assert flag_exact is True
+    assert flag_inside is True
+    # An age at half the target, and one three orders of magnitude below it, are
+    # both far outside the window and rejected: the check is not "at or below".
+    _, flag_half = rotevo._shouldAppend(0.5 * target, target)
     _, flag_tiny = rotevo._shouldAppend(1.0, 1.0e3)
-    assert flag_tiny is True
+    assert flag_half is False
+    assert flag_tiny is False
+    # An age just outside the window on the high side is rejected too, so the
+    # tolerance is symmetric about the target rather than one-sided.
+    _, flag_outside = rotevo._shouldAppend(target * (1.0 + 2.0e-6), target)
+    assert flag_outside is False
 
 
 def test_shouldappend_array_hit_removes_element():

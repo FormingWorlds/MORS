@@ -33,6 +33,8 @@ import numpy as np
 import pytest
 from numpy.testing import assert_allclose
 
+from mors import parameters
+
 pytestmark = [pytest.mark.unit, pytest.mark.timeout(30)]
 
 
@@ -140,6 +142,31 @@ def test_construction_populates_stars_and_hz_boundaries(cluster_mod):
     # Habitable-zone boundaries are strictly positive distances (AU).
     assert np.all(cluster.aOrbHZ['HZ'] > 0.0)
     assert np.all(cluster.aOrbHZ['RunawayGreenhouse'] > 0.0)
+
+
+def test_construction_copies_params_and_leaves_shared_default_intact(cluster_mod):
+    """Building a cluster copies its parameters rather than writing the shared default.
+
+    A cluster enables ``ExtendedTracks`` so the per-star model returns every
+    auxiliary quantity. That write must land on a private copy: the module-level
+    ``paramsDefault`` (the default argument shared by every entry point) has to
+    stay off, and a caller-supplied dictionary must be left as it was passed. If
+    the parameters were aliased instead of copied, the first cluster would flip
+    the flag globally and every later star would silently switch tracks.
+    """
+    # The shared default advertises ExtendedTracks off; constructing from it
+    # must not flip that global for later callers.
+    assert parameters.paramsDefault['ExtendedTracks'] is False
+    cluster = make_cluster(cluster_mod, n=3)
+    assert parameters.paramsDefault['ExtendedTracks'] is False
+    # The cluster works on an independent copy that carries the enabled flag.
+    assert cluster.params is not parameters.paramsDefault
+    assert cluster.params['ExtendedTracks'] is True
+    # A caller-supplied dictionary is copied too, not aliased and mutated.
+    user_params = dict(parameters.paramsDefault)
+    cluster_user = make_cluster(cluster_mod, n=3, params=user_params)
+    assert user_params['ExtendedTracks'] is False
+    assert cluster_user.params['ExtendedTracks'] is True
 
 
 def test_values_returns_per_star_array_and_requires_arguments(cluster_mod):

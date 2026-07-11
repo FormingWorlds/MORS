@@ -70,6 +70,25 @@ def test_star_reproduces_solar_luminosity_at_solar_age():
     assert faint < 0.1 * lbol
 
 
+def test_star_construction_leaves_shared_default_params_intact():
+    """Constructing a star copies its parameters rather than writing the shared default.
+
+    ``Star`` enables ``ExtendedTracks`` on its own parameter dictionary so every
+    evolved quantity is retained. That write must land on a private copy: the
+    module-level ``paramsDefault`` shared by every entry point stays off, while
+    the star's own copy carries the enabled flag. Aliasing instead of copying
+    would flip the global for every star built afterwards.
+    """
+    mors.DownloadEvolutionTracks('Spada')
+    # Pristine shared default: ExtendedTracks off before any construction.
+    assert paramsDefault['ExtendedTracks'] is False
+    star = mors.Star(Mstar=1.0, Omega=1.0)
+    # The shared default is untouched; only the star's private copy is enabled.
+    assert paramsDefault['ExtendedTracks'] is False
+    assert star.params is not paramsDefault
+    assert star.params['ExtendedTracks'] is True
+
+
 @pytest.mark.physics_invariant
 @pytest.mark.parametrize('inp,expected', SPADA_DEFAULT)
 def test_star_value_default_integrator(inp, expected):
@@ -123,22 +142,89 @@ def test_star_value_forward_euler_integrator(inp, expected):
 # than time series, so their getter raises when the 1D interpolator indexes them.
 SCALAR_TRACK_GETTERS = ('Mstar', 'nAge')
 ARRAY_TRACK_GETTERS = (
-    'Age', 'dAge', 'OmegaEnv', 'OmegaCore', 'Prot', 'Rstar', 'tauConv', 'Ro',
-    'Itotal', 'Ienv', 'Icore', 'dItotaldt', 'dIenvdt', 'dIcoredt', 'Rcore',
-    'dMcoredt', 'Mdot', 'Bdip', 'vEsc', 'torqueEnvMom', 'torqueCoreMom',
-    'torqueEnvCG', 'torqueCoreCG', 'torqueEnvWind', 'torqueEnvCE', 'torqueCoreCE',
-    'torqueEnvDL', 'torqueEnv', 'dOmegaEnvdt', 'torqueCore', 'dOmegaCoredt',
-    'Lbol', 'Teff', 'Lx', 'Fx', 'Rx', 'Tcor', 'Leuv1', 'Feuv1', 'Reuv1',
-    'Leuv2', 'Feuv2', 'Reuv2', 'Leuv', 'Feuv', 'Reuv', 'Lly', 'Fly', 'Rly',
-    'FxHZ', 'Feuv1HZ', 'Feuv2HZ', 'FeuvHZ', 'FlyHZ',
+    'Age',
+    'dAge',
+    'OmegaEnv',
+    'OmegaCore',
+    'Prot',
+    'Rstar',
+    'tauConv',
+    'Ro',
+    'Itotal',
+    'Ienv',
+    'Icore',
+    'dItotaldt',
+    'dIenvdt',
+    'dIcoredt',
+    'Rcore',
+    'dMcoredt',
+    'Mdot',
+    'Bdip',
+    'vEsc',
+    'torqueEnvMom',
+    'torqueCoreMom',
+    'torqueEnvCG',
+    'torqueCoreCG',
+    'torqueEnvWind',
+    'torqueEnvCE',
+    'torqueCoreCE',
+    'torqueEnvDL',
+    'torqueEnv',
+    'dOmegaEnvdt',
+    'torqueCore',
+    'dOmegaCoredt',
+    'Lbol',
+    'Teff',
+    'Lx',
+    'Fx',
+    'Rx',
+    'Tcor',
+    'Leuv1',
+    'Feuv1',
+    'Reuv1',
+    'Leuv2',
+    'Feuv2',
+    'Reuv2',
+    'Leuv',
+    'Feuv',
+    'Reuv',
+    'Lly',
+    'Fly',
+    'Rly',
+    'FxHZ',
+    'Feuv1HZ',
+    'Feuv2HZ',
+    'FeuvHZ',
+    'FlyHZ',
 )
 # Quantities that are strictly positive by physical construction at every age: a
 # whole-star radius, temperature, rotation rate, or an emitted power can never be
 # zero or negative for an active star.
 STRICTLY_POSITIVE_GETTERS = (
-    'Age', 'OmegaEnv', 'OmegaCore', 'Prot', 'Rstar', 'tauConv', 'Ro', 'Itotal',
-    'Ienv', 'vEsc', 'Bdip', 'Lbol', 'Teff', 'Lx', 'Fx', 'Rx',
-    'Leuv1', 'Feuv1', 'Leuv2', 'Feuv2', 'Leuv', 'Feuv', 'Lly', 'Fly',
+    'Age',
+    'OmegaEnv',
+    'OmegaCore',
+    'Prot',
+    'Rstar',
+    'tauConv',
+    'Ro',
+    'Itotal',
+    'Ienv',
+    'vEsc',
+    'Bdip',
+    'Lbol',
+    'Teff',
+    'Lx',
+    'Fx',
+    'Rx',
+    'Leuv1',
+    'Feuv1',
+    'Leuv2',
+    'Feuv2',
+    'Leuv',
+    'Feuv',
+    'Lly',
+    'Fly',
 )
 # The radiative core has not formed at 1 Myr (the star is fully convective), so
 # its moment of inertia and radius start at zero and grow positive as the star
@@ -280,9 +366,7 @@ def test_activity_lifetime_decreases_with_threshold(solar_star):
     life_sat = solar_star.ActivityLifetime(Quantity='Lx', Threshold='sat')
     assert life_sat > 0.0
     # AgeMax caps the search window; the answer cannot exceed the cap.
-    life_capped = solar_star.ActivityLifetime(
-        Quantity='Lx', Threshold=1.0e27, AgeMax=500.0
-    )
+    life_capped = solar_star.ActivityLifetime(Quantity='Lx', Threshold=1.0e27, AgeMax=500.0)
     assert life_capped <= 500.0 + 1.0e-6
 
 
@@ -361,9 +445,7 @@ def test_integrated_emission_validates_band_and_orbit(solar_star):
     with pytest.raises(Exception, match='invalid Band'):
         solar_star.IntegrateEmission(AgeMin=100.0, AgeMax=1000.0, Band='Gamma')
     with pytest.raises(Exception, match='invalid aOrb'):
-        solar_star.IntegrateEmission(
-            AgeMin=100.0, AgeMax=1000.0, Band='XUV', aOrb='NoSuchZone'
-        )
+        solar_star.IntegrateEmission(AgeMin=100.0, AgeMax=1000.0, Band='XUV', aOrb='NoSuchZone')
 
 
 @pytest.mark.physics_invariant
@@ -440,8 +522,14 @@ def test_check_input_mstar_enforces_grid_bounds():
 def _input_rotation(**overrides):
     """Call ``_InputRotation`` with all-None defaults, overriding named arguments."""
     base = dict(
-        Mstar=1.0, Age=None, Omega=None, OmegaEnv=None, OmegaCore=None,
-        Prot=None, percentile=None, params=dict(paramsDefault),
+        Mstar=1.0,
+        Age=None,
+        Omega=None,
+        OmegaEnv=None,
+        OmegaCore=None,
+        Prot=None,
+        percentile=None,
+        params=dict(paramsDefault),
     )
     base.update(overrides)
     return star_mod._InputRotation(**base)
@@ -462,9 +550,16 @@ def _input_rotation(**overrides):
         ({'Omega': 1.0, 'OmegaEnv': 1.0}, 'cannot set OmegaEnv and OmegaCore'),
     ],
     ids=[
-        'pct-and-omega', 'pct-and-omegaenv', 'pct-and-omegacore', 'pct-and-prot',
-        'bad-percentile-string', 'age-and-omegacore', 'omega-and-prot',
-        'age-without-omegaenv', 'nothing-set', 'omega-with-envcore',
+        'pct-and-omega',
+        'pct-and-omegaenv',
+        'pct-and-omegacore',
+        'pct-and-prot',
+        'bad-percentile-string',
+        'age-and-omegacore',
+        'omega-and-prot',
+        'age-without-omegaenv',
+        'nothing-set',
+        'omega-with-envcore',
     ],
 )
 def test_input_rotation_rejects_conflicting_arguments(overrides, match):
@@ -528,13 +623,18 @@ def test_percentile_validates_supplied_distribution():
         mors.Percentile(Mstar=1.0, Omega=1.0, MstarDist=md)
     with pytest.raises(Exception, match='cannot both be set'):
         mors.Percentile(
-            Mstar=1.0, Omega=1.0, MstarDist=md,
-            OmegaDist=np.array([1.0, 2.0]), ProtDist=np.array([10.0, 20.0]),
+            Mstar=1.0,
+            Omega=1.0,
+            MstarDist=md,
+            OmegaDist=np.array([1.0, 2.0]),
+            ProtDist=np.array([10.0, 20.0]),
         )
     with pytest.raises(Exception, match='same length'):
         mors.Percentile(
-            Mstar=1.0, Omega=1.0,
-            MstarDist=np.array([1.0, 1.0, 1.0]), OmegaDist=np.array([1.0, 2.0]),
+            Mstar=1.0,
+            Omega=1.0,
+            MstarDist=np.array([1.0, 1.0, 1.0]),
+            OmegaDist=np.array([1.0, 2.0]),
         )
 
 
@@ -559,25 +659,39 @@ def test_percentile_inverts_rotation_and_percentile():
     assert 0.0 <= pct_from_prot <= 100.0
 
 
-def test_percentile_protdist_conversion_unavailable():
-    """Supplying only ``ProtDist`` surfaces the missing period-to-rate helper.
+@pytest.mark.physics_invariant
+def test_percentile_from_period_distribution_matches_rate_distribution():
+    """A rotation-period distribution gives the same percentile as its rate form.
 
-    The period-distribution branch calls ``misc._Omega`` to convert periods to
-    rotation rates, but no such helper exists on the miscellaneous module, so the
-    call raises rather than returning a silently wrong rotation distribution.
+    The period-distribution branch converts each period to a rotation rate with
+    the standard period-to-rate relation, so a percentile computed from a
+    ``ProtDist`` must equal the percentile computed from the ``OmegaDist`` that
+    the same periods map to. Supplying both distributions at once is rejected.
     """
+    from mors import physicalmodel as phys
+
     md = np.array([1.0, 1.0])
-    pd = np.array([10.0, 20.0])
-    # This pins the present behaviour of the ProtDist branch: it references a
-    # helper that is not defined, so it raises instead of building a distribution.
-    with pytest.raises(AttributeError):
-        mors.Percentile(Mstar=1.0, percentile=50.0, MstarDist=md, ProtDist=pd)
-    # The equivalent rate-distribution path is well-defined and returns a value
-    # inside the physical rotation range, confirming only the period branch is out.
-    omega = mors.Percentile(
-        Mstar=1.0, percentile=50.0, MstarDist=md, OmegaDist=np.array([2.0, 4.0])
+    prot = np.array([10.0, 20.0])
+    omega_from_prot = mors.Percentile(Mstar=1.0, percentile=50.0, MstarDist=md, ProtDist=prot)
+    omega_from_rate = mors.Percentile(
+        Mstar=1.0, percentile=50.0, MstarDist=md, OmegaDist=phys._Omega(prot)
     )
-    assert omega == pytest.approx(3.0, rel=1e-6)
+    assert_allclose(omega_from_prot, omega_from_rate, rtol=1e-12)
+    # The percentile is a physical rotation rate inside the range the periods
+    # map to, so the conversion cannot have collapsed to a constant or a stray
+    # index. A shorter period maps to a faster rate, so _Omega is decreasing.
+    rates = phys._Omega(prot)
+    assert rates[0] > rates[1] > 0.0
+    assert min(rates) <= omega_from_prot <= max(rates)
+    # Setting both distributions at once violates the error contract.
+    with pytest.raises(Exception, match='cannot both be set'):
+        mors.Percentile(
+            Mstar=1.0,
+            percentile=50.0,
+            MstarDist=md,
+            OmegaDist=np.array([2.0, 4.0]),
+            ProtDist=prot,
+        )
 
 
 @pytest.mark.physics_invariant

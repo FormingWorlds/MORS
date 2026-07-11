@@ -1,20 +1,20 @@
 
-"""Module for holding functions used to evovle the rotation of stars."""
+"""Module for holding functions used to evolve the rotation of stars."""
 
-# Imports for standard stuff needed here
-import numpy as np
-import math
+from __future__ import annotations
+
 import copy
-
 import logging
-log = logging.getLogger("fwl."+__name__)
+import math
 
-# Imports for mors modules
+import numpy as np
+
 import mors.miscellaneous as misc
-import mors.physicalmodel as phys
 import mors.parameters as params
+import mors.physicalmodel as phys
 import mors.stellarevo as SE
-import sys
+
+log = logging.getLogger("fwl." + __name__)
 
 AgeMinDefault = 1.0       # when to start evolution (Myr)
 AgeMaxDefault = 5000.0    # when to end evolution (Myr)
@@ -195,7 +195,7 @@ def EvolveRotation(Mstar=None,Omega0=None,OmegaEnv0=None,OmegaCore0=None,AgeMin=
         AgeMax = params['AgeMaxDefault']
 
     # Make editable and np array form of AgesOut and use this from now on
-    if not AgesOut is None:
+    if AgesOut is not None:
         if isinstance(AgesOut,(float,int)):
             AgesOut2 = np.array([AgesOut])
         else:
@@ -204,7 +204,7 @@ def EvolveRotation(Mstar=None,Omega0=None,OmegaEnv0=None,OmegaCore0=None,AgeMin=
         AgesOut2 = None
 
     # If AgesOut has been set, use the final age from that as ending age
-    if not AgesOut2 is None:
+    if AgesOut2 is not None:
         AgeMax = AgesOut2[-1]
 
     # If an instance of the StarEvo class is not input, load it with defaults
@@ -222,7 +222,7 @@ def EvolveRotation(Mstar=None,Omega0=None,OmegaEnv0=None,OmegaCore0=None,AgeMin=
     dAge = 0.5
 
     # If AgesOut was set, make sure no ages are below AgeMin
-    if not AgesOut2 is None:
+    if AgesOut2 is not None:
         AgesOut2 = np.delete( AgesOut2 , np.where(AgesOut2<AgeMin) )
 
     # Starting rotation rates
@@ -282,7 +282,7 @@ def _dAgeCalc(dAge,Age,AgeMax,AgesOut,params):
     dAgeMax = AgeMax - Age
 
     # If AgesOut has been set, work out maximum from that
-    if not AgesOut is None:
+    if AgesOut is not None:
 
         # If AgesOut is just a number (float or int) then it is easy
         if isinstance(AgesOut,(float,int)):
@@ -315,13 +315,15 @@ def _shouldAppend(Age,AgesOut):
         return AgesOut , True
 
     # If AgesOut is set, work out if this is one of the output ages
-    if not AgesOut is None:
+    if AgesOut is not None:
 
         # If AgesOut is just a number (float or int) then it is easy
         if isinstance(AgesOut,(float,int)):
 
-            # Check if close enough to AgesOut to output
-            if ( abs(Age/float(AgesOut))-1.0 < 1.0e-6 ):
+            # Check if close enough to AgesOut to output. The relative distance
+            # abs(Age/AgesOut - 1) is compared to the tolerance, so only ages
+            # within 1e-6 of AgesOut are emitted, not every age up to AgesOut.
+            if ( abs(Age/float(AgesOut) - 1.0) < 1.0e-6 ):
                 return AgesOut , True
             else:
                 return AgesOut , False
@@ -814,7 +816,7 @@ def _AppendTracks(Tracks,Mstar,Age,dAge,OmegaEnv,OmegaCore,params,StarEvo,StarSt
         for quantity in StarState:
 
             # Do not do quantity if it was already added above
-            if not ( quantity in ['Age','dAge','OmegaEnv','OmegaCore'] ):
+            if quantity not in ['Age','dAge','OmegaEnv','OmegaCore']:
                 Tracks[quantity] = np.append( Tracks[quantity] , StarState[quantity] )
 
     return Tracks

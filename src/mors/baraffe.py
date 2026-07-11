@@ -1,17 +1,19 @@
 """Module for loading and interpolating Baraffe tracks data.
 Original tracks data can be found on the website
 http://perso.ens-lyon.fr/isabelle.baraffe/BHAC15dir/BHAC15_tracks+structure"""
-import os
-import shutil
+from __future__ import annotations
 
 import logging
-log = logging.getLogger("fwl."+__name__)
+import os
+import shutil
 
 import numpy as np
 from scipy.interpolate import PchipInterpolator
 
 import mors.constants as const
 from mors.data import FWL_DATA_DIR
+
+log = logging.getLogger("fwl." + __name__)
 
 #Short cut to Baraffe tracks mass and temporal range
 MassGrid = [0.010, 0.015, 0.020, 0.030, 0.040, 0.050,
@@ -250,9 +252,9 @@ def BaraffeLoadTrack(Mstar, pre_interp = True, tmin = None, tmax = None):
     path = (FWL_DATA_DIR / 'stellar_evolution_tracks' / 'Baraffe' / filename)
     if not path.exists():
         raise IOError(
-            "Cannot find Baraffe track file {path}. "
+            f"Cannot find Baraffe track file {path}. "
             "Did you set the FWL_DATA environment variable? "
-            "Did you run `mors dowload ...` to get access to the Baraffe track data?"
+            "Did you run `mors download baraffe` to get the Baraffe track data?"
         )
 
     data = np.loadtxt(path, skiprows=1).T
@@ -267,8 +269,10 @@ def BaraffeLoadTrack(Mstar, pre_interp = True, tmin = None, tmax = None):
     if pre_interp:
         # Params for interpolation
         grid_count = 5e4
-        if tmin==None: tmin = t[0]
-        if tmax==None: tmax = t[-1]
+        if tmin is None:
+            tmin = t[0]
+        if tmax is None:
+            tmax = t[-1]
 
         # Do interpolation
         #log.info("Interpolating stellar track onto a grid of size %d" % grid_count)
