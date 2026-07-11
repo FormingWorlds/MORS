@@ -2,7 +2,7 @@
 
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![Docs](https://img.shields.io/github/actions/workflow/status/FormingWorlds/MORS/docs.yaml?branch=main&label=Docs)](https://proteus-framework.org/MORS/)
-[![codecov](https://img.shields.io/codecov/c/github/FormingWorlds/MORS?label=coverage&logo=codecov)](https://app.codecov.io/gh/FormingWorlds/MORS)
+[![codecov](https://img.shields.io/codecov/c/github/FormingWorlds/MORS/main?label=coverage&logo=codecov)](https://app.codecov.io/gh/FormingWorlds/MORS)
 [![Unit Tests](https://img.shields.io/github/actions/workflow/status/FormingWorlds/MORS/tests.yaml?branch=main&label=Unit%20Tests)](https://github.com/FormingWorlds/MORS/actions/workflows/tests.yaml)
 [![Integration Tests](https://img.shields.io/github/actions/workflow/status/FormingWorlds/MORS/nightly.yml?branch=main&label=Integration%20Tests)](https://github.com/FormingWorlds/MORS/actions/workflows/nightly.yml)
 
