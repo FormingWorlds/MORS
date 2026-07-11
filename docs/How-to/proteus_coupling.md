@@ -18,6 +18,7 @@ tracks          = "spada"     # "spada" or "baraffe"
 age_now         = 4.567       # current stellar age [Gyr]
 rot_pcntle      = 50.0        # rotation percentile (0-100)
 spectrum_source = "solar"     # "solar", "muscles", or "phoenix"
+star_name       = "sun"       # required for "solar" and "muscles"
 ```
 
 ## Choosing the tracks
@@ -41,7 +42,7 @@ For Spada tracks, specify the rotation in exactly one of two ways:
 - `star.mors.rot_pcntle`: a rotation percentile in the 1 Myr distribution (`0` to `100`). The reference age is fixed at 1 Myr, matching `mors.Percentile()`. A percentile of 5 is a slow rotator, 50 the median, 95 a fast rotator.
 - `star.mors.rot_period`: a rotation period in days at the current stellar age `star.mors.age_now`.
 
-Set only one of the two. Baraffe tracks have no rotation model, so both settings are ignored there.
+Set exactly one of the two. The one-of rule is enforced for every MORS configuration: leaving both unset, or setting both, raises a configuration error regardless of the chosen tracks. Baraffe tracks have no rotation model, so the value does not affect the evolution, but the setting is still validated.
 
 ## Choosing the reference spectrum
 
@@ -49,15 +50,15 @@ Set only one of the two. Baraffe tracks have no rotation model, so both settings
 
 | Setting | Behaviour |
 |---|---|
-| `"solar"` | Modern or historical solar reference spectrum |
+| `"solar"` | Modern or historical solar reference spectrum (set `star.mors.star_name`) |
 | `"muscles"` | [MUSCLES](https://archive.stsci.edu/hlsp/muscles) observed spectrum (set `star.mors.star_name`) |
 | `"phoenix"` | [PHOENIX](https://phoenix.astro.physik.uni-goettingen.de/) synthetic spectrum from stellar parameters |
 
-For `"muscles"` and `"phoenix"`, set `star.mors.star_name` to the target star. PROTEUS rescales the chosen spectrum to the planet's orbital separation. Fuller detail on stellar spectra is in the [PROTEUS data reference](https://proteus-framework.org/PROTEUS/Reference/data.html#stellar-spectra).
+For `"solar"` and `"muscles"`, set `star.mors.star_name` to the target star (for the solar reference, `star_name = "sun"`). `"phoenix"` instead builds the spectrum from stellar parameters and does not need `star_name`. PROTEUS rescales the chosen spectrum to the planet's orbital separation. Fuller detail on stellar spectra is in the [PROTEUS data reference](https://proteus-framework.org/PROTEUS/Reference/data.html#stellar-spectra).
 
 ## Common pitfalls
 
-- **Both `rot_pcntle` and `rot_period` set.** Only one initial-rotation setting may be given for Spada tracks; setting both is rejected.
+- **Both `rot_pcntle` and `rot_period` set.** Exactly one initial-rotation setting may be given; setting both, or neither, is rejected for any tracks (including Baraffe).
 - **`age_now` missing or non-positive.** The current stellar age must be greater than zero; it is given in Gyr.
 - **Expecting XUV from Baraffe tracks.** Baraffe tracks provide no XUV; the XUV instellation is set to zero. Use Spada tracks for escape-driving XUV.
 - **Mass outside the track range.** The mass is clipped with a warning, so the simulated star may differ from the configured one. Check the log if the star mass is near a track limit.
