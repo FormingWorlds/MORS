@@ -11,7 +11,7 @@ import numpy as np
 from scipy.interpolate import PchipInterpolator
 
 import mors.constants as const
-from mors.data import FWL_DATA_DIR
+from mors.data import baraffe_data_dir
 
 log = logging.getLogger("fwl." + __name__)
 
@@ -249,7 +249,7 @@ def BaraffeLoadTrack(Mstar, pre_interp = True, tmin = None, tmax = None):
     # Load data
     formatted_mass = f"{Mstar:.3f}".replace('.', 'p')
     filename = f'BHAC15-M{formatted_mass}.txt'
-    path = (FWL_DATA_DIR / 'stellar_evolution_tracks' / 'Baraffe' / filename)
+    path = baraffe_data_dir() / filename
     if not path.exists():
         raise IOError(
             f"Cannot find Baraffe track file {path}. "
