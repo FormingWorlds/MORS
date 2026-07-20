@@ -3,7 +3,7 @@
 This page collects the most common errors and how to fix them.  If you encounter errors that you cannot solve via the standard step-by-step guide or the advice below, [contact the developers](../Community/contact.md).
 
 ## Error index
- 
+
 | Error | Section |
 |---|---|
 | `FileNotFoundError` on `.track1` / `.track2` file | [Data and installation issues](#data-and-installation-issues) |
@@ -30,7 +30,7 @@ This page collects the most common errors and how to fix them.  If you encounter
 | `AgeMin not in range of evolutionary track` | [Method and query errors](#method-and-query-errors) |
 | `Mstar and Omega have different lengths` | [Cluster-specific errors](#cluster-specific-errors) |
 | Saved object has no callable quantity methods after loading | [Loading saved objects](#loading-saved-objects) |
- 
+
 
 If your issue is not listed here, please open an issue on [GitHub](https://github.com/FormingWorlds/MORS/issues) and include the full traceback and the inputs you used. You can also try to get more diagnostic information, as described [here](#getting-more-diagnostic-information).
 
@@ -77,7 +77,7 @@ star = mors.Star(Mstar=1.0, Omega=1.0, starEvoDir="/path/to/tracks")
 
 **Symptom:** `mors download` exits with an error, or the data directory exists but is empty or missing files.
 
-**Cause:** MORS tries Zenodo first and then falls back to OSF, with a maximum of 2 attempts per source. A transient network issue or rate-limit can cause both to fail.
+**Cause:** The Spada grid is fetched from Zenodo with an OSF fallback (up to 2 attempts per source), so a transient network issue or rate-limit can cause both to fail. The Baraffe tracks are fetched, hash-verified, through fwl-io from their Zenodo record (no OSF mirror); a failure there raises directly, and a corrupt file is re-fetched automatically on the next run.
 
 **Fix:** Wait a few minutes and retry:
 
@@ -91,6 +91,13 @@ You can also download each track set independently if one source succeeded and t
 ```sh
 rm -rf $FWL_DATA/stellar_evolution_tracks/Spada
 mors download spada
+```
+
+The Baraffe tracks live under the fwl-io versioned path instead; to force a clean re-fetch, remove that directory and download again:
+
+```sh
+rm -rf $FWL_DATA/star/tracks/baraffe_2015
+mors download baraffe
 ```
 
 !!! note "Incomplete directory"

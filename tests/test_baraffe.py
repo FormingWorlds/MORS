@@ -221,13 +221,15 @@ def test_baraffe_load_track_missing_file_raises(monkeypatch, tmp_path):
     rather than hitting an opaque loadtxt error. The empty directory guarantees
     the file is absent and no track dictionary is returned.
     """
-    monkeypatch.setattr(baraffe, 'FWL_DATA_DIR', tmp_path)
+    # Point the Baraffe directory resolver at an empty tree so the track file is
+    # absent; this is the exact function BaraffeLoadTrack builds its path from.
+    monkeypatch.setattr(baraffe, 'baraffe_data_dir', lambda: tmp_path)
     with pytest.raises(IOError) as excinfo:
         baraffe.BaraffeLoadTrack(1.000)
-    # The raised message currently emits the literal placeholder '{path}' rather
-    # than the resolved path; this pins the present behaviour of the loader's
-    # error string and is not an endorsement of the missing interpolation.
+    # The error names the missing file and its resolved path, and directs the
+    # user to fetch the data rather than surfacing an opaque loadtxt failure.
     assert 'Cannot find Baraffe track file' in str(excinfo.value)
+    assert str(tmp_path) in str(excinfo.value)
     # No stray track file was created as a side effect of the failed load.
     assert not any(tmp_path.rglob('*.txt'))
 

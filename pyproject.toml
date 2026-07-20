@@ -29,6 +29,7 @@ keywords = ["exoplanet", "stellar evolution"]
 requires-python = '>=3.11'
 dependencies = [
   'click',
+  'fwl-io>=26.7.20',
   'matplotlib',
   'numpy>=2.0.0',
   'osfclient',
@@ -66,6 +67,9 @@ publishing = [
 
 [project.scripts]
 mors = "mors.cli:cli"
+
+[project.entry-points."fwl_io.manifests"]
+mors = "mors.data:manifest_path"
 
 [tool.setuptools]
 package-dir = {"mors" = "src/mors"}
