@@ -19,10 +19,28 @@ project_id = '9u3fb'
 
 # The Baraffe tracks are fetched through fwl-io into the versioned data layout
 # (star/tracks/baraffe_2015/r<record-id>), declared in mors_manifest.toml so the
-# subdir and Zenodo pin have a single source of truth. The Spada grid is a
-# single tarball that is extracted after download; it stays on the legacy
-# Zenodo/OSF path below until fwl-io gains archive extraction.
+# location and Zenodo pin have a single source of truth: fwl-io derives the
+# location from the table key, so it cannot drift. The Spada grid is a single
+# tarball and still comes down the legacy Zenodo/OSF path below.
 _BARAFFE_KEY = 'star.tracks.baraffe_2015'
+
+# The manifest schema the shipped manifest is written against. An fwl-io older
+# than this reads the manifest as malformed rather than as a version mismatch,
+# so the load names which side is out of date. Keep in step with the fwl-io
+# requirement in pyproject.toml; test_data.py pins the two together.
+_FWL_IO_FLOOR = '26.7.22'
+
+
+def _fwl_io_derives_the_location() -> bool:
+    """Report whether the installed fwl-io derives a dataset location from its key.
+
+    The field became a derived property in the release that removed ``subdir``
+    from the manifest schema, so its kind on the class distinguishes an fwl-io
+    that reads the shipped manifest from one that rejects it.
+    """
+    from fwl_io.manifest import Dataset
+
+    return isinstance(getattr(Dataset, 'subdir', None), property)
 
 
 def manifest_path() -> Path:
@@ -31,10 +49,24 @@ def manifest_path() -> Path:
 
 
 def _baraffe_dataset():
-    """Return the Baraffe dataset declared in the shipped manifest."""
+    """Return the Baraffe dataset declared in the shipped manifest.
+
+    An fwl-io older than the manifest schema rejects the shipped manifest as
+    malformed, which points the reader at a file they should not edit, so that
+    case is re-raised naming the version that reads it. A manifest error under a
+    current fwl-io is a real error in the shipped file and propagates unchanged.
+    """
     from fwl_io import load_manifest
 
-    datasets = {ds.key: ds for ds in load_manifest(manifest_path())}
+    try:
+        datasets = {ds.key: ds for ds in load_manifest(manifest_path())}
+    except ValueError as exc:
+        if _fwl_io_derives_the_location():
+            raise
+        raise RuntimeError(
+            f'fwl-io could not read the manifest MORS ships ({exc}); the installed '
+            f'fwl-io predates the manifest schema: upgrade to fwl-io>={_FWL_IO_FLOOR}.'
+        ) from exc
     return datasets[_BARAFFE_KEY]
 
 
@@ -66,7 +98,7 @@ def baraffe_data_dir() -> Path:
     if getattr(fetcher, 'version_dir', None) is None:
         raise RuntimeError(
             f'fwl-io resolved an unversioned Baraffe directory {fetcher.target_dir}; '
-            'upgrade to fwl-io>=26.7.20 for the versioned data layout.'
+            f'upgrade to fwl-io>={_FWL_IO_FLOOR} to resolve the versioned data layout.'
         )
     return fetcher.target_dir
 
@@ -147,8 +179,8 @@ def DownloadEvolutionTracks(fname=''):
         - fname (optional) :    folder name, "Spada" or "Baraffe"
                                 if not provided download both
 
-    Baraffe is fetched through fwl-io into the versioned data layout; Spada
-    stays on the legacy Zenodo/OSF path until fwl-io gains archive extraction.
+    Baraffe is fetched through fwl-io into the versioned data layout; Spada is a
+    single tarball and comes down the legacy Zenodo/OSF path, untarred in place.
     """
 
     # If no folder name specified download both Spada and Baraffe
