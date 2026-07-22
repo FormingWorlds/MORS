@@ -477,30 +477,54 @@ def test_manifest_error_under_a_current_fwl_io_propagates(monkeypatch):
     # The manifest error reaches the caller as itself, not recast as a version
     # problem, so the reader is sent to the file that is actually wrong.
     assert 'is not a DOI' in str(excinfo.value)
-    assert not isinstance(excinfo.value, RuntimeError)
     assert 'upgrade to fwl-io' not in str(excinfo.value)
+    # It is the original exception, not a new one carrying the same text.
+    assert excinfo.value.__cause__ is None
 
 
 def test_capability_check_distinguishes_the_two_manifest_schemas(monkeypatch):
     """The check separates an fwl-io that derives the location from one that declares it."""
+    import dataclasses
+
     import fwl_io.manifest as fwl_manifest
-    from fwl_io.manifest import Dataset
 
     # The installed fwl-io satisfies the declared floor, so it derives the
     # location and the shipped manifest loads.
     assert data._fwl_io_derives_the_location() is True
     assert data._baraffe_dataset().key == 'star.tracks.baraffe_2015'
-    assert isinstance(getattr(Dataset, 'subdir', None), property)
 
+    @dataclasses.dataclass
     class _DeclaredLocationDataset:
-        # An fwl-io before the schema move carries subdir as a plain dataclass
-        # field, so the class exposes no property of that name.
-        subdir: str
+        # An fwl-io before the schema move carries the location as a manifest
+        # field, which is the fact the check reads.
+        key: str = 'g.d'
+        subdir: str = 'g/d'
 
     monkeypatch.setattr(fwl_manifest, 'Dataset', _DeclaredLocationDataset)
     # Discrimination: against that class the check reports the older schema, so
     # the version guard is driven by the installed package, not hard-coded true.
     assert data._fwl_io_derives_the_location() is False
+
+    @dataclasses.dataclass
+    class _DerivedLocationDataset:
+        # A later fwl-io may implement the derivation any way it likes; what
+        # matters is that the location is no longer a field of the dataset.
+        key: str = 'g.d'
+
+        @property
+        def subdir(self) -> str:
+            return self.key.replace('.', '/')
+
+    monkeypatch.setattr(fwl_manifest, 'Dataset', _DerivedLocationDataset)
+    assert data._fwl_io_derives_the_location() is True
+
+    class _UnrecognisableDataset:
+        pass
+
+    monkeypatch.setattr(fwl_manifest, 'Dataset', _UnrecognisableDataset)
+    # An fwl-io the check cannot read is reported as current, so a manifest
+    # error is never blamed on a version mismatch that was not demonstrated.
+    assert data._fwl_io_derives_the_location() is True
 
 
 def test_declared_floor_matches_the_error_message_floor():
@@ -510,7 +534,9 @@ def test_declared_floor_matches_the_error_message_floor():
     pyproject = Path(__file__).parents[1] / 'pyproject.toml'
     declared = [
         dep
-        for dep in tomllib.loads(pyproject.read_text())['project']['dependencies']
+        for dep in tomllib.loads(pyproject.read_text(encoding='utf-8'))['project'][
+            'dependencies'
+        ]
         if dep.replace(' ', '').startswith('fwl-io')
     ]
     # Exactly one fwl-io requirement, so there is one floor to agree with.

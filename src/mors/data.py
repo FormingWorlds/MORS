@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import dataclasses
 import logging
 import os
 import shutil
@@ -34,13 +35,18 @@ _FWL_IO_FLOOR = '26.7.22'
 def _fwl_io_derives_the_location() -> bool:
     """Report whether the installed fwl-io derives a dataset location from its key.
 
-    The field became a derived property in the release that removed ``subdir``
-    from the manifest schema, so its kind on the class distinguishes an fwl-io
-    that reads the shipped manifest from one that rejects it.
+    The question is whether ``subdir`` is still a manifest field, so the answer
+    is read off the dataset fields rather than off how the attribute happens to
+    be implemented. Only positive evidence of the older schema counts: an fwl-io
+    that cannot be introspected is reported as current, so the caller never
+    blames a version mismatch it cannot demonstrate.
     """
-    from fwl_io.manifest import Dataset
+    try:
+        from fwl_io.manifest import Dataset
 
-    return isinstance(getattr(Dataset, 'subdir', None), property)
+        return 'subdir' not in {field.name for field in dataclasses.fields(Dataset)}
+    except Exception:
+        return True
 
 
 def manifest_path() -> Path:
@@ -53,7 +59,7 @@ def _baraffe_dataset():
 
     An fwl-io older than the manifest schema rejects the shipped manifest as
     malformed, which points the reader at a file they should not edit, so that
-    case is re-raised naming the version that reads it. A manifest error under a
+    case is reported as the version mismatch it is. A manifest error under a
     current fwl-io is a real error in the shipped file and propagates unchanged.
     """
     from fwl_io import load_manifest
@@ -93,8 +99,8 @@ def baraffe_data_dir() -> Path:
     ``mors download baraffe``) to populate it.
     """
     fetcher = _baraffe_fetcher()
-    # A pre-versioning fwl-io (before the r<record-id> layout) resolves the bare
-    # subdir and has no version_dir, which would silently mislocate the tracks.
+    # A fetcher without a version_dir resolves the bare location, which would
+    # put the tracks one directory above where every reader looks for them.
     if getattr(fetcher, 'version_dir', None) is None:
         raise RuntimeError(
             f'fwl-io resolved an unversioned Baraffe directory {fetcher.target_dir}; '
