@@ -39,16 +39,33 @@ jobs:
           python -m pip install --upgrade pip
           pip install -e ".[develop]"
 
-      # The key is derived from the dataset pin and the per-file checksums
-      # MORS ships, so it changes exactly when the tracks change. actions/cache
-      # only writes on an exact-key miss, so a key that never changes is never
-      # rewritten and its tree cannot follow the data. The prefix restore-key
-      # gives a run whose dataset moved a warm start from the previous tree.
+      # The key carries the Baraffe dataset pin and the per-file checksums MORS
+      # ships, so it moves when that dataset moves and stays put otherwise.
+      # actions/cache only writes on an exact-key miss, so a key that never
+      # changes is never rewritten and its tree cannot follow the data. An empty
+      # hash would be such a key, and would also collide with the restore-key
+      # prefix, so the step below refuses to build one. The Spada grid shares
+      # the cached tree but is pinned in mors/data.py rather than the manifest,
+      # so this key does not track it.
+      - name: Resolve the track-data cache key
+        id: cachekey
+        run: |
+          hash="${{ hashFiles('src/mors/data/mors_manifest.toml', 'src/mors/data/*.registry.txt') }}"
+          if [ -z "${hash}" ]; then
+            echo "No dataset manifest or registry found under src/mors/data/, so the" >&2
+            echo "cache key has nothing to track. Point the hashFiles patterns in this" >&2
+            echo "workflow at wherever those files now live." >&2
+            exit 1
+          fi
+          echo "key=mors-fwl-data-${hash}" >> "${GITHUB_OUTPUT}"
+
+      # On a run whose dataset moved, the prefix restore-key seeds the new entry
+      # from the previous tree, so only the files that changed come down.
       - name: Cache evolution-track data
         uses: actions/cache@v4
         with:
           path: ${{ github.workspace }}/fwl_data
-          key: mors-fwl-data-${{ hashFiles('src/mors/data/mors_manifest.toml', 'src/mors/data/*.registry.txt') }}
+          key: ${{ steps.cachekey.outputs.key }}
           restore-keys: |
             mors-fwl-data-
 
