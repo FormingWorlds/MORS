@@ -569,17 +569,21 @@ def test_nightly_cache_key_tracks_the_files_that_pin_the_tracks():
     patterns = re.findall(r"'([^']+)'", call.group(1))
     assert patterns, 'the hashFiles call declares no patterns'
 
+    from fwl_io import load_manifest
+
     hashed = {path.resolve() for pattern in patterns for path in repo_root.glob(pattern)}
-    dataset = data._baraffe_dataset()
     manifest = data.manifest_path().resolve()
-    registry = dataset.registry_path.resolve()
+    # Every declared dataset, not just Baraffe, so a dataset added to the
+    # manifest later is covered by this test rather than tripping it.
+    registries = {ds.registry_path.resolve() for ds in load_manifest(manifest)}
+    assert registries, 'the manifest declares no dataset to track'
     # The Zenodo pin lives in the manifest, so a re-pin has to move the key.
     assert manifest in hashed
-    # The per-file checksums live in the registry, so a re-sync has to move it too.
-    assert registry in hashed
+    # The per-file checksums live in the registries, so a re-sync has to move it too.
+    assert registries <= hashed
     # Nothing else: an over-broad pattern would bust the cache on edits that
     # leave the data untouched, which costs a full refetch from a single mirror.
-    assert hashed == {manifest, registry}
+    assert hashed == {manifest} | registries
 
 
 def test_manifest_path_loads_baraffe_dataset():
