@@ -29,7 +29,7 @@ keywords = ["exoplanet", "stellar evolution"]
 requires-python = '>=3.11'
 dependencies = [
   'click',
-  'fwl-io>=26.7.20',
+  'fwl-io>=26.7.22',
   'matplotlib',
   'numpy>=2.0.0',
   'osfclient',

@@ -412,18 +412,18 @@ def test_baraffe_data_dir_is_versioned(monkeypatch, tmp_path):
 
     # The path is the pinned version directory below the new domain-first subdir.
     assert resolved == tmp_path / 'star' / 'tracks' / 'baraffe_2015' / 'r15729114'
-    # Discrimination: the version segment must be present. A pre-versioning fwl-io
-    # would resolve the bare subdir, which is the failure baraffe_data_dir guards.
+    # Discrimination: the version segment must be present. A fetcher resolving the
+    # bare location would sit one level up, which is what baraffe_data_dir guards.
     assert resolved != tmp_path / 'star' / 'tracks' / 'baraffe_2015'
     assert resolved.name == 'r15729114'
 
 
 def test_baraffe_data_dir_rejects_unversioned_fwl_io(monkeypatch, tmp_path):
-    """A pre-versioning fwl-io that resolves an unversioned path is rejected loudly."""
+    """A fetcher resolving a directory without the version segment is rejected loudly."""
 
     class _StaleFetcher:
-        # An fwl-io before the versioned layout has no version_dir and resolves
-        # the bare subdir, which would silently mislocate the tracks.
+        # A fetcher with no version_dir resolves the bare location, one level
+        # above the tracks, which would silently mislocate every read.
         version_dir = None
         target_dir = tmp_path / 'star' / 'tracks' / 'baraffe_2015'
 
@@ -431,9 +431,129 @@ def test_baraffe_data_dir_rejects_unversioned_fwl_io(monkeypatch, tmp_path):
     with pytest.raises(RuntimeError) as excinfo:
         data.baraffe_data_dir()
     msg = str(excinfo.value)
-    # The error is actionable: it names the unversioned path and the fix.
+    # The error is actionable: it names the offending path and the layout expected.
     assert 'unversioned' in msg
-    assert 'fwl-io>=26.7.20' in msg
+    assert str(_StaleFetcher.target_dir) in msg
+    assert 'r<record-id>' in msg
+    # Discrimination: it is the layout guard talking, not the manifest-schema
+    # guard, which reports an unreadable manifest instead.
+    assert 'could not read the manifest' not in msg
+
+
+def test_stale_fwl_io_is_named_as_the_stale_side(monkeypatch):
+    """An fwl-io too old to read the shipped manifest is named as the thing to upgrade."""
+
+    def _rejects_the_current_schema(path):
+        # An fwl-io predating key-derived locations refuses the manifest for the
+        # field it no longer needs, which reads as an error in MORS's own file.
+        raise ValueError(
+            'dataset \'star.tracks.baraffe_2015\': missing required field "subdir"'
+        )
+
+    monkeypatch.setattr('fwl_io.load_manifest', _rejects_the_current_schema)
+    monkeypatch.setattr(data, '_fwl_io_derives_the_location', lambda: False)
+    with pytest.raises(RuntimeError) as excinfo:
+        data._baraffe_dataset()
+    msg = str(excinfo.value)
+    # The reader is sent to the installed package, not to the shipped manifest.
+    assert 'upgrade to fwl-io>=26.7.22' in msg
+    assert 'predates the manifest schema' in msg
+    # The underlying complaint is kept, so the failure stays diagnosable.
+    assert 'missing required field' in msg
+    assert isinstance(excinfo.value.__cause__, ValueError)
+
+
+def test_manifest_error_under_a_current_fwl_io_propagates(monkeypatch):
+    """A real defect in the shipped manifest is not blamed on the installed fwl-io."""
+
+    def _rejects_a_genuine_defect(path):
+        # An fwl-io that does derive locations rejecting the manifest means the
+        # manifest is at fault, and no upgrade would change that.
+        raise ValueError("dataset 'star.tracks.baraffe_2015': zenodo value 'x' is not a DOI")
+
+    monkeypatch.setattr('fwl_io.load_manifest', _rejects_a_genuine_defect)
+    monkeypatch.setattr(data, '_fwl_io_derives_the_location', lambda: True)
+    with pytest.raises(ValueError) as excinfo:
+        data._baraffe_dataset()
+    # The manifest error reaches the caller as itself, not recast as a version
+    # problem, so the reader is sent to the file that is actually wrong.
+    assert 'is not a DOI' in str(excinfo.value)
+    assert 'upgrade to fwl-io' not in str(excinfo.value)
+    # It is the original exception, not a new one carrying the same text.
+    assert excinfo.value.__cause__ is None
+
+
+def test_capability_check_distinguishes_the_two_manifest_schemas(monkeypatch):
+    """The check separates an fwl-io that derives the location from one that declares it."""
+    import dataclasses
+
+    import fwl_io.manifest as fwl_manifest
+
+    # The installed fwl-io satisfies the declared floor, so it derives the
+    # location and the shipped manifest loads.
+    assert data._fwl_io_derives_the_location() is True
+    assert data._baraffe_dataset().key == 'star.tracks.baraffe_2015'
+
+    @dataclasses.dataclass
+    class _DeclaredLocationDataset:
+        # An fwl-io before the schema move carries the location as a manifest
+        # field, which is the fact the check reads.
+        key: str = 'g.d'
+        subdir: str = 'g/d'
+
+    monkeypatch.setattr(fwl_manifest, 'Dataset', _DeclaredLocationDataset)
+    # Discrimination: against that class the check reports the older schema, so
+    # the version guard is driven by the installed package, not hard-coded true.
+    assert data._fwl_io_derives_the_location() is False
+
+    @dataclasses.dataclass
+    class _DerivedLocationDataset:
+        # A later fwl-io may implement the derivation any way it likes; what
+        # matters is that the location is no longer a field of the dataset.
+        key: str = 'g.d'
+
+        @property
+        def subdir(self) -> str:
+            return self.key.replace('.', '/')
+
+    monkeypatch.setattr(fwl_manifest, 'Dataset', _DerivedLocationDataset)
+    assert data._fwl_io_derives_the_location() is True
+
+    class _UnrecognisableDataset:
+        pass
+
+    monkeypatch.setattr(fwl_manifest, 'Dataset', _UnrecognisableDataset)
+    # An fwl-io the check cannot read is reported as current, so a manifest
+    # error is never blamed on a version mismatch that was not demonstrated.
+    assert data._fwl_io_derives_the_location() is True
+
+
+def test_declared_floor_matches_the_error_message_floor():
+    """The version the errors name is the version the package actually requires."""
+    import tomllib
+
+    from packaging.requirements import Requirement
+    from packaging.utils import canonicalize_name
+
+    pyproject = Path(__file__).parents[1] / 'pyproject.toml'
+    dependencies = tomllib.loads(pyproject.read_text(encoding='utf-8'))['project'][
+        'dependencies'
+    ]
+    # Match on the canonical project name, so an extras suffix or an underscore
+    # spelling still resolves to the same requirement instead of silently
+    # leaving the pin unchecked.
+    declared = [
+        req for req in map(Requirement, dependencies) if canonicalize_name(req.name) == 'fwl-io'
+    ]
+    # Exactly one fwl-io requirement, so there is one floor to agree with.
+    assert len(declared) == 1
+    lower_bounds = [spec.version for spec in declared[0].specifier if spec.operator == '>=']
+    # The constant the guards interpolate is the floor the requirement states.
+    # Raising the pin without raising the constant would send users to a version
+    # that no longer satisfies the install. Only the lower bound is read, so
+    # adding an upper bound or an environment marker does not fail this test for
+    # a floor that is still correct.
+    assert lower_bounds == [data._FWL_IO_FLOOR]
 
 
 def test_manifest_path_loads_baraffe_dataset():
@@ -444,7 +564,8 @@ def test_manifest_path_loads_baraffe_dataset():
     # The manifest declares exactly the Baraffe dataset (Spada is not fwl-io yet).
     assert set(datasets) == {'star.tracks.baraffe_2015'}
     baraffe = datasets['star.tracks.baraffe_2015']
-    # It pins the domain-first subdir and the Baraffe Zenodo version record.
+    # The location is the key spelled as a path, and it is the directory the
+    # tracks already live in, so this migration moves no user data.
     assert baraffe.subdir == 'star/tracks/baraffe_2015'
     assert baraffe.zenodo == '10.5281/zenodo.15729114'
     # MORS is the declared consumer, so fwl-io routes the fetch to it.
