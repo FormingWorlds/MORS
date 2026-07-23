@@ -412,18 +412,18 @@ def test_baraffe_data_dir_is_versioned(monkeypatch, tmp_path):
 
     # The path is the pinned version directory below the new domain-first subdir.
     assert resolved == tmp_path / 'star' / 'tracks' / 'baraffe_2015' / 'r15729114'
-    # Discrimination: the version segment must be present. A pre-versioning fwl-io
-    # would resolve the bare subdir, which is the failure baraffe_data_dir guards.
+    # Discrimination: the version segment must be present. A fetcher resolving the
+    # bare location would sit one level up, which is what baraffe_data_dir guards.
     assert resolved != tmp_path / 'star' / 'tracks' / 'baraffe_2015'
     assert resolved.name == 'r15729114'
 
 
 def test_baraffe_data_dir_rejects_unversioned_fwl_io(monkeypatch, tmp_path):
-    """A pre-versioning fwl-io that resolves an unversioned path is rejected loudly."""
+    """A fetcher resolving a directory without the version segment is rejected loudly."""
 
     class _StaleFetcher:
-        # An fwl-io before the versioned layout has no version_dir and resolves
-        # the bare subdir, which would silently mislocate the tracks.
+        # A fetcher with no version_dir resolves the bare location, one level
+        # above the tracks, which would silently mislocate every read.
         version_dir = None
         target_dir = tmp_path / 'star' / 'tracks' / 'baraffe_2015'
 
@@ -431,10 +431,11 @@ def test_baraffe_data_dir_rejects_unversioned_fwl_io(monkeypatch, tmp_path):
     with pytest.raises(RuntimeError) as excinfo:
         data.baraffe_data_dir()
     msg = str(excinfo.value)
-    # The error is actionable: it names the unversioned path and the fix.
+    # The error is actionable: it names the offending path and the layout expected.
     assert 'unversioned' in msg
-    assert 'fwl-io>=26.7.22' in msg
-    # Discrimination: it is the version guard talking, not the manifest-schema
+    assert str(_StaleFetcher.target_dir) in msg
+    assert 'r<record-id>' in msg
+    # Discrimination: it is the layout guard talking, not the manifest-schema
     # guard, which reports an unreadable manifest instead.
     assert 'could not read the manifest' not in msg
 
@@ -531,20 +532,28 @@ def test_declared_floor_matches_the_error_message_floor():
     """The version the errors name is the version the package actually requires."""
     import tomllib
 
+    from packaging.requirements import Requirement
+    from packaging.utils import canonicalize_name
+
     pyproject = Path(__file__).parents[1] / 'pyproject.toml'
+    dependencies = tomllib.loads(pyproject.read_text(encoding='utf-8'))['project'][
+        'dependencies'
+    ]
+    # Match on the canonical project name, so an extras suffix or an underscore
+    # spelling still resolves to the same requirement instead of silently
+    # leaving the pin unchecked.
     declared = [
-        dep
-        for dep in tomllib.loads(pyproject.read_text(encoding='utf-8'))['project'][
-            'dependencies'
-        ]
-        if dep.replace(' ', '').startswith('fwl-io')
+        req for req in map(Requirement, dependencies) if canonicalize_name(req.name) == 'fwl-io'
     ]
     # Exactly one fwl-io requirement, so there is one floor to agree with.
     assert len(declared) == 1
+    lower_bounds = [spec.version for spec in declared[0].specifier if spec.operator == '>=']
     # The constant the guards interpolate is the floor the requirement states.
     # Raising the pin without raising the constant would send users to a version
-    # that no longer satisfies the install.
-    assert declared[0].replace(' ', '') == f'fwl-io>={data._FWL_IO_FLOOR}'
+    # that no longer satisfies the install. Only the lower bound is read, so
+    # adding an upper bound or an environment marker does not fail this test for
+    # a floor that is still correct.
+    assert lower_bounds == [data._FWL_IO_FLOOR]
 
 
 def test_manifest_path_loads_baraffe_dataset():

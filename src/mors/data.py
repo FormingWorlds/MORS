@@ -104,7 +104,7 @@ def baraffe_data_dir() -> Path:
     if getattr(fetcher, 'version_dir', None) is None:
         raise RuntimeError(
             f'fwl-io resolved an unversioned Baraffe directory {fetcher.target_dir}; '
-            f'upgrade to fwl-io>={_FWL_IO_FLOOR} to resolve the versioned data layout.'
+            'the tracks are expected under an r<record-id> version directory.'
         )
     return fetcher.target_dir
 
