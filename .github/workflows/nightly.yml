@@ -39,11 +39,18 @@ jobs:
           python -m pip install --upgrade pip
           pip install -e ".[develop]"
 
+      # The key is derived from the dataset pin and the per-file checksums
+      # MORS ships, so it changes exactly when the tracks change. actions/cache
+      # only writes on an exact-key miss, so a key that never changes is never
+      # rewritten and its tree cannot follow the data. The prefix restore-key
+      # gives a run whose dataset moved a warm start from the previous tree.
       - name: Cache evolution-track data
         uses: actions/cache@v4
         with:
           path: ${{ github.workspace }}/fwl_data
-          key: mors-fwl-data-1
+          key: mors-fwl-data-${{ hashFiles('src/mors/data/mors_manifest.toml', 'src/mors/data/*.registry.txt') }}
+          restore-keys: |
+            mors-fwl-data-
 
       - name: Run unit + smoke + integration + slow tests with coverage
         env:
