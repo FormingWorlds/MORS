@@ -556,6 +556,36 @@ def test_declared_floor_matches_the_error_message_floor():
     assert lower_bounds == [data._FWL_IO_FLOOR]
 
 
+def test_nightly_cache_key_tracks_the_files_that_pin_the_tracks():
+    """The nightly cache key hashes exactly the manifest and registry MORS ships."""
+    import re
+
+    repo_root = Path(__file__).parents[1]
+    workflow = (repo_root / '.github' / 'workflows' / 'nightly.yml').read_text(encoding='utf-8')
+    call = re.search(r'hashFiles\(([^)]*)\)', workflow)
+    # A cache key that stops tracking the data does not fail: the nightly stays
+    # green and quietly refetches every run, so the coupling is pinned here.
+    assert call is not None, 'the nightly no longer derives its cache key from hashFiles'
+    patterns = re.findall(r"'([^']+)'", call.group(1))
+    assert patterns, 'the hashFiles call declares no patterns'
+
+    from fwl_io import load_manifest
+
+    hashed = {path.resolve() for pattern in patterns for path in repo_root.glob(pattern)}
+    manifest = data.manifest_path().resolve()
+    # Every declared dataset, not just Baraffe, so a dataset added to the
+    # manifest later is covered by this test rather than tripping it.
+    registries = {ds.registry_path.resolve() for ds in load_manifest(manifest)}
+    assert registries, 'the manifest declares no dataset to track'
+    # The Zenodo pin lives in the manifest, so a re-pin has to move the key.
+    assert manifest in hashed
+    # The per-file checksums live in the registries, so a re-sync has to move it too.
+    assert registries <= hashed
+    # Nothing else: an over-broad pattern would bust the cache on edits that
+    # leave the data untouched, which costs a full refetch from a single mirror.
+    assert hashed == {manifest} | registries
+
+
 def test_manifest_path_loads_baraffe_dataset():
     """The shipped MORS manifest declares Baraffe under the new versioned layout."""
     from fwl_io import load_manifest

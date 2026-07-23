@@ -121,6 +121,10 @@ def get_zenodo_record(folder: str) -> str | None:
         - str | None : Zenodo record ID or None if not found
     """
     # Baraffe is fetched through fwl-io and is intentionally absent here.
+    # This pin sits outside the manifest, so it is outside everything the
+    # nightly cache key hashes, and _download_spada skips the download whenever
+    # the folder is already there. Changing the record here therefore keeps
+    # serving the cached grid until that cache is cleared by hand.
     zenodo_map = {
         'Spada': '15729101',
     }
