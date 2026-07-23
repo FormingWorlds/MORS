@@ -52,6 +52,17 @@ jobs:
           restore-keys: |
             mors-fwl-data-
 
+      - name: Probe restored data tree
+        env:
+          FWL_DATA: ${{ github.workspace }}/fwl_data
+        run: |
+          echo "--- directories under fwl_data ---"
+          find "${FWL_DATA}" -maxdepth 4 -type d 2>/dev/null | sort || echo "(fwl_data absent)"
+          echo "--- resolved Baraffe directory ---"
+          python -c "from mors.data import baraffe_data_dir; p = baraffe_data_dir(); print(p); print('exists:', p.exists()); print('n_files:', len(list(p.glob('*.txt'))) if p.exists() else 0)"
+          echo "--- track file timestamps before the tests ---"
+          find "${FWL_DATA}" -name 'BHAC15-*.txt' -printf '%T@ %p\n' 2>/dev/null | sort | head -3 || true
+
       - name: Run unit + smoke + integration + slow tests with coverage
         env:
           FWL_DATA: ${{ github.workspace }}/fwl_data
