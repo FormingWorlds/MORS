@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import dataclasses
+import importlib.metadata
 import logging
 import os
 import shutil
@@ -10,6 +11,8 @@ from time import sleep
 
 import platformdirs
 from osfclient.api import OSF
+from packaging.requirements import Requirement
+from packaging.utils import canonicalize_name
 
 log = logging.getLogger('fwl.' + __name__)
 
@@ -25,11 +28,34 @@ project_id = '9u3fb'
 # tarball and still comes down the legacy Zenodo/OSF path below.
 _BARAFFE_KEY = 'star.tracks.baraffe_2015'
 
-# The manifest schema the shipped manifest is written against. An fwl-io older
-# than this reads the manifest as malformed rather than as a version mismatch,
-# so the load names which side is out of date. Keep in step with the fwl-io
-# requirement in pyproject.toml; test_data.py pins the two together.
-_FWL_IO_FLOOR = '26.7.22'
+
+def _required_fwl_io_floor() -> str | None:
+    """Return the fwl-io lower bound this package declares, or None.
+
+    Read from the installed metadata rather than written down a second time
+    here, so the version an error names is the one the requirement states.
+    Returns None when the metadata cannot be read, so a failure to look it up
+    degrades the advice rather than replacing the error being reported.
+    """
+    try:
+        requirements = importlib.metadata.requires('fwl-mors') or ()
+    except Exception:
+        return None
+    for text in requirements:
+        try:
+            requirement = Requirement(text)
+        except Exception:
+            continue
+        if canonicalize_name(requirement.name) != 'fwl-io':
+            continue
+        # A requirement behind a marker, an extra above all, does not state the
+        # floor a plain install resolves.
+        if requirement.marker is not None and not requirement.marker.evaluate():
+            continue
+        for spec in requirement.specifier:
+            if spec.operator in ('>=', '==', '~='):
+                return spec.version
+    return None
 
 
 def _fwl_io_derives_the_location() -> bool:
@@ -69,9 +95,11 @@ def _baraffe_dataset():
     except ValueError as exc:
         if _fwl_io_derives_the_location():
             raise
+        floor = _required_fwl_io_floor()
+        upgrade = f'upgrade to fwl-io>={floor}' if floor else 'upgrade fwl-io'
         raise RuntimeError(
             f'fwl-io could not read the manifest MORS ships ({exc}); the installed '
-            f'fwl-io predates the manifest schema: upgrade to fwl-io>={_FWL_IO_FLOOR}.'
+            f'fwl-io predates the manifest schema: {upgrade}.'
         ) from exc
     return datasets[_BARAFFE_KEY]
 

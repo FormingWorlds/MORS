@@ -14,9 +14,11 @@ assertions) do.
 
 from __future__ import annotations
 
+import importlib.metadata
 from pathlib import Path
 
 import pytest
+from packaging.version import Version
 
 import mors.data as data
 
@@ -440,6 +442,30 @@ def test_baraffe_data_dir_rejects_unversioned_fwl_io(monkeypatch, tmp_path):
     assert 'could not read the manifest' not in msg
 
 
+def _declared_fwl_io_floor() -> str:
+    """Return the fwl-io lower bound pyproject.toml states.
+
+    Read straight from the file so a test never takes the version under test's
+    word for what the requirement says.
+    """
+    import tomllib
+
+    from packaging.requirements import Requirement
+    from packaging.utils import canonicalize_name
+
+    pyproject = Path(__file__).parents[1] / 'pyproject.toml'
+    dependencies = tomllib.loads(pyproject.read_text(encoding='utf-8'))['project'][
+        'dependencies'
+    ]
+    declared = [
+        req for req in map(Requirement, dependencies) if canonicalize_name(req.name) == 'fwl-io'
+    ]
+    assert len(declared) == 1, 'exactly one fwl-io requirement, so there is one floor'
+    bounds = [spec.version for spec in declared[0].specifier if spec.operator == '>=']
+    assert len(bounds) == 1, 'the requirement states one lower bound'
+    return bounds[0]
+
+
 def test_stale_fwl_io_is_named_as_the_stale_side(monkeypatch):
     """An fwl-io too old to read the shipped manifest is named as the thing to upgrade."""
 
@@ -455,8 +481,10 @@ def test_stale_fwl_io_is_named_as_the_stale_side(monkeypatch):
     with pytest.raises(RuntimeError) as excinfo:
         data._baraffe_dataset()
     msg = str(excinfo.value)
-    # The reader is sent to the installed package, not to the shipped manifest.
-    assert 'upgrade to fwl-io>=26.7.22' in msg
+    # The reader is sent to the installed package, not to the shipped manifest,
+    # at the version pyproject requires rather than one the code under test
+    # reports about itself.
+    assert f'upgrade to fwl-io>={_declared_fwl_io_floor()}' in msg
     assert 'predates the manifest schema' in msg
     # The underlying complaint is kept, so the failure stays diagnosable.
     assert 'missing required field' in msg
@@ -528,32 +556,95 @@ def test_capability_check_distinguishes_the_two_manifest_schemas(monkeypatch):
     assert data._fwl_io_derives_the_location() is True
 
 
-def test_declared_floor_matches_the_error_message_floor():
-    """The version the errors name is the version the package actually requires."""
-    import tomllib
+def test_floor_read_from_metadata_matches_the_declared_requirement():
+    """The version an error names is the one pyproject requires.
 
-    from packaging.requirements import Requirement
-    from packaging.utils import canonicalize_name
+    The floor is read from the installed metadata, which a development
+    checkout regenerates only on install, so this compares that read against
+    the file that states the requirement.
+    """
+    floor = data._required_fwl_io_floor()
 
-    pyproject = Path(__file__).parents[1] / 'pyproject.toml'
-    dependencies = tomllib.loads(pyproject.read_text(encoding='utf-8'))['project'][
-        'dependencies'
-    ]
-    # Match on the canonical project name, so an extras suffix or an underscore
-    # spelling still resolves to the same requirement instead of silently
-    # leaving the pin unchecked.
-    declared = [
-        req for req in map(Requirement, dependencies) if canonicalize_name(req.name) == 'fwl-io'
-    ]
-    # Exactly one fwl-io requirement, so there is one floor to agree with.
-    assert len(declared) == 1
-    lower_bounds = [spec.version for spec in declared[0].specifier if spec.operator == '>=']
-    # The constant the guards interpolate is the floor the requirement states.
-    # Raising the pin without raising the constant would send users to a version
-    # that no longer satisfies the install. Only the lower bound is read, so
-    # adding an upper bound or an environment marker does not fail this test for
-    # a floor that is still correct.
-    assert lower_bounds == [data._FWL_IO_FLOOR]
+    assert floor == _declared_fwl_io_floor(), (
+        'metadata and pyproject disagree on the fwl-io floor; reinstall the package'
+    )
+    # The environment satisfies the requirement it declares, so the floor an
+    # error names is one the reader can actually install.
+    assert Version(importlib.metadata.version('fwl-io')) >= Version(floor)
+
+
+@pytest.mark.parametrize(
+    ('requirements', 'expected'),
+    [
+        (['astropy>=6.0', 'fwl-io>=26.7.22'], '26.7.22'),
+        (['fwl_io>=26.7.22'], '26.7.22'),
+        (['fwl-io-extras>=9.9.9', 'fwl-io>=26.7.22'], '26.7.22'),
+        (['fwl-io>=99.0; extra == "develop"', 'fwl-io>=26.7.22'], '26.7.22'),
+        (['fwl-io'], None),
+        (['click', 'numpy>=2.0.0'], None),
+    ],
+    ids=[
+        'later-in-list',
+        'underscore-spelling',
+        'prefix-collision',
+        'extra-marker',
+        'no-bound',
+        'absent',
+    ],
+)
+def test_floor_read_picks_the_right_requirement(monkeypatch, requirements, expected):
+    """The floor comes from the fwl-io requirement itself, not from whichever
+    requirement happens to carry a lower bound first.
+
+    Each case is a spelling that a naive scan gets wrong: another package
+    bounded earlier in the list, an underscore name, a package whose name
+    starts with the one sought, and an fwl-io pulled in by an extra rather
+    than by a plain install.
+    """
+    monkeypatch.setattr(importlib.metadata, 'requires', lambda name: list(requirements))
+
+    floor = data._required_fwl_io_floor()
+
+    assert floor == expected
+    # Discrimination: every bound in these lists that belongs to some other
+    # requirement, so picking one up instead would be caught rather than
+    # happening to match.
+    assert floor not in {'6.0', '9.9.9', '99.0', '2.0.0'} - {expected}
+
+
+def test_floor_read_survives_metadata_it_cannot_read(monkeypatch):
+    """A metadata lookup that fails does not replace the error being reported.
+
+    The floor is a detail of the message, so a missing distribution and an
+    unreadable one both have to degrade the advice rather than raise something
+    else on top of the manifest failure.
+    """
+    for failure in (
+        importlib.metadata.PackageNotFoundError('fwl-mors'),
+        PermissionError(13, 'Permission denied'),
+    ):
+
+        def _fails(name, exc=failure):
+            raise exc
+
+        monkeypatch.setattr(importlib.metadata, 'requires', _fails)
+        assert data._required_fwl_io_floor() is None
+
+    def _rejects_the_current_schema(path):
+        raise ValueError(
+            'dataset \'star.tracks.baraffe_2015\': missing required field "subdir"'
+        )
+
+    monkeypatch.setattr('fwl_io.load_manifest', _rejects_the_current_schema)
+    monkeypatch.setattr(data, '_fwl_io_derives_the_location', lambda: False)
+    with pytest.raises(RuntimeError) as excinfo:
+        data._baraffe_dataset()
+    msg = str(excinfo.value)
+    # The version guard still fires and still names fwl-io, without inventing a
+    # version it could not read.
+    assert 'upgrade fwl-io' in msg
+    assert 'upgrade to fwl-io>=' not in msg
+    assert 'predates the manifest schema' in msg
 
 
 def test_nightly_cache_key_tracks_the_files_that_pin_the_tracks():

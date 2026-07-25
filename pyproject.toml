@@ -33,6 +33,7 @@ dependencies = [
   'matplotlib',
   'numpy>=2.0.0',
   'osfclient',
+  'packaging',
   'platformdirs',
   'scipy',
   'zenodo_get',
