@@ -94,10 +94,51 @@ jobs:
           # bare count and reads as if it had run.
           pytest -m "(unit or smoke or integration or slow) and not skip" \
             -rs \
+            --junit-xml=report.xml \
             --cov=mors \
             --cov-report=term-missing \
             --cov-report=xml \
             --cov-fail-under=${FULL_FAIL_UNDER}
+
+      # A check that did not run leaves the run green, so it is raised to the
+      # run summary here rather than left in the body of a long log.
+      - name: Report checks that did not run
+        if: ${{ always() }}
+        run: |
+          python - <<'PY'
+          import pathlib, xml.etree.ElementTree as ET
+
+          # A marker-deselected test leaves no element in the report at all, so
+          # these are looked for by name rather than waited on to appear.
+          MUST_RUN = {
+              'tests.test_data_live.test_committed_baraffe_registry_matches_live_zenodo',
+          }
+
+          # An unreadable report earns a warning rather than a failure, since it
+          # means the run was killed before it finished writing one.
+          try:
+              root = ET.parse(pathlib.Path('report.xml')).getroot()
+          except (OSError, ET.ParseError) as exc:
+              print(f'::warning::the test report could not be read ({exc}), so any '
+                    'check that did not run is unreported')
+              raise SystemExit(0)
+
+          ran = set()
+          for case in root.iter('testcase'):
+              name = f'{case.get("classname", "")}.{case.get("name", "")}'.strip('.')
+              ran.add(name)
+              for skipped in case.iter('skipped'):
+                  # Collapsing whitespace keeps a reason from carrying a line
+                  # break into the annotation, where it would start a new one.
+                  reason = ' '.join((skipped.get('message') or 'no reason given').split())
+                  print(f'::warning::{name} did not run: {reason}')
+
+          missing = sorted(MUST_RUN - ran)
+          for name in missing:
+              print(f'::error::{name} is absent from the test report, so it was '
+                    'deselected or renamed rather than run')
+          raise SystemExit(1 if missing else 0)
+          PY
 
       - name: Upload coverage to Codecov
         if: ${{ !cancelled() }}
