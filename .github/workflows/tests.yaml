@@ -34,7 +34,7 @@ jobs:
       # full matrix.
       matrix:
         os: ${{ github.event.pull_request.draft == true && fromJSON('["ubuntu-latest"]') || fromJSON('["ubuntu-latest", "macos-latest"]') }}
-        python-version: ${{ github.event.pull_request.draft == true && fromJSON('["3.12"]') || fromJSON('["3.11", "3.12", "3.13"]') }}
+        python-version: ${{ github.event.pull_request.draft == true && fromJSON('["3.12"]') || fromJSON('["3.12", "3.13"]') }}
 
     runs-on: ${{ matrix.os }}
     steps:

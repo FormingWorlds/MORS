@@ -4,7 +4,7 @@
     The standard way of installing this version of MORS is within the PROTEUS Framework, as described in the [PROTEUS installation guide](https://proteus-framework.org/PROTEUS/installation.html#9-install-submodules-as-editable). When installed as part of PROTEUS, MORS is set up automatically alongside all other modules. The standalone instructions below are only needed if you want to use MORS independently of PROTEUS.
 
 !!! info "Prerequisites"
-    - **Python** ≥ 3.11
+    - **Python** ≥ 3.12
     - **pip** (`python -m pip --version`)
     - **Git**: only needed for the developer install (`git --version`)
     - **Internet access**: required once to download the stellar evolution tracks
@@ -39,7 +39,7 @@ Use this route if you want to modify the source code or contribute to MORS.
 === "Conda"
 
     ```sh
-    conda create -n mors python=3.11 -y
+    conda create -n mors python=3.12 -y
     conda activate mors
     ```
 

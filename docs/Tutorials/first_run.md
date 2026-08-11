@@ -12,7 +12,7 @@ You need a Python 3 environment with `pip` and a working internet connection for
 Optionally, create and activate an isolated environment first. With Conda:
 
 ```bash
-conda create -n mors python=3.11 -y
+conda create -n mors python=3.12 -y
 conda activate mors
 ```
 

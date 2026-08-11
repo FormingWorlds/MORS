@@ -28,11 +28,11 @@ Sister modules in the ecosystem: AGNI (atmospheric radiative transfer), SOCRATES
 
 **Project Type**: Scientific simulation module (Python).
 
-**Languages**: Python 3.11+.
+**Languages**: Python 3.12+.
 
 **Size**: 15 source files in `src/mors/`.
 
-**Target Runtime**: Python 3.11+ on Linux / macOS.
+**Target Runtime**: Python 3.12+ on Linux / macOS.
 
 ## Build & Validation
 
@@ -40,7 +40,7 @@ Sister modules in the ecosystem: AGNI (atmospheric radiative transfer), SOCRATES
 
 **Prerequisites**:
 
-1. Python 3.11, 3.12 or 3.13 (via conda / miniforge or system).
+1. Python 3.12 or 3.13 (via conda / miniforge or system).
 2. Git.
 3. `FWL_DATA` environment variable pointing at a data directory; MORS downloads its evolutionary tracks (Baraffe 2015, Spada 2013) there on first use.
 

@@ -21,12 +21,11 @@ classifiers = [
     "Natural Language :: English",
     "Operating System :: OS Independent",
     "Programming Language :: Python",
-    "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
 ]
 keywords = ["exoplanet", "stellar evolution"]
-requires-python = '>=3.11'
+requires-python = '>=3.12'
 dependencies = [
   'click',
   'fwl-io>=26.7.22',
