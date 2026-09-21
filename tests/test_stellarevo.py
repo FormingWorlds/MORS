@@ -92,13 +92,14 @@ def test_stellarevo_luminosity_increases_with_mass():
 
 @pytest.mark.reference_pinned
 @pytest.mark.physics_invariant
-def test_grid_compiled_from_raw_tracks_matches_saved_grid(tmp_path):
+def test_grid_compiled_from_raw_tracks_matches_saved_grid(tmp_path, monkeypatch):
     """Compiling the grid from the raw Spada track files reproduces the solar calibration.
 
     Reference: Spada et al. (2013), ApJ 776, 87. The default install ships a
     pre-pickled grid; here the raw ``.track1`` / ``.track2`` files are read and
     the grid is compiled from scratch (the code path that produced that pickle).
-    The freshly compiled 1 Msun track must still land near L = 1 Lsun and
+    The pickle is written to the user cache directory, never into the track
+    directory, which holds immutable fetched data. The freshly compiled 1 Msun track must still land near L = 1 Lsun and
     R = 1 Rsun at the solar age, and a second construction from the pickle it
     just wrote must return the identical grid. A wrong column index in the raw
     reader, a dropped log-to-linear conversion, or a Gyr-to-Myr slip would move
@@ -107,13 +108,19 @@ def test_grid_compiled_from_raw_tracks_matches_saved_grid(tmp_path):
     real_model_dir = os.path.join(se.starEvoDirDefault, SOLAR_MODEL_SET)
     # Point a private grid directory at the real raw tracks with no pickle present,
     # so construction is forced down the compile-from-scratch branch.
-    os.symlink(real_model_dir, tmp_path / SOLAR_MODEL_SET)
-    pickle_path = tmp_path / (SOLAR_MODEL_SET + '.pickle')
-    assert not pickle_path.exists()
+    grid_dir = tmp_path / 'grid'
+    grid_dir.mkdir()
+    os.symlink(real_model_dir, grid_dir / SOLAR_MODEL_SET)
+    cache_root = tmp_path / 'cache'
+    monkeypatch.setattr(se.platformdirs, 'user_cache_dir', lambda *_a, **_k: str(cache_root))
+    pickle_path = se._gridCacheFile(str(grid_dir), SOLAR_MODEL_SET)
+    assert not os.path.exists(pickle_path)
 
-    compiled = mors.StarEvo(starEvoDir=str(tmp_path), evoModels=SOLAR_MODEL_SET)
-    # The compile branch writes the pickle it just built.
-    assert pickle_path.exists()
+    compiled = mors.StarEvo(starEvoDir=str(grid_dir), evoModels=SOLAR_MODEL_SET)
+    # The compile branch writes the pickle it just built, into the cache directory.
+    assert os.path.isfile(pickle_path)
+    assert pickle_path.startswith(str(cache_root))
+    assert not list(grid_dir.glob('*.pickle*'))
 
     lbol = compiled.Lbol(1.0, SOLAR_AGE_MYR)
     rstar = compiled.Rstar(1.0, SOLAR_AGE_MYR)
@@ -127,10 +134,34 @@ def test_grid_compiled_from_raw_tracks_matches_saved_grid(tmp_path):
     assert lbol > 0.5
 
     # Re-constructing now loads the saved pickle; the grids must agree at 1 Msun.
-    reloaded = mors.StarEvo(starEvoDir=str(tmp_path), evoModels=SOLAR_MODEL_SET)
+    reloaded = mors.StarEvo(starEvoDir=str(grid_dir), evoModels=SOLAR_MODEL_SET)
     assert_allclose(reloaded.Lbol(1.0, SOLAR_AGE_MYR), lbol, rtol=1e-12)
     assert_allclose(reloaded.Teff(1.0, SOLAR_AGE_MYR),
                     compiled.Teff(1.0, SOLAR_AGE_MYR), rtol=1e-12)
+
+
+def test_grid_cache_write_failure_does_not_break_construction(tmp_path, monkeypatch, caplog):
+    """An unwritable cache location costs a recompile, not the construction.
+
+    The cache root is a regular file, so creating the cache directory fails with
+    an ``OSError``. ``StarEvo`` must still return the compiled grid, warn once,
+    and leave nothing in the track directory.
+    """
+    mors.DownloadEvolutionTracks('Spada')
+    real_model_dir = os.path.join(se.starEvoDirDefault, SOLAR_MODEL_SET)
+    grid_dir = tmp_path / 'grid'
+    grid_dir.mkdir()
+    os.symlink(real_model_dir, grid_dir / SOLAR_MODEL_SET)
+    blocker = tmp_path / 'not_a_directory'
+    blocker.write_text('')
+    monkeypatch.setattr(se.platformdirs, 'user_cache_dir', lambda *_a, **_k: str(blocker))
+
+    with caplog.at_level('WARNING', logger='fwl.mors.stellarevo'):
+        grid = mors.StarEvo(starEvoDir=str(grid_dir), evoModels=SOLAR_MODEL_SET)
+
+    assert_allclose(grid.Lbol(1.0, SOLAR_AGE_MYR), 1.0, atol=0.2)
+    assert any('grid cache' in rec.message for rec in caplog.records)
+    assert not list(grid_dir.glob('*.pickle*'))
 
 
 @pytest.mark.physics_invariant

@@ -123,7 +123,7 @@ print(vals.shape)  # (2, 2, 3) — (masses, ages, quantities)
 
 ### Performance: pre-loading a mass track
 
-On first use, MORS compiles the Spada grid and saves a cache file in the stellar evolution tracks directory. Subsequent runs load from this cache and are faster.
+On first use, MORS compiles the Spada grid and saves a cache file in the user cache directory (for example `~/Library/Caches/mors` on macOS or `~/.cache/mors` on Linux), outside `FWL_DATA`. Subsequent runs load from this cache and are faster.
 
 If you will query many ages for a specific mass, pre-load that track to avoid repeated interpolation between mass bins:
 

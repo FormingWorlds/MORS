@@ -1,13 +1,18 @@
 """Module for loading the stellar evolution tracks and retrieving basic stellar properties."""
 
 import copy
+import hashlib
+import logging
 import os
 import pickle
 
 import numpy as np
+import platformdirs
 
 import mors.miscellaneous as misc
 from mors.data import spada_data_dir
+
+log = logging.getLogger('fwl.' + __name__)
 
 #----------------------------------------------------------
 # Parameters for stellar evolution models
@@ -195,6 +200,16 @@ def _LoadModels(starEvoDir=None,evoModels=evoModelsDefault):
 
     return ModelData
 
+def _gridCacheFile(starEvoDir,evoModels):
+    """Return the path of the compiled-grid cache file for a track directory.
+
+    The cache lives in the user cache directory, keyed on the absolute track
+    directory, and never inside the track directory itself, which is immutable
+    fetched data and may be read-only.
+    """
+    key = hashlib.sha256(os.path.abspath(str(starEvoDir)).encode()).hexdigest()[:16]
+    return os.path.join(platformdirs.user_cache_dir('mors'),'stellarevo',key,evoModels+".pickle")
+
 def _shouldCompileNew(starEvoDir,evoModels):
     """Takes directory for stellar evo models, returns if new grid needs to be compiled."""
 
@@ -202,7 +217,7 @@ def _shouldCompileNew(starEvoDir,evoModels):
     compileNew = True
 
     # Check if previously compiled models already exist
-    if ( os.path.isfile(starEvoDir+"/"+evoModels+".pickle") ):
+    if os.path.isfile(_gridCacheFile(starEvoDir,evoModels)):
         compileNew = False
 
     return compileNew
@@ -230,10 +245,15 @@ def _CompileNewGrid(starEvoDir,evoModels):
     for iMstar in range(0,len(MstarAll)):
         ModelData[MstarAll[iMstar]] = _ReadEvolutionTrack( starEvoDir , evoModels , MstarAll[iMstar] , MstarFilenameMiddle[iMstar] )
 
-    # Save compiled models
-    with open(starEvoDir+"/"+evoModels+".pickle",'wb') as f:
-        pickle.dump(ModelData,f)
-
+    # Save compiled models; a cache that cannot be written only costs a recompile
+    cacheFile = _gridCacheFile(starEvoDir,evoModels)
+    try:
+        os.makedirs(os.path.dirname(cacheFile),exist_ok=True)
+        with open(cacheFile+'.tmp','wb') as f:
+            pickle.dump(ModelData,f)
+        os.replace(cacheFile+'.tmp',cacheFile)
+    except OSError as exc:
+        log.warning('Could not write the compiled grid cache %s: %s',cacheFile,exc)
 
     return ModelData
 
@@ -423,7 +443,7 @@ def _LoadSavedGrid(starEvoDir,evoModels):
     """Takes filename for stellar evo model, returns grid of models."""
 
     # Simply load data
-    with open(starEvoDir+"/"+evoModels+".pickle",'rb') as f:
+    with open(_gridCacheFile(starEvoDir,evoModels),'rb') as f:
         ModelData = pickle.load(f)
 
     return ModelData
