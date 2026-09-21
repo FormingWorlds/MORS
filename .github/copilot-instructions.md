@@ -145,7 +145,7 @@ Pre-commit runs on the files a commit touches. Legacy modules carry lint debt th
 - `src/mors/` - Main Python source code (flat layout, 15 files)
   - `__init__.py` - Re-exports (utility)
   - `constants.py` - Physical constants (utility)
-  - `data.py` - OSF track-data download (utility)
+  - `data.py` - fwl-io track-data download (utility)
   - `cli.py` - Command-line entry point (utility)
   - `logs.py` - Logger setup (utility)
   - `parameters.py` - Default parameter dictionary (utility)

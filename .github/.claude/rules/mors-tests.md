@@ -110,7 +110,7 @@ Utility sources are exempt from the physics-invariant requirement but still subj
 ```
 src/mors/__init__.py     (re-exports)
 src/mors/constants.py    (pure physical constants, no derivation)
-src/mors/data.py         (OSF track download)
+src/mors/data.py         (fwl-io track download)
 src/mors/cli.py          (command-line entry point)
 src/mors/logs.py         (logger setup)
 src/mors/parameters.py   (default parameter dictionary)
@@ -185,7 +185,7 @@ import pytest
 hypothesis = pytest.importorskip('hypothesis')
 ```
 
-Optional deps recognized by the linter (`OPTIONAL_DEPS` constant in `tools/check_test_quality.py`): `hypothesis`. MORS's runtime dependencies (`numpy`, `scipy`, `matplotlib`, `click`, `osfclient`, `platformdirs`, `zenodo_get`) are always installed and do not need a guard. Any test that adds a new optional dependency must extend `OPTIONAL_DEPS`.
+Optional deps recognized by the linter (`OPTIONAL_DEPS` constant in `tools/check_test_quality.py`): `hypothesis`. MORS's runtime dependencies (`numpy`, `scipy`, `matplotlib`, `click`, `platformdirs`) are always installed and do not need a guard. Any test that adds a new optional dependency must extend `OPTIONAL_DEPS`.
 
 ---
 

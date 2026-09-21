@@ -3,27 +3,23 @@ from __future__ import annotations
 import dataclasses
 import logging
 import os
-import shutil
-import subprocess
 from pathlib import Path
-from time import sleep
 
 import platformdirs
-from osfclient.api import OSF
 
 log = logging.getLogger('fwl.' + __name__)
 
 FWL_DATA_DIR = Path(os.environ.get('FWL_DATA', platformdirs.user_data_dir('fwl_data')))
 
-# project ID of the stellar evolution tracks folder in the OSF
-project_id = '9u3fb'
-
-# The Baraffe tracks are fetched through fwl-io into the versioned data layout
-# (star/tracks/baraffe_2015/r<record-id>), declared in mors_manifest.toml so the
-# location and Zenodo pin have a single source of truth: fwl-io derives the
-# location from the table key, so it cannot drift. The Spada grid is a single
-# tarball and still comes down the legacy Zenodo/OSF path below.
+# The stellar evolution tracks are fetched through fwl-io into the versioned
+# data layout (star/tracks/<dataset>/r<record-id>), declared in
+# mors_manifest.toml so the location and Zenodo pin have a single source of
+# truth: fwl-io derives the location from the table key, so it cannot drift.
 _BARAFFE_KEY = 'star.tracks.baraffe_2015'
+_SPADA_KEY = 'star.tracks.spada_2013'
+
+# Top-level directory inside the Spada archive.
+_SPADA_GRID = 'fs255_grid'
 
 # The manifest schema the shipped manifest is written against. An fwl-io older
 # than this reads the manifest as malformed rather than as a version mismatch,
@@ -54,8 +50,8 @@ def manifest_path() -> Path:
     return Path(__file__).parent / 'data' / 'mors_manifest.toml'
 
 
-def _baraffe_dataset():
-    """Return the Baraffe dataset declared in the shipped manifest.
+def _dataset(key: str):
+    """Return the dataset declared under ``key`` in the shipped manifest.
 
     An fwl-io older than the manifest schema rejects the shipped manifest as
     malformed, which points the reader at a file they should not edit, so that
@@ -73,20 +69,36 @@ def _baraffe_dataset():
             f'fwl-io could not read the manifest MORS ships ({exc}); the installed '
             f'fwl-io predates the manifest schema: upgrade to fwl-io>={_FWL_IO_FLOOR}.'
         ) from exc
-    return datasets[_BARAFFE_KEY]
+    return datasets[key]
 
 
-def _baraffe_fetcher():
-    """Build an fwl-io fetcher for the Baraffe tracks from the manifest pin."""
+def _fetcher(key: str):
+    """Build an fwl-io fetcher for the dataset ``key`` from its manifest pin."""
     from fwl_io import create_fetcher
 
-    ds = _baraffe_dataset()
+    ds = _dataset(key)
     return create_fetcher(
         subdir=ds.subdir,
         zenodo=ds.zenodo,
         registry=ds.registry(),
         data_root=GetFWLData(),
+        extract=ds.extract,
     )
+
+
+def _versioned_dir(key: str, label: str) -> Path:
+    """Return the version directory that holds the files of dataset ``key``.
+
+    A fetcher without a version_dir resolves the bare location, which would put
+    the files one directory above where every reader looks for them.
+    """
+    fetcher = _fetcher(key)
+    if getattr(fetcher, 'version_dir', None) is None:
+        raise RuntimeError(
+            f'fwl-io resolved an unversioned {label} directory {fetcher.target_dir}; '
+            'the tracks are expected under an r<record-id> version directory.'
+        )
+    return fetcher.target_dir
 
 
 def baraffe_data_dir() -> Path:
@@ -98,80 +110,17 @@ def baraffe_data_dir() -> Path:
     download the tracks; call ``DownloadEvolutionTracks("Baraffe")`` (or
     ``mors download baraffe``) to populate it.
     """
-    fetcher = _baraffe_fetcher()
-    # A fetcher without a version_dir resolves the bare location, which would
-    # put the tracks one directory above where every reader looks for them.
-    if getattr(fetcher, 'version_dir', None) is None:
-        raise RuntimeError(
-            f'fwl-io resolved an unversioned Baraffe directory {fetcher.target_dir}; '
-            'the tracks are expected under an r<record-id> version directory.'
-        )
-    return fetcher.target_dir
+    return _versioned_dir(_BARAFFE_KEY, 'Baraffe')
 
 
-def get_zenodo_record(folder: str) -> str | None:
+def spada_data_dir() -> Path:
+    """Return the directory that holds the Spada model grid.
+
+    This is the ``fs255_grid`` directory inside the versioned fwl-io location of
+    the Spada archive. Resolving the path does not download the tracks; call
+    ``DownloadEvolutionTracks("Spada")`` (or ``mors download spada``) to populate it.
     """
-    Get Zenodo record ID for a given folder.
-
-    Inputs :
-        - folder : str
-            Folder name to get the Zenodo record ID for
-
-    Returns :
-        - str | None : Zenodo record ID or None if not found
-    """
-    # Baraffe is fetched through fwl-io and is intentionally absent here.
-    # This pin sits outside the manifest, so it is outside everything the
-    # nightly cache key hashes, and _download_spada skips the download whenever
-    # the folder is already there. Changing the record here therefore keeps
-    # serving the cached grid until that cache is cleared by hand.
-    zenodo_map = {
-        'Spada': '15729101',
-    }
-    return zenodo_map.get(folder, None)
-
-
-def download_zenodo_folder(folder: str, data_dir: Path):
-    """
-    Download a specific Zenodo record into specified folder
-
-    Inputs :
-        - folder : str
-            Folder name to download
-        - folder_dir : Path
-            local repository where data are saved
-    """
-
-    folder_dir = data_dir / folder
-    folder_dir.mkdir(parents=True)
-    zenodo_id = get_zenodo_record(folder)
-    cmd = ['zenodo_get', zenodo_id, '-o', folder_dir]
-    out = os.path.join(GetFWLData(), 'zenodo.log')
-    log.debug('    logging to %s' % out)
-    with open(out, 'w') as hdl:
-        subprocess.run(cmd, check=True, stdout=hdl, stderr=hdl)
-
-
-def download_OSF_folder(*, storage, folders: list[str], data_dir: Path):
-    """
-    Download a specific folder in the OSF repository
-
-    Inputs :
-        - storage : OSF storage name
-        - folders : folder names to download
-        - data_dir : local repository where data are saved
-    """
-    for file in storage.files:
-        for folder in folders:
-            if not file.path[1:].startswith(folder):
-                continue
-            parts = file.path.split('/')[1:]
-            target = Path(data_dir, *parts)
-            target.parent.mkdir(parents=True, exist_ok=True)
-            log.info(f'Downloading {file.path}...')
-            with open(target, 'wb') as f:
-                file.write_to(f)
-            break
+    return _versioned_dir(_SPADA_KEY, 'Spada') / _SPADA_GRID
 
 
 def GetFWLData() -> Path:
@@ -189,8 +138,8 @@ def DownloadEvolutionTracks(fname=''):
         - fname (optional) :    folder name, "Spada" or "Baraffe"
                                 if not provided download both
 
-    Baraffe is fetched through fwl-io into the versioned data layout; Spada is a
-    single tarball and comes down the legacy Zenodo/OSF path, untarred in place.
+    Both grids are fetched through fwl-io into the versioned data layout. The
+    Spada grid is a single archive, which fwl-io unpacks into its directory.
     """
 
     # If no folder name specified download both Spada and Baraffe
@@ -204,72 +153,16 @@ def DownloadEvolutionTracks(fname=''):
     if 'Baraffe' in folder_list:
         _fetch_baraffe()
     if 'Spada' in folder_list:
-        _download_spada()
+        _fetch_spada()
 
     return
 
 
 def _fetch_baraffe():
     """Fetch the Baraffe tracks through fwl-io (idempotent, hash-verified)."""
-    _baraffe_fetcher().fetch_all()
+    _fetcher(_BARAFFE_KEY).fetch_all()
 
 
-def _download_spada():
-    """Download and unpack the Spada grid via Zenodo, falling back to OSF."""
-    # Create stellar evolution tracks data repository if not existing
-    data_dir = GetFWLData() / 'stellar_evolution_tracks'
-    data_dir.mkdir(parents=True, exist_ok=True)
-
-    folder = 'Spada'
-    folder_dir = data_dir / folder
-    if folder_dir.exists():
-        return
-
-    # Link with OSF project repository (fallback mirror)
-    osf = OSF()
-    project = osf.project(project_id)
-    storage = project.storage('osfstorage')
-
-    max_tries = 2  # Maximum download attempts, could be a function argument
-    log.info(f'Downloading stellar evolution tracks to {data_dir}')
-    for i in range(max_tries):
-        log.info(f'Attempt {i + 1} of {max_tries}')
-        success = False
-
-        try:
-            download_zenodo_folder(folder=folder, data_dir=data_dir)
-            success = True
-        except (subprocess.CalledProcessError, OSError) as e:
-            # zenodo_get exits non-zero on failure (CalledProcessError via
-            # check=True) or is missing (FileNotFoundError); neither is a
-            # RuntimeError, so both must be caught for the fallback to run.
-            log.error(f'Zenodo download failed: {e}')
-            # A non-zero exit can leave partial files, so clear the whole tree;
-            # rmdir would raise on a non-empty directory and mask the failure.
-            shutil.rmtree(folder_dir, ignore_errors=True)
-
-        if not success:
-            try:
-                download_OSF_folder(storage=storage, folders=folder, data_dir=data_dir)
-                success = True
-            except (RuntimeError, OSError) as e:
-                log.error(f'OSF download failed: {e}')
-
-        if success:
-            break
-
-        if i < max_tries - 1:
-            log.info('Retrying download...')
-            sleep(5)  # Wait 5 seconds before retrying
-        else:
-            log.error('Max retries reached. Download failed.')
-
-    # Unzip Spada evolution tracks (only when the download populated the folder)
-    if folder_dir.exists():
-        wrk_dir = os.getcwd()
-        os.chdir(os.path.join(data_dir, 'Spada'))
-        subprocess.call(['tar', 'xvfz', 'fs255_grid.tar.gz'])
-        subprocess.call(['rm', '-f', 'fs255_grid.tar.gz'])
-        os.chdir(wrk_dir)
-
-    return
+def _fetch_spada():
+    """Fetch and unpack the Spada grid through fwl-io (idempotent, hash-verified)."""
+    _fetcher(_SPADA_KEY).fetch_all()

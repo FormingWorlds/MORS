@@ -1,4 +1,4 @@
-"""Live check that the committed Baraffe registry matches its Zenodo record.
+"""Live check that each committed track registry matches its Zenodo record.
 
 Nightly/slow tier only; needs network. A republished or edited Zenodo deposit is
 caught here instead of by a user's failing fetch.
@@ -20,8 +20,9 @@ import requests
 
 pytestmark = [pytest.mark.slow, pytest.mark.timeout(3600)]
 
-# Number of track files the committed Baraffe registry pins.
-BARAFFE_FILE_COUNT = 31
+# Number of files each committed registry pins: 30 Baraffe mass tracks plus the
+# combined structure file, and the single Spada archive.
+FILE_COUNTS = {'star.tracks.baraffe_2015': 31, 'star.tracks.spada_2013': 1}
 
 # Statuses that mean zenodo.org is busy or unwell rather than the pinned record
 # being wrong: 429 is rate limiting, the 5xx entries are gateway and backend
@@ -85,17 +86,19 @@ def _fetch_live_registry(doi: str) -> dict[str, str]:
     pytest.skip(f'{failure} on all {FETCH_ATTEMPTS} attempts, so nothing was compared')
 
 
-def test_committed_baraffe_registry_matches_live_zenodo():
-    """The 31 committed Baraffe checksums equal the live Zenodo record's."""
+@pytest.mark.parametrize('key', sorted(FILE_COUNTS))
+def test_committed_registry_matches_live_zenodo(key):
+    """The committed checksums of each track dataset equal the live Zenodo record's."""
     import mors.data as data
 
-    ds = data._baraffe_dataset()
+    ds = data._dataset(key)
     committed = ds.registry()
     live = _fetch_live_registry(ds.zenodo)
+    expected = FILE_COUNTS[key]
     # Guard against a vacuous match on an empty/partial API response.
-    assert len(live) == len(committed) == BARAFFE_FILE_COUNT, (
+    assert len(live) == len(committed) == expected, (
         f'Zenodo record {ds.zenodo} listed {len(live)} files against {len(committed)} '
-        f'committed; BARAFFE_FILE_COUNT expects {BARAFFE_FILE_COUNT} of each'
+        f'committed; FILE_COUNTS expects {expected} of each'
     )
     # Every committed checksum matches the live deposit; any drift fails here.
-    assert live == committed, f'Baraffe registry has drifted from Zenodo record {ds.zenodo}'
+    assert live == committed, f'{key} registry has drifted from Zenodo record {ds.zenodo}'

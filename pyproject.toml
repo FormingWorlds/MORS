@@ -32,10 +32,8 @@ dependencies = [
   'fwl-io>=26.7.22',
   'matplotlib',
   'numpy>=2.0.0',
-  'osfclient',
   'platformdirs',
   'scipy',
-  'zenodo_get',
 ]
 
 [project.urls]

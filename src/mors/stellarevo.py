@@ -7,13 +7,22 @@ import pickle
 import numpy as np
 
 import mors.miscellaneous as misc
-from mors.data import FWL_DATA_DIR
+from mors.data import spada_data_dir
 
 #----------------------------------------------------------
 # Parameters for stellar evolution models
 
 # Directory for stellar evolution models
-starEvoDirDefault = str(FWL_DATA_DIR /'stellar_evolution_tracks'/'Spada'/'fs255_grid')
+def _defaultStarEvoDir():
+    """Return the directory of the Spada evolution models as a string."""
+    return str(spada_data_dir())
+
+
+def __getattr__(name):
+    """Resolve ``starEvoDirDefault`` on access, so importing fetches nothing."""
+    if name == 'starEvoDirDefault':
+        return _defaultStarEvoDir()
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
 
 # Set which set of models to use, i.e. which X, Z, and A values (set to X0p70952_Z0p01631_A1p875 for closest to solar)
 evoModelsDefault = "X0p70952_Z0p01631_A1p875"
@@ -41,12 +50,12 @@ class StarEvo:
 
     """
 
-    def __init__(self,starEvoDir=starEvoDirDefault,evoModels=evoModelsDefault):
+    def __init__(self,starEvoDir=None,evoModels=evoModelsDefault):
         """Initialises instance of StarEvo class."""
 
         # If starEvoDir and evoModels are None, use defaults
         if starEvoDir is None:
-            starEvoDir = starEvoDirDefault
+            starEvoDir = _defaultStarEvoDir()
         if evoModels is None:
             evoModels = evoModelsDefault
 
@@ -172,8 +181,11 @@ class StarEvo:
         """Takes mass and age, returns rate of change of core radius."""
         return Value( Mstar , Age , 'dRcoredt' , ModelData=self.ModelData )
 
-def _LoadModels(starEvoDir=starEvoDirDefault,evoModels=evoModelsDefault):
+def _LoadModels(starEvoDir=None,evoModels=evoModelsDefault):
     """Loads evolutionary tracks as a grid of parameters at each mass and age."""
+
+    if starEvoDir is None:
+        starEvoDir = _defaultStarEvoDir()
 
     # Check if should compile new grid of evolutionary models or load previous grid
     if _shouldCompileNew(starEvoDir,evoModels):

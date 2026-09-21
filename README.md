@@ -42,7 +42,7 @@ The `docs` extra pulls in [Zensical](https://zensical.org/) so you can build thi
 
 ### Stellar evolution data
 
-MORS ships without the stellar-evolution tracks, which live in the [OSF repository](https://osf.io/9u3fb/). Set the `FWL_DATA` environment variable to the directory where the data should live, then download the tracks:
+MORS ships without the stellar-evolution tracks, which are fetched from Zenodo through fwl-io. Set the `FWL_DATA` environment variable to the directory where the data should live, then download the tracks:
 
 ```console
 export FWL_DATA=/your/local/path/FWL_DATA   # add to ~/.bashrc to persist

@@ -1,11 +1,10 @@
 """Tests for src/mors/data.py: stellar evolution track download plumbing.
 
-Covers the Spada Zenodo record lookup, the Zenodo and OSF folder downloaders,
-and the DownloadEvolutionTracks orchestrator: the Baraffe fwl-io fetch, the
-Spada legacy path (untar, already-present short-circuit, retry / fallback
-ladder), and the unknown-name error contract. The Baraffe track directory
-resolver and the shipped fwl-io manifest are covered too. All network and
-filesystem download side effects are mocked so nothing leaves the test process.
+Covers the DownloadEvolutionTracks orchestrator (both grids are fetched through
+fwl-io, and an unknown name is rejected before any fetch), the versioned
+directory resolvers for the Baraffe and Spada grids, and the shipped fwl-io
+manifest and registries. All network and filesystem download side effects are
+mocked so nothing leaves the test process.
 
 data.py is a utility source, so the physics-invariant requirement does not
 apply; the anti-happy-path rules (edge case, error contract, discriminating
@@ -23,123 +22,22 @@ import mors.data as data
 pytestmark = [pytest.mark.unit, pytest.mark.timeout(30)]
 
 
-class _FakeStorage:
-    """Minimal OSF storage double exposing a .files iterable."""
+class _RecordingFetcher:
+    """Fetcher double that records which dataset keys were fetched."""
 
-    def __init__(self, files):
-        self.files = files
+    def __init__(self, log, key):
+        self._log = log
+        self._key = key
 
-
-class _FakeProject:
-    def __init__(self, storage):
-        self._storage = storage
-
-    def storage(self, name):
-        assert name == 'osfstorage'
-        return self._storage
+    def fetch_all(self):
+        self._log.append(self._key)
 
 
-class _FakeOSF:
-    """Stand-in for osfclient.api.OSF that never touches the network."""
-
-    storage_obj = _FakeStorage([])
-
-    def project(self, project_id):
-        assert project_id == data.project_id
-        return _FakeProject(self.storage_obj)
-
-
-class _FakeOSFFile:
-    """OSF file double whose write_to persists a marker byte string."""
-
-    def __init__(self, path, payload=b'trackdata'):
-        self.path = path
-        self.payload = payload
-
-    def write_to(self, handle):
-        handle.write(self.payload)
-
-
-def _patch_osf(monkeypatch):
-    """Route data.OSF() through the network-free fake."""
-    monkeypatch.setattr(data, 'OSF', _FakeOSF)
-
-
-def test_get_zenodo_record_spada_only():
-    """The legacy Zenodo map resolves Spada; Baraffe has moved to fwl-io."""
-    # Spada resolves to its pinned published record id (a string, not None).
-    assert data.get_zenodo_record('Spada') == '15729101'
-    # Baraffe is fetched through fwl-io now, so it is absent from the legacy map
-    # and yields the sentinel None rather than its old record id.
-    assert data.get_zenodo_record('Baraffe') is None
-    assert data.get_zenodo_record('Baraffe') != '15729114'
-    # Edge case: an unrecognised folder yields the sentinel None, not a KeyError.
-    assert data.get_zenodo_record('Nonexistent') is None
-    assert data.get_zenodo_record('') is None
-
-
-def test_download_zenodo_folder_builds_command_and_logs(monkeypatch, tmp_path):
-    """download_zenodo_folder creates the target folder and shells out to zenodo_get."""
-    monkeypatch.setattr(data, 'FWL_DATA_DIR', tmp_path, raising=False)
-
-    captured = {}
-
-    def fake_run(cmd, check, stdout, stderr):
-        captured['cmd'] = cmd
-        captured['check'] = check
-        # Emulate the tool writing to its log handle.
-        stdout.write('ok')
-
-    monkeypatch.setattr(data.subprocess, 'run', fake_run)
-
-    data.download_zenodo_folder('Spada', tmp_path)
-
-    folder_dir = tmp_path / 'Spada'
-    # The per-folder directory is created before the download starts.
-    assert folder_dir.is_dir()
-    # The command targets the Spada record id and writes into the folder dir.
-    assert captured['cmd'][0] == 'zenodo_get'
-    assert captured['cmd'][1] == '15729101'
-    assert Path(captured['cmd'][-1]) == folder_dir
-    # check=True so a non-zero exit from zenodo_get propagates as an exception.
-    assert captured['check'] is True
-    # The log lands next to FWL_DATA_DIR, not inside the folder being populated.
-    assert (tmp_path / 'zenodo.log').exists()
-
-
-def test_download_OSF_folder_writes_matching_skips_others(tmp_path):
-    """download_OSF_folder writes only files under the requested folders, once each."""
-    files = [
-        _FakeOSFFile('/Spada/fs255_grid.tar.gz', payload=b'spada'),
-        _FakeOSFFile('/Baraffe/BHAC15.dat', payload=b'baraffe'),
-        _FakeOSFFile('/Other/ignore.txt', payload=b'nope'),
-    ]
-    storage = _FakeStorage(files)
-
-    data.download_OSF_folder(storage=storage, folders=['Spada'], data_dir=tmp_path)
-
-    written = tmp_path / 'Spada' / 'fs255_grid.tar.gz'
-    # The matching file is written with its byte payload into the mirrored tree.
-    assert written.read_bytes() == b'spada'
-    # A non-requested folder is left untouched (no directory, no file).
-    assert not (tmp_path / 'Baraffe').exists()
-    # The unrelated top-level folder is also skipped.
-    assert not (tmp_path / 'Other').exists()
-
-
-def test_download_OSF_folder_multiple_folders(tmp_path):
-    """A folder list matches each of its members and mirrors the OSF path layout."""
-    files = [
-        _FakeOSFFile('/Spada/a.txt', payload=b'A'),
-        _FakeOSFFile('/Baraffe/b.txt', payload=b'B'),
-    ]
-    storage = _FakeStorage(files)
-
-    data.download_OSF_folder(storage=storage, folders=['Spada', 'Baraffe'], data_dir=tmp_path)
-
-    # Both requested folders are mirrored with their nested files.
-    assert (tmp_path / 'Spada' / 'a.txt').read_bytes() == b'A'
-    assert (tmp_path / 'Baraffe' / 'b.txt').read_bytes() == b'B'
+def _record_fetches(monkeypatch):
+    """Route data._fetcher to a network-free double and return the fetch log."""
+    log = []
+    monkeypatch.setattr(data, '_fetcher', lambda key: _RecordingFetcher(log, key))
+    return log
 
 
 def test_get_fwl_data_returns_absolute(monkeypatch, tmp_path):
@@ -166,242 +64,62 @@ def test_get_fwl_data_returns_absolute(monkeypatch, tmp_path):
 def test_download_tracks_unknown_name_raises(monkeypatch, tmp_path):
     """DownloadEvolutionTracks rejects an unrecognised folder name with ValueError."""
     monkeypatch.setattr(data, 'FWL_DATA_DIR', tmp_path, raising=False)
-    _patch_osf(monkeypatch)
-
-    called = {'zenodo': 0}
-
-    def fake_zenodo(**kwargs):
-        called['zenodo'] += 1
-
-    monkeypatch.setattr(data, 'download_zenodo_folder', fake_zenodo)
+    log = _record_fetches(monkeypatch)
 
     with pytest.raises(ValueError, match='Unrecognised folder name'):
         data.DownloadEvolutionTracks('Kroupa')
 
-    # The error fires before any download is attempted (no side effect ran).
-    assert called['zenodo'] == 0
+    # The error fires before any fetch is attempted (no side effect ran).
+    assert log == []
+    # Nothing was created below the data root either.
+    assert list(tmp_path.iterdir()) == []
 
 
-def test_download_tracks_spada_short_circuits_baraffe_delegates(monkeypatch, tmp_path):
-    """A present Spada folder skips its download; Baraffe always delegates to fwl-io."""
+@pytest.mark.parametrize(
+    ('name', 'keys'),
+    [
+        ('Baraffe', ['star.tracks.baraffe_2015']),
+        ('Spada', ['star.tracks.spada_2013']),
+        ('', ['star.tracks.baraffe_2015', 'star.tracks.spada_2013']),
+    ],
+)
+def test_download_tracks_fetches_the_requested_grids(monkeypatch, tmp_path, name, keys):
+    """Each grid name fetches exactly its own manifest dataset, and no name fetches both."""
     monkeypatch.setattr(data, 'FWL_DATA_DIR', tmp_path, raising=False)
-    _patch_osf(monkeypatch)
+    log = _record_fetches(monkeypatch)
 
-    # Pre-create the Spada track folder so its existence guard short-circuits.
-    (tmp_path / 'stellar_evolution_tracks' / 'Spada').mkdir(parents=True)
+    data.DownloadEvolutionTracks(name)
 
-    calls = {'zenodo': 0, 'osf': 0, 'baraffe': 0}
-    monkeypatch.setattr(
-        data,
-        'download_zenodo_folder',
-        lambda **k: calls.__setitem__('zenodo', calls['zenodo'] + 1),
-    )
-    monkeypatch.setattr(
-        data,
-        'download_OSF_folder',
-        lambda **k: calls.__setitem__('osf', calls['osf'] + 1),
-    )
-    monkeypatch.setattr(
-        data,
-        '_fetch_baraffe',
-        lambda: calls.__setitem__('baraffe', calls['baraffe'] + 1),
-    )
-
-    # Empty fname takes the both-tracks branch.
-    data.DownloadEvolutionTracks('')
-
-    # Spada is already on disk, so neither Spada downloader runs.
-    assert calls['zenodo'] == 0
-    assert calls['osf'] == 0
-    # Baraffe is delegated to fwl-io unconditionally (fwl-io does its own
-    # checksum-based idempotency), so the fetch is invoked exactly once.
-    assert calls['baraffe'] == 1
+    # The requested datasets were fetched once each, in a fixed order.
+    assert log == keys
+    # Discrimination: a named grid never pulls in the other one.
+    assert len(log) == len(keys)
 
 
-def test_download_tracks_spada_untar(monkeypatch, tmp_path):
-    """The Spada path downloads then untars and removes the grid archive."""
+def test_fetcher_forwards_the_archive_setting(monkeypatch, tmp_path):
+    """The fetcher is built with the manifest's extract setting and the data root."""
+    import fwl_io
+
     monkeypatch.setattr(data, 'FWL_DATA_DIR', tmp_path, raising=False)
-    _patch_osf(monkeypatch)
+    seen = {}
 
-    base = tmp_path / 'stellar_evolution_tracks'
+    def fake_create_fetcher(**kwargs):
+        seen.update(kwargs)
+        return object()
 
-    def fake_zenodo(*, folder, data_dir):
-        # A real download creates the folder; mirror that so os.chdir succeeds.
-        (data_dir / folder).mkdir(parents=True, exist_ok=True)
+    monkeypatch.setattr(fwl_io, 'create_fetcher', fake_create_fetcher)
 
-    monkeypatch.setattr(data, 'download_zenodo_folder', fake_zenodo)
+    data._fetcher(data._SPADA_KEY)
 
-    subcalls = []
-    monkeypatch.setattr(data.subprocess, 'call', lambda cmd: subcalls.append(cmd))
-
-    data.DownloadEvolutionTracks('Spada')
-
-    # The Spada folder exists after the download step.
-    assert (base / 'Spada').is_dir()
-    # Exactly the untar and cleanup commands run, in order.
-    assert subcalls[0][0] == 'tar'
-    assert 'fs255_grid.tar.gz' in subcalls[0]
-    assert subcalls[1][0] == 'rm'
-    assert len(subcalls) == 2
-
-
-def test_download_tracks_baraffe_uses_fwl_io(monkeypatch, tmp_path):
-    """Baraffe is fetched through fwl-io, not the legacy Zenodo/OSF/untar path."""
-    monkeypatch.setattr(data, 'FWL_DATA_DIR', tmp_path, raising=False)
-
-    fetched = {'n': 0}
-
-    class _FakeFetcher:
-        def fetch_all(self):
-            fetched['n'] += 1
-
-    monkeypatch.setattr(data, '_baraffe_fetcher', lambda: _FakeFetcher())
-
-    # The legacy downloaders and the untar step must not be touched for Baraffe.
-    legacy = {'zenodo': 0, 'osf': 0}
-    monkeypatch.setattr(
-        data,
-        'download_zenodo_folder',
-        lambda **k: legacy.__setitem__('zenodo', legacy['zenodo'] + 1),
-    )
-    monkeypatch.setattr(
-        data,
-        'download_OSF_folder',
-        lambda **k: legacy.__setitem__('osf', legacy['osf'] + 1),
-    )
-    subcalls = []
-    monkeypatch.setattr(data.subprocess, 'call', lambda cmd: subcalls.append(cmd))
-
-    data.DownloadEvolutionTracks('Baraffe')
-
-    # The fwl-io fetcher ran exactly once.
-    assert fetched['n'] == 1
-    # No legacy Zenodo/OSF download and no Spada-style untar for Baraffe.
-    assert legacy == {'zenodo': 0, 'osf': 0}
-    assert subcalls == []
-
-
-def test_download_tracks_spada_zenodo_fails_osf_fallback(monkeypatch, tmp_path):
-    """When Spada's Zenodo download fails, the OSF fallback runs and succeeds."""
-    monkeypatch.setattr(data, 'FWL_DATA_DIR', tmp_path, raising=False)
-    _patch_osf(monkeypatch)
-
-    def failing_zenodo(*, folder, data_dir):
-        # Real code creates the folder before failing; the handler cleans it up.
-        (data_dir / folder).mkdir(parents=True, exist_ok=True)
-        # zenodo_get exits non-zero, which subprocess.run(check=True) surfaces as
-        # CalledProcessError; the mock raises the real type so the fallback is
-        # exercised through the exception the production code actually sees.
-        raise data.subprocess.CalledProcessError(1, ['zenodo_get'])
-
-    monkeypatch.setattr(data, 'download_zenodo_folder', failing_zenodo)
-
-    osf_calls = {'n': 0, 'kwargs': None}
-
-    def fake_osf(*, storage, folders, data_dir):
-        # Capture the exact keyword arguments so a signature drift is caught,
-        # not silently absorbed by a no-op stand-in.
-        osf_calls['n'] += 1
-        osf_calls['kwargs'] = {
-            'storage': storage,
-            'folders': folders,
-            'data_dir': data_dir,
-        }
-
-    monkeypatch.setattr(data, 'download_OSF_folder', fake_osf)
-    # Guard against any accidental real sleep in the retry ladder.
-    monkeypatch.setattr(data, 'sleep', lambda s: None)
-
-    data.DownloadEvolutionTracks('Spada')
-
-    # The OSF fallback ran exactly once after the single Zenodo failure.
-    assert osf_calls['n'] == 1
-    kw = osf_calls['kwargs']
-    tracks_dir = tmp_path / 'stellar_evolution_tracks'
-    # The fallback receives the OSF storage handle opened from the project, so a
-    # rename of the storage keyword would surface here.
-    assert kw['storage'] is _FakeOSF.storage_obj
-    # The download target is the shared tracks directory, not a per-folder subdir.
-    assert kw['data_dir'] == tracks_dir
-    # Present behaviour: _download_spada passes the folder name as a bare string,
-    # while download_OSF_folder annotates folders as list[str] and iterates it (a
-    # string is then iterated character by character). This pins the current call
-    # shape; the string-vs-list mismatch is a source bug.
-    assert kw['folders'] == 'Spada'
-    # The stale folder created by the failed Zenodo attempt was cleared by rmtree.
-    assert not (tracks_dir / 'Spada').exists()
-
-
-def test_download_tracks_spada_clears_partial_download(monkeypatch, tmp_path):
-    """A non-empty partial folder from a failed Zenodo attempt is cleared, not crashed on."""
-    monkeypatch.setattr(data, 'FWL_DATA_DIR', tmp_path, raising=False)
-    _patch_osf(monkeypatch)
-
-    def failing_zenodo(*, folder, data_dir):
-        # zenodo_get can exit non-zero after writing partial files, so the folder
-        # is NOT empty when the failure handler cleans it up. rmdir would raise
-        # OSError on a non-empty directory; shutil.rmtree clears it.
-        d = data_dir / folder
-        d.mkdir(parents=True, exist_ok=True)
-        (d / 'partial.tmp').write_text('half a track')
-        raise data.subprocess.CalledProcessError(1, ['zenodo_get'])
-
-    def failing_osf(*, storage, folders, data_dir):
-        raise RuntimeError('osf down')
-
-    monkeypatch.setattr(data, 'download_zenodo_folder', failing_zenodo)
-    monkeypatch.setattr(data, 'download_OSF_folder', failing_osf)
-    monkeypatch.setattr(data, 'sleep', lambda s: None)
-
-    # Must not raise: on the buggy rmdir this propagates OSError('Directory not
-    # empty') out of _download_spada, so the call itself discriminates the fix.
-    result = data.DownloadEvolutionTracks('Spada')
-    assert result is None
-    # The partial folder was removed, so a retry can recreate it cleanly.
-    assert not (tmp_path / 'stellar_evolution_tracks' / 'Spada').exists()
-
-
-def test_download_tracks_spada_both_fail_retries_then_gives_up(monkeypatch, tmp_path):
-    """Both Spada downloaders failing triggers one retry with a back-off, then gives up."""
-    monkeypatch.setattr(data, 'FWL_DATA_DIR', tmp_path, raising=False)
-    _patch_osf(monkeypatch)
-
-    zenodo_attempts = {'n': 0}
-    osf_calls = {'n': 0, 'folders': None}
-
-    def failing_zenodo(*, folder, data_dir):
-        zenodo_attempts['n'] += 1
-        (data_dir / folder).mkdir(parents=True, exist_ok=True)
-        # The real failure type (non-zero zenodo_get exit), not RuntimeError.
-        raise data.subprocess.CalledProcessError(1, ['zenodo_get'])
-
-    def failing_osf(*, storage, folders, data_dir):
-        # Record the call shape before failing so a signature drift in the
-        # fallback path is caught even when the download itself errors out.
-        osf_calls['n'] += 1
-        osf_calls['folders'] = folders
-        raise RuntimeError('osf down')
-
-    monkeypatch.setattr(data, 'download_zenodo_folder', failing_zenodo)
-    monkeypatch.setattr(data, 'download_OSF_folder', failing_osf)
-
-    sleeps = []
-    monkeypatch.setattr(data, 'sleep', lambda s: sleeps.append(s))
-
-    # No exception is raised; the function logs the failure and returns.
-    result = data.DownloadEvolutionTracks('Spada')
-
-    assert result is None
-    # Two attempts are made (max_tries == 2); the first failure triggers a back-off.
-    assert zenodo_attempts['n'] == 2
-    # The OSF fallback is tried on each of the two attempts.
-    assert osf_calls['n'] == 2
-    # Present behaviour: the folder name reaches the fallback as a bare string
-    # (see test_download_tracks_spada_zenodo_fails_osf_fallback); this pins that shape.
-    assert osf_calls['folders'] == 'Spada'
-    # Exactly one back-off sleep occurs between the two attempts, and it is positive.
-    assert len(sleeps) == 1
-    assert sleeps[0] > 0
+    # The Spada archive is unpacked by fwl-io, so the setting must reach it.
+    assert seen['extract'] == 'tar'
+    assert seen['zenodo'] == '10.5281/zenodo.15729101'
+    assert seen['data_root'] == tmp_path.absolute()
+    # Discrimination: a plain-file dataset passes no extraction.
+    seen.clear()
+    data._fetcher(data._BARAFFE_KEY)
+    assert seen['extract'] is None
+    assert seen['zenodo'] == '10.5281/zenodo.15729114'
 
 
 def test_baraffe_data_dir_is_versioned(monkeypatch, tmp_path):
@@ -427,7 +145,7 @@ def test_baraffe_data_dir_rejects_unversioned_fwl_io(monkeypatch, tmp_path):
         version_dir = None
         target_dir = tmp_path / 'star' / 'tracks' / 'baraffe_2015'
 
-    monkeypatch.setattr(data, '_baraffe_fetcher', lambda: _StaleFetcher)
+    monkeypatch.setattr(data, '_fetcher', lambda key: _StaleFetcher)
     with pytest.raises(RuntimeError) as excinfo:
         data.baraffe_data_dir()
     msg = str(excinfo.value)
@@ -453,7 +171,7 @@ def test_stale_fwl_io_is_named_as_the_stale_side(monkeypatch):
     monkeypatch.setattr('fwl_io.load_manifest', _rejects_the_current_schema)
     monkeypatch.setattr(data, '_fwl_io_derives_the_location', lambda: False)
     with pytest.raises(RuntimeError) as excinfo:
-        data._baraffe_dataset()
+        data._dataset(data._BARAFFE_KEY)
     msg = str(excinfo.value)
     # The reader is sent to the installed package, not to the shipped manifest.
     assert 'upgrade to fwl-io>=26.7.22' in msg
@@ -474,7 +192,7 @@ def test_manifest_error_under_a_current_fwl_io_propagates(monkeypatch):
     monkeypatch.setattr('fwl_io.load_manifest', _rejects_a_genuine_defect)
     monkeypatch.setattr(data, '_fwl_io_derives_the_location', lambda: True)
     with pytest.raises(ValueError) as excinfo:
-        data._baraffe_dataset()
+        data._dataset(data._BARAFFE_KEY)
     # The manifest error reaches the caller as itself, not recast as a version
     # problem, so the reader is sent to the file that is actually wrong.
     assert 'is not a DOI' in str(excinfo.value)
@@ -492,7 +210,7 @@ def test_capability_check_distinguishes_the_two_manifest_schemas(monkeypatch):
     # The installed fwl-io satisfies the declared floor, so it derives the
     # location and the shipped manifest loads.
     assert data._fwl_io_derives_the_location() is True
-    assert data._baraffe_dataset().key == 'star.tracks.baraffe_2015'
+    assert data._dataset(data._BARAFFE_KEY).key == 'star.tracks.baraffe_2015'
 
     @dataclasses.dataclass
     class _DeclaredLocationDataset:
@@ -586,20 +304,26 @@ def test_nightly_cache_key_tracks_the_files_that_pin_the_tracks():
     assert hashed == {manifest} | registries
 
 
-def test_manifest_path_loads_baraffe_dataset():
-    """The shipped MORS manifest declares Baraffe under the new versioned layout."""
+def test_manifest_path_loads_both_track_datasets():
+    """The shipped MORS manifest declares Baraffe and Spada under the versioned layout."""
     from fwl_io import load_manifest
 
     datasets = {ds.key: ds for ds in load_manifest(data.manifest_path())}
-    # The manifest declares exactly the Baraffe dataset (Spada is not fwl-io yet).
-    assert set(datasets) == {'star.tracks.baraffe_2015'}
+    # Exactly the two track grids MORS reads.
+    assert set(datasets) == {'star.tracks.baraffe_2015', 'star.tracks.spada_2013'}
     baraffe = datasets['star.tracks.baraffe_2015']
-    # The location is the key spelled as a path, and it is the directory the
-    # tracks already live in, so this migration moves no user data.
+    # The location is the key spelled as a path.
     assert baraffe.subdir == 'star/tracks/baraffe_2015'
     assert baraffe.zenodo == '10.5281/zenodo.15729114'
     # MORS is the declared consumer, so fwl-io routes the fetch to it.
     assert 'mors' in baraffe.required_by
+    spada = datasets['star.tracks.spada_2013']
+    assert spada.subdir == 'star/tracks/spada_2013'
+    assert spada.zenodo == '10.5281/zenodo.15729101'
+    assert 'mors' in spada.required_by
+    # Spada is one tarball, Baraffe is a set of plain files.
+    assert spada.extract == 'tar'
+    assert baraffe.extract is None
 
 
 def test_baraffe_registry_pins_committed_checksums():
@@ -617,6 +341,67 @@ def test_baraffe_registry_pins_committed_checksums():
     assert 'BHAC15-M1p000.txt' in registry
 
 
+def test_spada_registry_pins_the_archive_checksum():
+    """The committed Spada registry pins the single archive and its md5."""
+    from fwl_io import load_manifest
+
+    ds = {d.key: d for d in load_manifest(data.manifest_path())}['star.tracks.spada_2013']
+    registry = ds.registry()
+    # An archive dataset lists exactly one file: the tarball fwl-io verifies.
+    assert list(registry) == ['fs255_grid.tar.gz']
+    # The pinned md5 catches a corrupted download or the wrong Zenodo record.
+    assert registry['fs255_grid.tar.gz'] == 'md5:f76987cf3d1da50435547f44a484a97f'
+
+
+def test_spada_data_dir_is_versioned_and_inside_the_grid(monkeypatch, tmp_path):
+    """spada_data_dir resolves to the fs255_grid directory of the versioned location."""
+    monkeypatch.setattr(data, 'FWL_DATA_DIR', tmp_path, raising=False)
+
+    resolved = data.spada_data_dir()
+
+    version_dir = tmp_path / 'star' / 'tracks' / 'spada_2013' / 'r15729101'
+    # The grid directory sits inside the version directory the archive unpacks into.
+    assert resolved == version_dir / 'fs255_grid'
+    # Discrimination: neither the bare location nor the version directory alone.
+    assert resolved != version_dir
+    assert resolved.parent.name == 'r15729101'
+
+
+def test_spada_data_dir_rejects_unversioned_fwl_io(monkeypatch, tmp_path):
+    """An unversioned Spada location is rejected loudly and names the Spada grid."""
+
+    class _StaleFetcher:
+        version_dir = None
+        target_dir = tmp_path / 'star' / 'tracks' / 'spada_2013'
+
+    monkeypatch.setattr(data, '_fetcher', lambda key: _StaleFetcher)
+    with pytest.raises(RuntimeError) as excinfo:
+        data.spada_data_dir()
+    msg = str(excinfo.value)
+    assert 'unversioned Spada directory' in msg
+    assert str(_StaleFetcher.target_dir) in msg
+
+
+def test_star_evo_default_directory_resolves_lazily(monkeypatch, tmp_path):
+    """starEvoDirDefault is resolved on access, so importing stellarevo fetches nothing."""
+    import mors.stellarevo as se
+
+    monkeypatch.setattr(data, 'FWL_DATA_DIR', tmp_path, raising=False)
+
+    resolved = se.starEvoDirDefault
+
+    # The attribute is the string form of the Spada grid directory under the data root.
+    assert resolved == str(
+        tmp_path / 'star' / 'tracks' / 'spada_2013' / 'r15729101' / 'fs255_grid'
+    )
+    # Discrimination: it follows FWL_DATA at access time, not at import time.
+    monkeypatch.setattr(data, 'FWL_DATA_DIR', tmp_path / 'other', raising=False)
+    assert se.starEvoDirDefault.startswith(str(tmp_path / 'other'))
+    # An unknown module attribute still raises, so the hook does not swallow typos.
+    with pytest.raises(AttributeError):
+        se.starEvoDirDefaultTypo
+
+
 def test_mors_manifest_is_discovered_via_entry_point():
     """fwl-io discovers the MORS manifest through the fwl_io.manifests entry point."""
     from fwl_io import discover_manifests
@@ -625,4 +410,4 @@ def test_mors_manifest_is_discovered_via_entry_point():
     # A typo in the entry-point name or target would drop MORS from discovery.
     assert 'mors' in found, 'MORS manifest is not registered under fwl_io.manifests'
     keys = {ds.key for ds in found['mors']}
-    assert keys == {'star.tracks.baraffe_2015'}
+    assert keys == {'star.tracks.baraffe_2015', 'star.tracks.spada_2013'}
