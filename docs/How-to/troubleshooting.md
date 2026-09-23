@@ -101,6 +101,9 @@ mors download baraffe
 !!! note "Incomplete directory"
     fwl-io downloads the Spada archive (`fs255_grid.tar.gz`), verifies its checksum, unpacks it and removes the archive. The unpacked tree is moved into place in one step, so an interrupted download does not leave a partial grid.
 
+!!! note "Compiled grid cache"
+    The first `StarEvo` load of a track set compiles it into a pickle cached under `platformdirs.user_cache_dir("mors")` (for example `~/Library/Caches/mors` on macOS, `~/.cache/mors` on Linux), not inside the track directory. The cache key covers the track files' names, sizes and modification times, so re-fetching a track set after `rm -rf` produces a new key and a fresh compile; the old entry is simply unused rather than deleted. To reclaim the space, remove the `mors` folder under the cache directory above.
+
 ---
 
 ### `ValueError: Unrecognised folder name`

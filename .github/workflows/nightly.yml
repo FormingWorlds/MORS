@@ -108,7 +108,8 @@ jobs:
           # A marker-deselected test leaves no element in the report at all, so
           # these are looked for by name rather than waited on to appear.
           MUST_RUN = {
-              'tests.test_data_live.test_committed_baraffe_registry_matches_live_zenodo',
+              'tests.test_data_live.test_committed_registry_matches_live_zenodo[star.tracks.baraffe_2015]',
+              'tests.test_data_live.test_committed_registry_matches_live_zenodo[star.tracks.spada_2013]',
           }
 
           # An unreadable report earns a warning rather than a failure, since it
