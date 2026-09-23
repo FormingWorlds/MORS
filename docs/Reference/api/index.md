@@ -20,7 +20,7 @@ This is a detailed overview of MORS' API for the user's reference. If you want t
 | [`mors.miscellaneous`](miscellaneous.md) | `Load`, `ModelCluster`, `ActivityLifetime`, `IntegrateEmission` |
 | [`mors.parameters`](parameters.md) | Default parameter dictionary, `NewParams`, `PrintParams` |
 | [`mors.constants`](constants.md) | Physical constants and solar reference values (CGS) |
-| [`mors.data`](data.md) | Stellar evolution track downloads (Zenodo + OSF) |
+| [`mors.data`](data.md) | Stellar evolution track downloads (fwl-io) |
 | [`mors.cli`](cli.md) | Command-line interface (`mors download`, `mors env`) |
 
 ---
@@ -32,7 +32,7 @@ src/mors
 ├── __init__.py           # Public API, re-exports all user-facing functions and classes
 ├── constants.py          # Physical constants and solar reference values (CGS units)
 ├── parameters.py         # Default model parameter dictionary and NewParams/PrintParams helpers
-├── data.py               # Stellar evolution track downloads (Zenodo + OSF)
+├── data.py               # Stellar evolution track downloads (fwl-io)
 ├── data/
 │   └── ModelDistribution.dat  # Built-in 1 Myr rotation distribution (masses + Omega)
 ├── stellarevo.py         # Spada et al. (2013) grid loading, interpolation, and StarEvo class

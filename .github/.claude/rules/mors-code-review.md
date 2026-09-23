@@ -26,7 +26,7 @@ When reviewing code that crosses these boundaries (a new emission relation, a ne
 
 ## Track-data loading and determinism
 
-`baraffe.py` and `stellarevo.py` load evolutionary tracks from `FWL_DATA` (downloaded from OSF on first use).
+`baraffe.py` and `stellarevo.py` load evolutionary tracks from `FWL_DATA` (fetched through fwl-io on first use).
 
 - Flag any code that assumes the track files are present without a download / existence check.
 - Flag any interpolation that changes results depending on the track release without recording the release the numbers were pinned against.

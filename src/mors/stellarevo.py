@@ -1,19 +1,35 @@
 """Module for loading the stellar evolution tracks and retrieving basic stellar properties."""
+from __future__ import annotations
 
 import copy
+import hashlib
+import logging
 import os
 import pickle
+import tempfile
 
 import numpy as np
+import platformdirs
 
 import mors.miscellaneous as misc
-from mors.data import FWL_DATA_DIR
+from mors.data import spada_data_dir
+
+log = logging.getLogger('fwl.' + __name__)
 
 #----------------------------------------------------------
 # Parameters for stellar evolution models
 
 # Directory for stellar evolution models
-starEvoDirDefault = str(FWL_DATA_DIR /'stellar_evolution_tracks'/'Spada'/'fs255_grid')
+def _defaultStarEvoDir():
+    """Return the directory of the Spada evolution models as a string."""
+    return str(spada_data_dir())
+
+
+def __getattr__(name):
+    """Resolve ``starEvoDirDefault`` on access, so importing fetches nothing."""
+    if name == 'starEvoDirDefault':
+        return _defaultStarEvoDir()
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
 
 # Set which set of models to use, i.e. which X, Z, and A values (set to X0p70952_Z0p01631_A1p875 for closest to solar)
 evoModelsDefault = "X0p70952_Z0p01631_A1p875"
@@ -41,12 +57,12 @@ class StarEvo:
 
     """
 
-    def __init__(self,starEvoDir=starEvoDirDefault,evoModels=evoModelsDefault):
+    def __init__(self,starEvoDir=None,evoModels=evoModelsDefault):
         """Initialises instance of StarEvo class."""
 
         # If starEvoDir and evoModels are None, use defaults
         if starEvoDir is None:
-            starEvoDir = starEvoDirDefault
+            starEvoDir = _defaultStarEvoDir()
         if evoModels is None:
             evoModels = evoModelsDefault
 
@@ -109,7 +125,7 @@ class StarEvo:
         # Call Value() outside this class to get the value with this model
         value = Value(Mstar,Age,ParamString,ModelData=self.ModelData)
 
-        return value 
+        return value
 
     # The following functions are for individual parameters that can be called
     def Rstar(self,Mstar,Age,ModelData=ModelDataDefault):
@@ -172,8 +188,11 @@ class StarEvo:
         """Takes mass and age, returns rate of change of core radius."""
         return Value( Mstar , Age , 'dRcoredt' , ModelData=self.ModelData )
 
-def _LoadModels(starEvoDir=starEvoDirDefault,evoModels=evoModelsDefault):
+def _LoadModels(starEvoDir=None,evoModels=evoModelsDefault):
     """Loads evolutionary tracks as a grid of parameters at each mass and age."""
+
+    if starEvoDir is None:
+        starEvoDir = _defaultStarEvoDir()
 
     # Check if should compile new grid of evolutionary models or load previous grid
     if _shouldCompileNew(starEvoDir,evoModels):
@@ -183,6 +202,39 @@ def _LoadModels(starEvoDir=starEvoDirDefault,evoModels=evoModelsDefault):
 
     return ModelData
 
+def _starEvoDirFingerprint(starEvoDir):
+    """Digest the names, sizes and modification times of the files under a track directory."""
+
+    entries = []
+    for root,_dirs,files in os.walk(starEvoDir):
+        for name in files:
+            path = os.path.join(root,name)
+            try:
+                st = os.stat(path)
+            except OSError:
+                continue
+            entries.append((os.path.relpath(path,starEvoDir),st.st_size,st.st_mtime_ns))
+    entries.sort()
+
+    digest = hashlib.sha256()
+    for relpath,size,mtime_ns in entries:
+        digest.update(f'{relpath}|{size}|{mtime_ns}\n'.encode())
+    return digest.hexdigest()
+
+def _gridCacheFile(starEvoDir,evoModels):
+    """Return the path of the compiled-grid cache file for a track directory.
+
+    The cache lives in the user cache directory, never inside the track
+    directory itself, which is immutable fetched data and may be read-only.
+    The key covers the resolved directory path and a fingerprint of its
+    contents, so a symlink and its target share one entry, and a directory
+    whose files change never serves a grid compiled from the old data.
+    """
+    realDir = os.path.realpath(str(starEvoDir))
+    fingerprint = _starEvoDirFingerprint(realDir)
+    key = hashlib.sha256(f'{realDir}|{fingerprint}'.encode()).hexdigest()[:16]
+    return os.path.join(platformdirs.user_cache_dir('mors'),'stellarevo',key,evoModels+".pickle")
+
 def _shouldCompileNew(starEvoDir,evoModels):
     """Takes directory for stellar evo models, returns if new grid needs to be compiled."""
 
@@ -190,7 +242,7 @@ def _shouldCompileNew(starEvoDir,evoModels):
     compileNew = True
 
     # Check if previously compiled models already exist
-    if ( os.path.isfile(starEvoDir+"/"+evoModels+".pickle") ):
+    if os.path.isfile(_gridCacheFile(starEvoDir,evoModels)):
         compileNew = False
 
     return compileNew
@@ -218,10 +270,29 @@ def _CompileNewGrid(starEvoDir,evoModels):
     for iMstar in range(0,len(MstarAll)):
         ModelData[MstarAll[iMstar]] = _ReadEvolutionTrack( starEvoDir , evoModels , MstarAll[iMstar] , MstarFilenameMiddle[iMstar] )
 
-    # Save compiled models
-    with open(starEvoDir+"/"+evoModels+".pickle",'wb') as f:
-        pickle.dump(ModelData,f)
-
+    # Save compiled models; a cache that cannot be written only costs a recompile.
+    # Each writer gets its own temp file, so concurrent compiles of the same
+    # grid never open and truncate one another's file before the atomic replace.
+    cacheFile = _gridCacheFile(starEvoDir,evoModels)
+    cacheDir = os.path.dirname(cacheFile)
+    tmpFile = None
+    try:
+        os.makedirs(cacheDir,exist_ok=True)
+        fd,tmpFile = tempfile.mkstemp(dir=cacheDir,prefix=os.path.basename(cacheFile)+'.')
+        with os.fdopen(fd,'wb') as f:
+            pickle.dump(ModelData,f)
+            f.flush()
+            os.fsync(f.fileno())
+        os.replace(tmpFile,cacheFile)
+        tmpFile = None
+    except OSError as exc:
+        log.warning('Could not write the compiled grid cache %s: %s',cacheFile,exc)
+    finally:
+        if tmpFile is not None:
+            try:
+                os.remove(tmpFile)
+            except OSError:
+                pass
 
     return ModelData
 
@@ -410,9 +481,17 @@ def _CalculateGradient(Age,X):
 def _LoadSavedGrid(starEvoDir,evoModels):
     """Takes filename for stellar evo model, returns grid of models."""
 
-    # Simply load data
-    with open(starEvoDir+"/"+evoModels+".pickle",'rb') as f:
-        ModelData = pickle.load(f)
+    cacheFile = _gridCacheFile(starEvoDir,evoModels)
+    try:
+        with open(cacheFile,'rb') as f:
+            ModelData = pickle.load(f)
+    except (OSError,EOFError,pickle.UnpicklingError,AttributeError,ImportError,IndexError,ValueError) as exc:
+        log.warning('Could not load the compiled grid cache %s (%s); deleting it and recompiling',cacheFile,exc)
+        try:
+            os.remove(cacheFile)
+        except OSError:
+            pass
+        ModelData = _CompileNewGrid(starEvoDir,evoModels)
 
     return ModelData
 
@@ -587,7 +666,10 @@ def Value(MstarIn,AgeIn,ParamString,ModelData=ModelDataDefault):
 
     """
 
-    # Check if ModelData is not None, otherwise need to load defaults
+    # Reuse the already-loaded default grid before falling back to a load,
+    # mirroring LoadTrack (the default argument is bound at import time).
+    if ModelData is None:
+        ModelData = ModelDataDefault
     if ModelData is None:
         ModelData = _LoadDefaultModelData()
 
@@ -622,12 +704,12 @@ def Value(MstarIn,AgeIn,ParamString,ModelData=ModelDataDefault):
         # Get number of elements in all three directions
         try:
             nMstar = len(Mstar)
-        except:
+        except TypeError:
             nMstar = 1
 
         try:
             nAge = len(Age)
-        except:
+        except TypeError:
             nAge = 1
 
         if isinstance(ParamString,list):

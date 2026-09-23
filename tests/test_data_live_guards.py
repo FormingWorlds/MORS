@@ -19,6 +19,10 @@ import test_data_live as live
 
 import mors.data as data
 
+# The guards are exercised against the Baraffe dataset; the live check is the same
+# code for every dataset.
+_KEY = 'star.tracks.baraffe_2015'
+
 pytestmark = [pytest.mark.unit, pytest.mark.timeout(30)]
 
 # The statuses the live check is required to read as weather. Pinned here rather
@@ -29,6 +33,11 @@ EXPECTED_TRANSIENT = (429, 500, 502, 503, 504)
 
 class _UnexpectedSkip(Exception):
     """Raised when the live check skips a condition it is required to fail on."""
+
+
+def _live_check():
+    """Run the live registry check against the guarded dataset."""
+    return live.test_committed_registry_matches_live_zenodo(_KEY)
 
 
 def _without_skipping(call):
@@ -65,7 +74,7 @@ class _StubFetch:
 
 def _record_url() -> str:
     """Return the pinned record's API URL, read from the shipped manifest."""
-    record_id = data._baraffe_dataset().zenodo.rsplit('.', 1)[-1]
+    record_id = data._dataset(_KEY).zenodo.rsplit('.', 1)[-1]
     return f'https://zenodo.org/api/records/{record_id}'
 
 
@@ -91,7 +100,7 @@ def _install(monkeypatch, stub: _StubFetch) -> None:
 
 def _committed() -> dict[str, str]:
     """Return the committed Baraffe registry, read from the shipped file."""
-    return data._baraffe_dataset().registry()
+    return data._dataset(_KEY).registry()
 
 
 def test_the_transient_status_set_is_the_pinned_one():
@@ -113,7 +122,7 @@ def test_every_transient_status_skips_the_live_check(monkeypatch, status):
     stub = _StubFetch(_http_error(status))
     _install(monkeypatch, stub)
     with pytest.raises(pytest.skip.Exception, match=f'HTTP {status}'):
-        live.test_committed_baraffe_registry_matches_live_zenodo()
+        live.test_committed_registry_matches_live_zenodo(_KEY)
     # Every attempt is spent before giving up, and there is more than one, so a
     # status that clears partway through still completes the check.
     assert stub.calls == live.FETCH_ATTEMPTS
@@ -132,7 +141,7 @@ def test_sustained_read_timeout_skips_the_live_check(monkeypatch):
     stub = _StubFetch(stalled)
     _install(monkeypatch, stub)
     with pytest.raises(pytest.skip.Exception, match='timed out'):
-        live.test_committed_baraffe_registry_matches_live_zenodo()
+        live.test_committed_registry_matches_live_zenodo(_KEY)
     assert stub.calls == live.FETCH_ATTEMPTS
     assert live.FETCH_ATTEMPTS > 1
 
@@ -142,7 +151,7 @@ def test_unreachable_host_skips_the_live_check(monkeypatch):
     stub = _StubFetch(requests.exceptions.ConnectionError('Name or service not known'))
     _install(monkeypatch, stub)
     with pytest.raises(pytest.skip.Exception, match='could not be reached'):
-        live.test_committed_baraffe_registry_matches_live_zenodo()
+        live.test_committed_registry_matches_live_zenodo(_KEY)
     assert stub.calls == live.FETCH_ATTEMPTS
     assert live.FETCH_ATTEMPTS > 1
 
@@ -166,7 +175,7 @@ def test_incomplete_response_body_skips_the_live_check(monkeypatch, error):
     stub = _StubFetch(error)
     _install(monkeypatch, stub)
     with pytest.raises(pytest.skip.Exception, match='incomplete response body'):
-        live.test_committed_baraffe_registry_matches_live_zenodo()
+        live.test_committed_registry_matches_live_zenodo(_KEY)
     assert stub.calls == live.FETCH_ATTEMPTS
     assert live.FETCH_ATTEMPTS > 1
 
@@ -175,7 +184,7 @@ def test_a_single_stall_is_absorbed_by_the_retry(monkeypatch):
     """One stalled attempt followed by an answer completes the check."""
     stub = _StubFetch(requests.exceptions.ReadTimeout('Read timed out.'), _committed())
     _install(monkeypatch, stub)
-    _without_skipping(live.test_committed_baraffe_registry_matches_live_zenodo)
+    _without_skipping(_live_check)
     # The second attempt is what answered, so the retry did the work rather
     # than the first call having quietly succeeded.
     assert stub.calls == 2
@@ -189,7 +198,7 @@ def test_the_retry_waits_longer_after_each_attempt(monkeypatch):
     stub = _StubFetch(_http_error(503))
     monkeypatch.setattr('fwl_io.sync.fetch_zenodo_registry', stub)
     with pytest.raises(pytest.skip.Exception, match='HTTP 503'):
-        live.test_committed_baraffe_registry_matches_live_zenodo()
+        live.test_committed_registry_matches_live_zenodo(_KEY)
     # One wait fewer than attempts: the last failure skips instead of sleeping.
     assert len(waits) == live.FETCH_ATTEMPTS - 1
     assert waits[0] > 0
@@ -201,7 +210,7 @@ def test_missing_record_fails_the_live_check(monkeypatch):
     stub = _StubFetch(_http_error(404))
     _install(monkeypatch, stub)
     with pytest.raises(requests.exceptions.HTTPError, match='404 Client Error'):
-        _without_skipping(live.test_committed_baraffe_registry_matches_live_zenodo)
+        _without_skipping(_live_check)
     # A record that is gone stays gone, so retrying it would only add delay.
     assert stub.calls == 1
 
@@ -211,7 +220,7 @@ def test_missing_record_after_a_stall_fails_the_live_check(monkeypatch):
     stub = _StubFetch(_http_error(503), _http_error(404))
     _install(monkeypatch, stub)
     with pytest.raises(requests.exceptions.HTTPError, match='404 Client Error'):
-        _without_skipping(live.test_committed_baraffe_registry_matches_live_zenodo)
+        _without_skipping(_live_check)
     # The earlier stall must not carry the run to a skip and bury the 404.
     assert stub.calls == 2
 
@@ -221,7 +230,7 @@ def test_non_json_body_fails_the_live_check(monkeypatch):
     stub = _StubFetch(requests.exceptions.JSONDecodeError('Expecting value', '<html>', 0))
     _install(monkeypatch, stub)
     with pytest.raises(requests.exceptions.JSONDecodeError):
-        _without_skipping(live.test_committed_baraffe_registry_matches_live_zenodo)
+        _without_skipping(_live_check)
     # A body that is not JSON says nothing about the deposit, so reading it as
     # weather would hide a change in what the API returns.
     assert stub.calls == 1
@@ -232,7 +241,7 @@ def test_deposit_without_files_fails_the_live_check(monkeypatch):
     stub = _StubFetch(ValueError('Zenodo record 15729114 lists no files'))
     _install(monkeypatch, stub)
     with pytest.raises(ValueError, match='lists no files'):
-        _without_skipping(live.test_committed_baraffe_registry_matches_live_zenodo)
+        _without_skipping(_live_check)
     assert stub.calls == 1
 
 
@@ -246,7 +255,7 @@ def test_drifted_checksum_fails_the_live_check(monkeypatch):
     stub = _StubFetch(drifted)
     _install(monkeypatch, stub)
     with pytest.raises(AssertionError, match='drifted from Zenodo record'):
-        _without_skipping(live.test_committed_baraffe_registry_matches_live_zenodo)
+        _without_skipping(_live_check)
     assert stub.calls == 1
 
 
@@ -256,9 +265,9 @@ def test_partial_response_fails_the_live_check(monkeypatch):
     partial.pop(sorted(partial)[0])
     stub = _StubFetch(partial)
     _install(monkeypatch, stub)
-    expected = rf'listed {live.BARAFFE_FILE_COUNT - 1} files'
+    expected = rf'listed {live.FILE_COUNTS[_KEY] - 1} files'
     with pytest.raises(AssertionError, match=expected) as excinfo:
-        _without_skipping(live.test_committed_baraffe_registry_matches_live_zenodo)
+        _without_skipping(_live_check)
     # The count guard is what fires: a short response never reaches the
     # checksum comparison, so it cannot be reported as drift.
     assert 'drifted' not in str(excinfo.value)

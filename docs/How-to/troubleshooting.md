@@ -43,7 +43,7 @@ If your issue is not listed here, please open an issue on [GitHub](https://githu
 
 ### `FileNotFoundError` on first run
 
-**Symptom:** Python raises a `FileNotFoundError` when creating a `Star` or `Cluster` object, pointing to a `.track1` or `.track2` file inside the `stellar_evolution_tracks` directory.
+**Symptom:** Python raises a `FileNotFoundError` when creating a `Star` or `Cluster` object, pointing to a `.track1` or `.track2` file inside the `star/tracks` directory of `FWL_DATA`.
 
 **Cause:** The stellar evolution data has not been downloaded yet, or was downloaded to a different location than where MORS is looking.
 
@@ -77,7 +77,7 @@ star = mors.Star(Mstar=1.0, Omega=1.0, starEvoDir="/path/to/tracks")
 
 **Symptom:** `mors download` exits with an error, or the data directory exists but is empty or missing files.
 
-**Cause:** The Spada grid is fetched from Zenodo with an OSF fallback (up to 2 attempts per source), so a transient network issue or rate-limit can cause both to fail. The Baraffe tracks are fetched, hash-verified, through fwl-io from their Zenodo record (no OSF mirror); a failure there raises directly, and a corrupt file is re-fetched automatically on the next run.
+**Cause:** Both track sets are fetched, hash-verified, through fwl-io from their Zenodo records. A transient network issue or rate-limit raises directly, and a corrupt file is re-fetched automatically on the next run.
 
 **Fix:** Wait a few minutes and retry:
 
@@ -86,14 +86,12 @@ mors download spada
 mors download baraffe
 ```
 
-You can also download each track set independently if one source succeeded and the other did not. If the Spada directory was partially created before the failure, remove it before retrying, otherwise MORS will assume it is complete and skip the download:
+You can also download each track set independently. To force a clean re-fetch of a set, remove its directory and download again:
 
 ```sh
-rm -rf $FWL_DATA/stellar_evolution_tracks/Spada
+rm -rf $FWL_DATA/star/tracks/spada_2013
 mors download spada
 ```
-
-The Baraffe tracks live under the fwl-io versioned path instead; to force a clean re-fetch, remove that directory and download again:
 
 ```sh
 rm -rf $FWL_DATA/star/tracks/baraffe_2015
@@ -101,7 +99,10 @@ mors download baraffe
 ```
 
 !!! note "Incomplete directory"
-    After a successful Spada download, MORS automatically extracts the archive (`fs255_grid.tar.gz`) and removes it. If extraction failed mid-way, the directory may exist but be incomplete. Removing it and re-downloading is the safest fix.
+    fwl-io downloads the Spada archive (`fs255_grid.tar.gz`), verifies its checksum, unpacks it and removes the archive. The unpacked tree is moved into place in one step, so an interrupted download does not leave a partial grid.
+
+!!! note "Compiled grid cache"
+    The first `StarEvo` load of a track set compiles it into a pickle cached under `platformdirs.user_cache_dir("mors")` (for example `~/Library/Caches/mors` on macOS, `~/.cache/mors` on Linux), not inside the track directory. The cache key covers the track files' names, sizes and modification times, so re-fetching a track set after `rm -rf` produces a new key and a fresh compile; the old entry is simply unused rather than deleted. To reclaim the space, remove the `mors` folder under the cache directory above.
 
 ---
 
