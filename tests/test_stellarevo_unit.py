@@ -72,6 +72,7 @@ def _concurrent_compile_worker(track_dir, cache_root, evoModels, log_path):
 
 
 def test_grid_cache_file_lives_outside_track_dir(tmp_path, monkeypatch):
+    """The compiled-grid cache path sits under the cache root, not the track directory."""
     cache_root = tmp_path / 'cache'
     monkeypatch.setattr(se.platformdirs, 'user_cache_dir', lambda *_a, **_k: str(cache_root))
 
@@ -83,6 +84,7 @@ def test_grid_cache_file_lives_outside_track_dir(tmp_path, monkeypatch):
 
 
 def test_grid_cache_key_differs_for_different_track_trees(tmp_path, monkeypatch):
+    """A change to the tracks' own content changes the cache key, not just the path."""
     cache_root = tmp_path / 'cache'
     monkeypatch.setattr(se.platformdirs, 'user_cache_dir', lambda *_a, **_k: str(cache_root))
 
@@ -94,9 +96,12 @@ def test_grid_cache_key_differs_for_different_track_trees(tmp_path, monkeypatch)
     key_after = se._gridCacheFile(track_dir, 'evoA')
 
     assert key_before != key_after
+    assert key_before.startswith(str(cache_root))
+    assert key_after.startswith(str(cache_root))
 
 
 def test_grid_cache_key_same_through_symlink(tmp_path, monkeypatch):
+    """A symlinked track directory shares one cache entry with its real target."""
     cache_root = tmp_path / 'cache'
     monkeypatch.setattr(se.platformdirs, 'user_cache_dir', lambda *_a, **_k: str(cache_root))
 
@@ -108,9 +113,11 @@ def test_grid_cache_key_same_through_symlink(tmp_path, monkeypatch):
     key_link = se._gridCacheFile(link_dir, 'evoA')
 
     assert key_real == key_link
+    assert key_real.startswith(str(cache_root))
 
 
 def test_concurrent_compiles_of_same_grid_produce_one_loadable_grid(tmp_path, monkeypatch):
+    """Several OS processes compiling the same grid at once leave one complete, loadable pickle."""
     cache_root = str(tmp_path / 'cache')
     track_dir = str(_make_track_dir(tmp_path))
 
@@ -145,6 +152,7 @@ def test_concurrent_compiles_of_same_grid_produce_one_loadable_grid(tmp_path, mo
 
 
 def test_corrupt_cache_file_is_replaced_by_a_fresh_compile(tmp_path, monkeypatch, caplog):
+    """A truncated pickle triggers a warning and a full recompile, not a crash."""
     cache_root = tmp_path / 'cache'
     monkeypatch.setattr(se.platformdirs, 'user_cache_dir', lambda *_a, **_k: str(cache_root))
     monkeypatch.setattr(se, '_ReadEvolutionTrack', lambda *a: _fake_track(*a))
