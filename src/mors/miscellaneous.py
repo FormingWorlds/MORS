@@ -39,7 +39,7 @@ def _convertFloatArray(Xin):
         isNumber = True
         try:
             X = float(Xin)
-        except:
+        except Exception:
             isNumber = False
 
         # If it is just a single value, return float version

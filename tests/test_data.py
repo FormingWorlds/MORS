@@ -399,7 +399,7 @@ def test_star_evo_default_directory_resolves_lazily(monkeypatch, tmp_path):
     assert se.starEvoDirDefault.startswith(str(tmp_path / 'other'))
     # An unknown module attribute still raises, so the hook does not swallow typos.
     with pytest.raises(AttributeError):
-        se.starEvoDirDefaultTypo
+        _ = se.starEvoDirDefaultTypo
 
 
 def test_mors_manifest_is_discovered_via_entry_point():

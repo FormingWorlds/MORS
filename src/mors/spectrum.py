@@ -8,10 +8,10 @@ import os
 
 import numpy as np
 
-log = logging.getLogger('fwl.' + __name__)
-
 # Import MORS files
 import mors.constants as const
+
+log = logging.getLogger('fwl.' + __name__)
 
 # Spectral bands for stellar fluxes, in nm
 bands_limits = {
@@ -93,7 +93,7 @@ class Spectrum:
                 wb = WhichBand(self.wl[i])
 
                 # Out of range
-                if wb == None:
+                if wb is None:
                     continue
 
                 if b in wb:

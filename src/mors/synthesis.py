@@ -9,15 +9,14 @@ from copy import deepcopy
 import numpy as np
 from scipy.optimize import minimize
 
-log = logging.getLogger('fwl.' + __name__)
-
-
 # Import MORS files
 import mors.constants as const
 import mors.spectrum as spec
 from mors.physicalmodel import Lxuv
 from mors.star import Percentile
 from mors.stellarevo import Lbol, Value
+
+log = logging.getLogger('fwl.' + __name__)
 
 
 def GetProperties(Mstar: float, pctle: float, age: float):
@@ -142,7 +141,7 @@ def CalcScaledSpectrumFromProps(
     # Get band indicies
     for i in range(len(spec_wl)):
         b = spec.WhichBand(spec_wl[i])
-        if b == None:
+        if b is None:
             continue
         spec_fl[i] *= Q_dict['Q_' + b[0]]
 

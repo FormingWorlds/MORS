@@ -139,7 +139,6 @@ def DownloadModernSpectrum(name, distance):
             # GJ436 is 31.8 light years away and has 0.42 solar radius
             # GJ1214 is 47.5 light years away and has 0.2064 solar radius
             # TRAPPIST-1 is 40.66209 ly away and has 0.1192 solar radius
-            hdulist = fits.open(database_spectrum)
             spec = fits.getdata(database_spectrum, 1)
 
             # WAVELENGTH : midpoint of the wavelength bin in Angstroms
@@ -167,7 +166,6 @@ def DownloadModernSpectrum(name, distance):
             if negaflux:
                 print(
                     '\t WARNING: The stellar spectrum contained flux value(s) <= 0.0 ! These were set to zero.'
-                    % wl
                 )
 
         case 'vpl':
@@ -241,7 +239,7 @@ def PrintHelp():
     print("""
 This script downloads and parses stellar spectra from online databases.
 
-Run pattern: GetStellarSpectrum.py [command] [param1] [param2] 
+Run pattern: GetStellarSpectrum.py [command] [param1] [param2]
 
 Commands:
     'help'
