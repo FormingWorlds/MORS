@@ -1,24 +1,26 @@
 """Module for historical spectral synthesis"""
 
 # Import system libraries
-import numpy as np
-from copy import deepcopy
-from scipy.optimize import minimize
+from __future__ import annotations
 
 import logging
-log = logging.getLogger("fwl."+__name__)
+from copy import deepcopy
+
+import numpy as np
+from scipy.optimize import minimize
+
+log = logging.getLogger('fwl.' + __name__)
 
 
 # Import MORS files
-import mors.spectrum as spec
 import mors.constants as const
-import mors.miscellaneous as misc
-from mors.star import  Percentile
-from mors.stellarevo import Value, Lbol
+import mors.spectrum as spec
 from mors.physicalmodel import Lxuv
+from mors.star import Percentile
+from mors.stellarevo import Lbol, Value
 
 
-def GetProperties(Mstar:float, pctle:float, age:float):
+def GetProperties(Mstar: float, pctle: float, age: float):
     """Calculate properties of star for a given rotation percentile and  age
 
     Parameters
@@ -50,37 +52,39 @@ def GetProperties(Mstar:float, pctle:float, age:float):
 
     # Output
     out = {
-        "age"    : age,        # units of Myr
-        "radius" : Rstar,
-        "Teff"   : Tstar,
+        'age': age,  # units of Myr
+        'radius': Rstar,
+        'Teff': Tstar,
     }
 
     # Luminosities (erg s-1)
-    out["L_bo"] = Lbol(Mstar,age) * const.LbolSun
-    out["L_xr"] = Ldict["Lx"]
-    out["L_e1"] = Ldict["Leuv1"]
-    out["L_e2"] = Ldict["Leuv2"]
+    out['L_bo'] = Lbol(Mstar, age) * const.LbolSun
+    out['L_xr'] = Ldict['Lx']
+    out['L_e1'] = Ldict['Leuv1']
+    out['L_e2'] = Ldict['Leuv2']
 
     # Fluxes at 1 AU
-    area = (4.0 * const.Pi * const.AU * const.AU)
-    for k in ["bo","xr","e1","e2"]:
-        out["F_"+k] = out["L_"+k]/area
+    area = 4.0 * const.Pi * const.AU * const.AU
+    for k in ['bo', 'xr', 'e1', 'e2']:
+        out['F_' + k] = out['L_' + k] / area
 
     # Get flux from Planckian band
-    wl_pl = np.logspace(np.log10(spec.bands_limits["pl"][0]), np.log10(spec.bands_limits["pl"][1]), 1000)
+    wl_pl = np.logspace(
+        np.log10(spec.bands_limits['pl'][0]), np.log10(spec.bands_limits['pl'][1]), 1000
+    )
     fl_pl = spec.PlanckFunction_surf(wl_pl, Tstar)
     fl_pl = spec.ScaleTo1AU(fl_pl, Rstar)
-    out["F_pl"] = np.trapezoid(fl_pl, wl_pl)
-    out["L_pl"] = out["F_pl"] * area
+    out['F_pl'] = np.trapezoid(fl_pl, wl_pl)
+    out['L_pl'] = out['F_pl'] * area
 
     # Get flux of UV band from remainder
-    out["F_uv"] = out["F_bo"] - out["F_xr"] - out["F_e1"] - out["F_e2"] - out["F_pl"]
-    out["L_uv"] = out["F_uv"] * area
+    out['F_uv'] = out['F_bo'] - out['F_xr'] - out['F_e1'] - out['F_e2'] - out['F_pl']
+    out['L_uv'] = out['F_uv'] * area
 
     return out
 
 
-def CalcBandScales(modern_dict:dict, historical_dict):
+def CalcBandScales(modern_dict: dict, historical_dict):
     """Get band scale factors for historical spectrum
 
     Parameters
@@ -99,11 +103,14 @@ def CalcBandScales(modern_dict:dict, historical_dict):
     # Get scale factors
     Q_dict = {}
     for key in spec.bands_limits.keys():
-        Q_dict["Q_"+key] = historical_dict["F_"+key]/modern_dict["F_"+key]
+        Q_dict['Q_' + key] = historical_dict['F_' + key] / modern_dict['F_' + key]
 
     return Q_dict
 
-def CalcScaledSpectrumFromProps(modern_spec:spec.Spectrum, modern_dict:dict, historical_dict:dict):
+
+def CalcScaledSpectrumFromProps(
+    modern_spec: spec.Spectrum, modern_dict: dict, historical_dict: dict
+):
     """Scale a stellar spectrum according to stellar properties.
 
     Returns a new Spectrum object containing the historical fluxes.
@@ -123,7 +130,7 @@ def CalcScaledSpectrumFromProps(modern_spec:spec.Spectrum, modern_dict:dict, his
         Spectrum object containing data for historical fluxes
     """
 
-    log.debug("Calculating scaled spectrum from properties")
+    log.debug('Calculating scaled spectrum from properties')
 
     # Get scale factors relative to modern spectrum
     Q_dict = CalcBandScales(modern_dict, historical_dict)
@@ -137,7 +144,7 @@ def CalcScaledSpectrumFromProps(modern_spec:spec.Spectrum, modern_dict:dict, his
         b = spec.WhichBand(spec_wl[i])
         if b == None:
             continue
-        spec_fl[i] *= Q_dict["Q_"+b[0]]
+        spec_fl[i] *= Q_dict['Q_' + b[0]]
 
     # Make new spectrum object
     historical_spec = spec.Spectrum()
@@ -146,7 +153,7 @@ def CalcScaledSpectrumFromProps(modern_spec:spec.Spectrum, modern_dict:dict, his
     return historical_spec
 
 
-def FitModernProperties(modern_spec:spec.Spectrum, Mstar:float, age:float=-1):
+def FitModernProperties(modern_spec: spec.Spectrum, Mstar: float, age: float = -1):
     """Estimate rotation percentile and (optionally) age from modern spectrum.
 
     Parameters
@@ -166,15 +173,15 @@ def FitModernProperties(modern_spec:spec.Spectrum, Mstar:float, age:float=-1):
         Best estimate of star's age (equal to `age` if `age` is provided)
     """
 
-    log.debug("Fitting properties to modern spectrum")
+    log.debug('Fitting properties to modern spectrum')
 
     # Integrated fluxes
     modern_spec.CalcBandFluxes()
 
-    fit_age = bool(age>0)
+    fit_age = bool(age > 0)
 
     # Objective function
-    def _fev(x_arr:tuple):
+    def _fev(x_arr: tuple):
 
         this_pctle = x_arr[0]
         if fit_age:
@@ -187,10 +194,10 @@ def FitModernProperties(modern_spec:spec.Spectrum, Mstar:float, age:float=-1):
         props = GetProperties(Mstar, this_pctle, this_age)
 
         resid = 0.0
-        for k in ["xr","e1","e2","uv"]:
+        for k in ['xr', 'e1', 'e2', 'uv']:
             lim = spec.bands_limits[k]
-            wid = lim[1]-lim[0]
-            resid += (props["F_"+k]/wid - modern_spec.fl_integ[k]/wid)**2
+            wid = lim[1] - lim[0]
+            resid += (props['F_' + k] / wid - modern_spec.fl_integ[k] / wid) ** 2
 
         return np.sqrt(resid)
 
@@ -205,7 +212,7 @@ def FitModernProperties(modern_spec:spec.Spectrum, Mstar:float, age:float=-1):
 
     # Check
     if not result.success:
-        log.error("Could not fit stellar properties to modern spectrum")
+        log.error('Could not fit stellar properties to modern spectrum')
 
     # Result
     best_pctle = result.x[0]

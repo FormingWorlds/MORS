@@ -1,4 +1,3 @@
-
 """Module holding the Star class and related functions."""
 
 from __future__ import annotations
@@ -17,19 +16,32 @@ import mors.physicalmodel as phys
 import mors.rotevo as RE
 import mors.stellarevo as SE
 
-log = logging.getLogger("fwl." + __name__)
+log = logging.getLogger('fwl.' + __name__)
 
 # Limits on various input values
 MstarMin = 0.1
 MstarMax = 1.25
 
+
 class Star:
-    """A class for star objects that hold all information about a star.
-    """
+    """A class for star objects that hold all information about a star."""
 
-    #---------------------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------------------
 
-    def __init__(self,Mstar=None,Age=None,percentile=None,Omega=None,Prot=None,OmegaEnv=None,OmegaCore=None,AgesOut=None,starEvoDir=None,evoModels=None,params=params.paramsDefault):
+    def __init__(
+        self,
+        Mstar=None,
+        Age=None,
+        percentile=None,
+        Omega=None,
+        Prot=None,
+        OmegaEnv=None,
+        OmegaCore=None,
+        AgesOut=None,
+        starEvoDir=None,
+        evoModels=None,
+        params=params.paramsDefault,
+    ):
         """Initialises instance of Star class.
 
         This is the main function that is run when creating an instance of the Star class and it sets up all
@@ -78,7 +90,9 @@ class Star:
 
         # Make sure Omega, OmegaEnv, and OmegaCore are well set
         # (if Omega is set, OmegaEnv and OmegaCore will both be set to that value)
-        Omega , OmegaEnv , OmegaCore = _InputRotation(Mstar,Age,Omega,OmegaEnv,OmegaCore,Prot,percentile,params)
+        Omega, OmegaEnv, OmegaCore = _InputRotation(
+            Mstar, Age, Omega, OmegaEnv, OmegaCore, Prot, percentile, params
+        )
 
         # Set parameters. Copy the passed dictionary so enabling ExtendedTracks
         # below stays local to this star and does not mutate the shared default
@@ -99,27 +113,26 @@ class Star:
         self._LoadStarEvo()
 
         # Get evolutionary tracks
-        self._LoadEvoTracks(Age,OmegaEnv,OmegaCore,AgesOut=AgesOut)
+        self._LoadEvoTracks(Age, OmegaEnv, OmegaCore, AgesOut=AgesOut)
 
         # Get HZ boundaries
-        self.aOrbHZ = phys.aOrbHZ(Mstar=self.Mstar,params=self.params)
+        self.aOrbHZ = phys.aOrbHZ(Mstar=self.Mstar, params=self.params)
 
         return
 
-    def _LoadStarEvo(self,starEvoDir=None,evoModels=None):
+    def _LoadStarEvo(self, starEvoDir=None, evoModels=None):
         """Loads stellar evolution tracks."""
 
         # Get an instance of the StarEvo class holding evolutionary tracks for all masses
-        self.StarEvo = SE.StarEvo(starEvoDir=self.starEvoDir,evoModels=self.evoModels)
+        self.StarEvo = SE.StarEvo(starEvoDir=self.starEvoDir, evoModels=self.evoModels)
 
         # Load evolutionary tracks for this mass only (so delete tracks for other masses after getting this one)
-        self.StarEvo.LoadTrack(self.Mstar,ClearData=True)
+        self.StarEvo.LoadTrack(self.Mstar, ClearData=True)
 
         return
 
-    def _LoadEvoTracks(self,Age,OmegaEnv0,OmegaCore0,AgesOut=None):
+    def _LoadEvoTracks(self, Age, OmegaEnv0, OmegaCore0, AgesOut=None):
         """Loads rotation and activity tracks."""
-
 
         # Set starting age to 1 Myr
         self.AgeMin = 1.0
@@ -129,38 +142,51 @@ class Star:
 
         # If needing to get initial rotation rate then get it
         if Age is not None:
-
             # Get initial rotation
-            Omega0 = RE.FitRotation( Mstar=self.Mstar , Age=Age , Omega=OmegaEnv0 ,
-                                        AgeMin=self.AgeMin , params=self.params , StarEvo=self.StarEvo )
+            Omega0 = RE.FitRotation(
+                Mstar=self.Mstar,
+                Age=Age,
+                Omega=OmegaEnv0,
+                AgeMin=self.AgeMin,
+                params=self.params,
+                StarEvo=self.StarEvo,
+            )
 
             # Make sure a correct initial rotation rate was found
-            if ( Omega0 == -1 ):
-                raise Exception("input rotation rate too low for given mass and age")
-            if ( Omega0 == -2 ):
-                raise Exception("input rotation rate too high for given mass and age")
-            if ( Omega0 == -3 ):
-                raise Exception("input rotation rate in valid range for mass and age but solver was unable to fit track")
+            if Omega0 == -1:
+                raise Exception('input rotation rate too low for given mass and age')
+            if Omega0 == -2:
+                raise Exception('input rotation rate too high for given mass and age')
+            if Omega0 == -3:
+                raise Exception(
+                    'input rotation rate in valid range for mass and age but solver was unable to fit track'
+                )
 
             # Set initial rotation rates for input into RE.EvolveRotation()
             OmegaEnv0 = Omega0
             OmegaCore0 = Omega0
 
         # Run evolution model using OmegaEnv0 and OmegaCore0 as initial rotation rate
-        self.Tracks = RE.EvolveRotation( Mstar=self.Mstar , OmegaEnv0=OmegaEnv0 , OmegaCore0=OmegaCore0 ,
-                                        AgeMin=self.AgeMin , AgeMax=self.AgeMax , AgesOut=AgesOut ,
-                                        params=self.params , StarEvo=self.StarEvo )
+        self.Tracks = RE.EvolveRotation(
+            Mstar=self.Mstar,
+            OmegaEnv0=OmegaEnv0,
+            OmegaCore0=OmegaCore0,
+            AgeMin=self.AgeMin,
+            AgeMax=self.AgeMax,
+            AgesOut=AgesOut,
+            params=self.params,
+            StarEvo=self.StarEvo,
+        )
 
         # Set the percentile of this track in the starting distribution
-        self.percentile = Percentile( Mstar=self.Mstar , Omega=OmegaEnv0 )
+        self.percentile = Percentile(Mstar=self.Mstar, Omega=OmegaEnv0)
 
         # Make evolutionary tracks attributes of this class
         # (this is so the user can get a track using e.g. star.Age instead of star.Tracks['Age'])
         for track in self.Tracks:
-
             # Note: the following two options are basically equivalent
-            #self.__dict__[track+'Track'] = self.Tracks[track]
-            setattr( self , track+'Track' , self.Tracks[track] )
+            # self.__dict__[track+'Track'] = self.Tracks[track]
+            setattr(self, track + 'Track', self.Tracks[track])
 
         # Load dictionary holding units for each quantity
         self.Units = phys.QuantitiesUnits()
@@ -175,211 +201,322 @@ class Star:
 
         # Loop over quantities held in self.Tracks
         # for track in self.Tracks:
-            # The method for this is very strange and I don't like it. Better would likely just to be to
-            # add individual functions for each quantity since I was unable to find a solution that did
-            # not involve using exec() here. This should not provide a security risk since exec() is not
-            # being run on any user input data. The following two lines first create a two-line function
-            # from a string that calls self.Value() with a specific value for Quantity, so the function
-            # Lx() that is created calls Value with Quantity='Lx'. This function is then added to the Star
-            # class using setattr on self.__class__. Technically this means that if the user makes multiple
-            # instances of Star, the next two lines will not be necessary.
+        # The method for this is very strange and I don't like it. Better would likely just to be to
+        # add individual functions for each quantity since I was unable to find a solution that did
+        # not involve using exec() here. This should not provide a security risk since exec() is not
+        # being run on any user input data. The following two lines first create a two-line function
+        # from a string that calls self.Value() with a specific value for Quantity, so the function
+        # Lx() that is created calls Value with Quantity='Lx'. This function is then added to the Star
+        # class using setattr on self.__class__. Technically this means that if the user makes multiple
+        # instances of Star, the next two lines will not be necessary.
 
-            # exec( "def "+track+"(self,Age):\n  return self.Value(Age=Age,Quantity='"+track+"')")
-            # exec( "setattr( self.__class__ , '"+track+"' , "+track+" )")
+        # exec( "def "+track+"(self,Age):\n  return self.Value(Age=Age,Quantity='"+track+"')")
+        # exec( "setattr( self.__class__ , '"+track+"' , "+track+" )")
 
-        def Age(self,Age):
-            return self.Value(Age=Age, Quantity="Age")
-        setattr(self.__class__, "Age", Age)
-        def dAge(self,Age):
-            return self.Value(Age=Age, Quantity="dAge")
-        setattr(self.__class__, "dAge", dAge)
-        def OmegaEnv(self,Age):
-            return self.Value(Age=Age, Quantity="OmegaEnv")
-        setattr(self.__class__, "OmegaEnv", OmegaEnv)
-        def OmegaCore(self,Age):
-            return self.Value(Age=Age, Quantity="OmegaCore")
-        setattr(self.__class__, "OmegaCore", OmegaCore)
-        def Mstar(self,Age):
-            return self.Value(Age=Age, Quantity="Mstar")
-        setattr(self.__class__, "Mstar", Mstar)
-        def Prot(self,Age):
-            return self.Value(Age=Age, Quantity="Prot")
-        setattr(self.__class__, "Prot", Prot)
-        def Rstar(self,Age):
-            return self.Value(Age=Age, Quantity="Rstar")
-        setattr(self.__class__, "Rstar", Rstar)
-        def tauConv(self,Age):
-            return self.Value(Age=Age, Quantity="tauConv")
-        setattr(self.__class__, "tauConv", tauConv)
-        def Ro(self,Age):
-            return self.Value(Age=Age, Quantity="Ro")
-        setattr(self.__class__, "Ro", Ro)
-        def Itotal(self,Age):
-            return self.Value(Age=Age, Quantity="Itotal")
-        setattr(self.__class__, "Itotal", Itotal)
-        def Ienv(self,Age):
-            return self.Value(Age=Age, Quantity="Ienv")
-        setattr(self.__class__, "Ienv", Ienv)
-        def Icore(self,Age):
-            return self.Value(Age=Age, Quantity="Icore")
-        setattr(self.__class__, "Icore", Icore)
-        def dItotaldt(self,Age):
-            return self.Value(Age=Age, Quantity="dItotaldt")
-        setattr(self.__class__, "dItotaldt", dItotaldt)
-        def dIenvdt(self,Age):
-            return self.Value(Age=Age, Quantity="dIenvdt")
-        setattr(self.__class__, "dIenvdt", dIenvdt)
-        def dIcoredt(self,Age):
-            return self.Value(Age=Age, Quantity="dIcoredt")
-        setattr(self.__class__, "dIcoredt", dIcoredt)
-        def Rcore(self,Age):
-            return self.Value(Age=Age, Quantity="Rcore")
-        setattr(self.__class__, "Rcore", Rcore)
-        def dMcoredt(self,Age):
-            return self.Value(Age=Age, Quantity="dMcoredt")
-        setattr(self.__class__, "dMcoredt", dMcoredt)
-        def Mdot(self,Age):
-            return self.Value(Age=Age, Quantity="Mdot")
-        setattr(self.__class__, "Mdot", Mdot)
-        def Bdip(self,Age):
-            return self.Value(Age=Age, Quantity="Bdip")
-        setattr(self.__class__, "Bdip", Bdip)
-        def vEsc(self,Age):
-            return self.Value(Age=Age, Quantity="vEsc")
-        setattr(self.__class__, "vEsc", vEsc)
-        def torqueEnvMom(self,Age):
-            return self.Value(Age=Age, Quantity="torqueEnvMom")
-        setattr(self.__class__, "torqueEnvMom", torqueEnvMom)
-        def torqueCoreMom(self,Age):
-            return self.Value(Age=Age, Quantity="torqueCoreMom")
-        setattr(self.__class__, "torqueCoreMom", torqueCoreMom)
-        def torqueEnvCG(self,Age):
-            return self.Value(Age=Age, Quantity="torqueEnvCG")
-        setattr(self.__class__, "torqueEnvCG", torqueEnvCG)
-        def torqueCoreCG(self,Age):
-            return self.Value(Age=Age, Quantity="torqueCoreCG")
-        setattr(self.__class__, "torqueCoreCG", torqueCoreCG)
-        def torqueEnvWind(self,Age):
-            return self.Value(Age=Age, Quantity="torqueEnvWind")
-        setattr(self.__class__, "torqueEnvWind", torqueEnvWind)
-        def torqueEnvCE(self,Age):
-            return self.Value(Age=Age, Quantity="torqueEnvCE")
-        setattr(self.__class__, "torqueEnvCE", torqueEnvCE)
-        def torqueCoreCE(self,Age):
-            return self.Value(Age=Age, Quantity="torqueCoreCE")
-        setattr(self.__class__, "torqueCoreCE", torqueCoreCE)
-        def torqueEnvDL(self,Age):
-            return self.Value(Age=Age, Quantity="torqueEnvDL")
-        setattr(self.__class__, "torqueEnvDL", torqueEnvDL)
-        def torqueEnv(self,Age):
-            return self.Value(Age=Age, Quantity="torqueEnv")
-        setattr(self.__class__, "torqueEnv", torqueEnv)
-        def dOmegaEnvdt(self,Age):
-            return self.Value(Age=Age, Quantity="dOmegaEnvdt")
-        setattr(self.__class__, "dOmegaEnvdt", dOmegaEnvdt)
-        def torqueCore(self,Age):
-            return self.Value(Age=Age, Quantity="torqueCore")
-        setattr(self.__class__, "torqueCore", torqueCore)
-        def dOmegaCoredt(self,Age):
-            return self.Value(Age=Age, Quantity="dOmegaCoredt")
-        setattr(self.__class__, "dOmegaCoredt", dOmegaCoredt)
-        def Lbol(self,Age):
-            return self.Value(Age=Age, Quantity="Lbol")
-        setattr(self.__class__, "Lbol", Lbol)
-        def Teff(self,Age):
-            return self.Value(Age=Age, Quantity="Teff")
-        setattr(self.__class__, "Teff", Teff)
-        def Lx(self,Age):
-            return self.Value(Age=Age, Quantity="Lx")
-        setattr(self.__class__, "Lx", Lx)
-        def Fx(self,Age):
-            return self.Value(Age=Age, Quantity="Fx")
-        setattr(self.__class__, "Fx", Fx)
-        def Rx(self,Age):
-            return self.Value(Age=Age, Quantity="Rx")
-        setattr(self.__class__, "Rx", Rx)
-        def Tcor(self,Age):
-            return self.Value(Age=Age, Quantity="Tcor")
-        setattr(self.__class__, "Tcor", Tcor)
-        def Leuv1(self,Age):
-            return self.Value(Age=Age, Quantity="Leuv1")
-        setattr(self.__class__, "Leuv1", Leuv1)
-        def Feuv1(self,Age):
-            return self.Value(Age=Age, Quantity="Feuv1")
-        setattr(self.__class__, "Feuv1", Feuv1)
-        def Reuv1(self,Age):
-            return self.Value(Age=Age, Quantity="Reuv1")
-        setattr(self.__class__, "Reuv1", Reuv1)
-        def Leuv2(self,Age):
-            return self.Value(Age=Age, Quantity="Leuv2")
-        setattr(self.__class__, "Leuv2", Leuv2)
-        def Feuv2(self,Age):
-            return self.Value(Age=Age, Quantity="Feuv2")
-        setattr(self.__class__, "Feuv2", Feuv2)
-        def Reuv2(self,Age):
-            return self.Value(Age=Age, Quantity="Reuv2")
-        setattr(self.__class__, "Reuv2", Reuv2)
-        def Leuv(self,Age):
-            return self.Value(Age=Age, Quantity="Leuv")
-        setattr(self.__class__, "Leuv", Leuv)
-        def Feuv(self,Age):
-            return self.Value(Age=Age, Quantity="Feuv")
-        setattr(self.__class__, "Feuv", Feuv)
-        def Reuv(self,Age):
-            return self.Value(Age=Age, Quantity="Reuv")
-        setattr(self.__class__, "Reuv", Reuv)
-        def Lly(self,Age):
-            return self.Value(Age=Age, Quantity="Lly")
-        setattr(self.__class__, "Lly", Lly)
-        def Fly(self,Age):
-            return self.Value(Age=Age, Quantity="Fly")
-        setattr(self.__class__, "Fly", Fly)
-        def Rly(self,Age):
-            return self.Value(Age=Age, Quantity="Rly")
-        setattr(self.__class__, "Rly", Rly)
-        def FxHZ(self,Age):
-            return self.Value(Age=Age, Quantity="FxHZ")
-        setattr(self.__class__, "FxHZ", FxHZ)
-        def Feuv1HZ(self,Age):
-            return self.Value(Age=Age, Quantity="Feuv1HZ")
-        setattr(self.__class__, "Feuv1HZ", Feuv1HZ)
-        def Feuv2HZ(self,Age):
-            return self.Value(Age=Age, Quantity="Feuv2HZ")
-        setattr(self.__class__, "Feuv2HZ", Feuv2HZ)
-        def FeuvHZ(self,Age):
-            return self.Value(Age=Age, Quantity="FeuvHZ")
-        setattr(self.__class__, "FeuvHZ", FeuvHZ)
-        def FlyHZ(self,Age):
-            return self.Value(Age=Age, Quantity="FlyHZ")
-        setattr(self.__class__, "FlyHZ", FlyHZ)
-        def nAge(self,Age):
-            return self.Value(Age=Age, Quantity="nAge")
-        setattr(self.__class__, "nAge", nAge)
+        def Age(self, Age):
+            return self.Value(Age=Age, Quantity='Age')
+
+        self.__class__.Age = Age
+
+        def dAge(self, Age):
+            return self.Value(Age=Age, Quantity='dAge')
+
+        self.__class__.dAge = dAge
+
+        def OmegaEnv(self, Age):
+            return self.Value(Age=Age, Quantity='OmegaEnv')
+
+        self.__class__.OmegaEnv = OmegaEnv
+
+        def OmegaCore(self, Age):
+            return self.Value(Age=Age, Quantity='OmegaCore')
+
+        self.__class__.OmegaCore = OmegaCore
+
+        def Mstar(self, Age):
+            return self.Value(Age=Age, Quantity='Mstar')
+
+        self.__class__.Mstar = Mstar
+
+        def Prot(self, Age):
+            return self.Value(Age=Age, Quantity='Prot')
+
+        self.__class__.Prot = Prot
+
+        def Rstar(self, Age):
+            return self.Value(Age=Age, Quantity='Rstar')
+
+        self.__class__.Rstar = Rstar
+
+        def tauConv(self, Age):
+            return self.Value(Age=Age, Quantity='tauConv')
+
+        self.__class__.tauConv = tauConv
+
+        def Ro(self, Age):
+            return self.Value(Age=Age, Quantity='Ro')
+
+        self.__class__.Ro = Ro
+
+        def Itotal(self, Age):
+            return self.Value(Age=Age, Quantity='Itotal')
+
+        self.__class__.Itotal = Itotal
+
+        def Ienv(self, Age):
+            return self.Value(Age=Age, Quantity='Ienv')
+
+        self.__class__.Ienv = Ienv
+
+        def Icore(self, Age):
+            return self.Value(Age=Age, Quantity='Icore')
+
+        self.__class__.Icore = Icore
+
+        def dItotaldt(self, Age):
+            return self.Value(Age=Age, Quantity='dItotaldt')
+
+        self.__class__.dItotaldt = dItotaldt
+
+        def dIenvdt(self, Age):
+            return self.Value(Age=Age, Quantity='dIenvdt')
+
+        self.__class__.dIenvdt = dIenvdt
+
+        def dIcoredt(self, Age):
+            return self.Value(Age=Age, Quantity='dIcoredt')
+
+        self.__class__.dIcoredt = dIcoredt
+
+        def Rcore(self, Age):
+            return self.Value(Age=Age, Quantity='Rcore')
+
+        self.__class__.Rcore = Rcore
+
+        def dMcoredt(self, Age):
+            return self.Value(Age=Age, Quantity='dMcoredt')
+
+        self.__class__.dMcoredt = dMcoredt
+
+        def Mdot(self, Age):
+            return self.Value(Age=Age, Quantity='Mdot')
+
+        self.__class__.Mdot = Mdot
+
+        def Bdip(self, Age):
+            return self.Value(Age=Age, Quantity='Bdip')
+
+        self.__class__.Bdip = Bdip
+
+        def vEsc(self, Age):
+            return self.Value(Age=Age, Quantity='vEsc')
+
+        self.__class__.vEsc = vEsc
+
+        def torqueEnvMom(self, Age):
+            return self.Value(Age=Age, Quantity='torqueEnvMom')
+
+        self.__class__.torqueEnvMom = torqueEnvMom
+
+        def torqueCoreMom(self, Age):
+            return self.Value(Age=Age, Quantity='torqueCoreMom')
+
+        self.__class__.torqueCoreMom = torqueCoreMom
+
+        def torqueEnvCG(self, Age):
+            return self.Value(Age=Age, Quantity='torqueEnvCG')
+
+        self.__class__.torqueEnvCG = torqueEnvCG
+
+        def torqueCoreCG(self, Age):
+            return self.Value(Age=Age, Quantity='torqueCoreCG')
+
+        self.__class__.torqueCoreCG = torqueCoreCG
+
+        def torqueEnvWind(self, Age):
+            return self.Value(Age=Age, Quantity='torqueEnvWind')
+
+        self.__class__.torqueEnvWind = torqueEnvWind
+
+        def torqueEnvCE(self, Age):
+            return self.Value(Age=Age, Quantity='torqueEnvCE')
+
+        self.__class__.torqueEnvCE = torqueEnvCE
+
+        def torqueCoreCE(self, Age):
+            return self.Value(Age=Age, Quantity='torqueCoreCE')
+
+        self.__class__.torqueCoreCE = torqueCoreCE
+
+        def torqueEnvDL(self, Age):
+            return self.Value(Age=Age, Quantity='torqueEnvDL')
+
+        self.__class__.torqueEnvDL = torqueEnvDL
+
+        def torqueEnv(self, Age):
+            return self.Value(Age=Age, Quantity='torqueEnv')
+
+        self.__class__.torqueEnv = torqueEnv
+
+        def dOmegaEnvdt(self, Age):
+            return self.Value(Age=Age, Quantity='dOmegaEnvdt')
+
+        self.__class__.dOmegaEnvdt = dOmegaEnvdt
+
+        def torqueCore(self, Age):
+            return self.Value(Age=Age, Quantity='torqueCore')
+
+        self.__class__.torqueCore = torqueCore
+
+        def dOmegaCoredt(self, Age):
+            return self.Value(Age=Age, Quantity='dOmegaCoredt')
+
+        self.__class__.dOmegaCoredt = dOmegaCoredt
+
+        def Lbol(self, Age):
+            return self.Value(Age=Age, Quantity='Lbol')
+
+        self.__class__.Lbol = Lbol
+
+        def Teff(self, Age):
+            return self.Value(Age=Age, Quantity='Teff')
+
+        self.__class__.Teff = Teff
+
+        def Lx(self, Age):
+            return self.Value(Age=Age, Quantity='Lx')
+
+        self.__class__.Lx = Lx
+
+        def Fx(self, Age):
+            return self.Value(Age=Age, Quantity='Fx')
+
+        self.__class__.Fx = Fx
+
+        def Rx(self, Age):
+            return self.Value(Age=Age, Quantity='Rx')
+
+        self.__class__.Rx = Rx
+
+        def Tcor(self, Age):
+            return self.Value(Age=Age, Quantity='Tcor')
+
+        self.__class__.Tcor = Tcor
+
+        def Leuv1(self, Age):
+            return self.Value(Age=Age, Quantity='Leuv1')
+
+        self.__class__.Leuv1 = Leuv1
+
+        def Feuv1(self, Age):
+            return self.Value(Age=Age, Quantity='Feuv1')
+
+        self.__class__.Feuv1 = Feuv1
+
+        def Reuv1(self, Age):
+            return self.Value(Age=Age, Quantity='Reuv1')
+
+        self.__class__.Reuv1 = Reuv1
+
+        def Leuv2(self, Age):
+            return self.Value(Age=Age, Quantity='Leuv2')
+
+        self.__class__.Leuv2 = Leuv2
+
+        def Feuv2(self, Age):
+            return self.Value(Age=Age, Quantity='Feuv2')
+
+        self.__class__.Feuv2 = Feuv2
+
+        def Reuv2(self, Age):
+            return self.Value(Age=Age, Quantity='Reuv2')
+
+        self.__class__.Reuv2 = Reuv2
+
+        def Leuv(self, Age):
+            return self.Value(Age=Age, Quantity='Leuv')
+
+        self.__class__.Leuv = Leuv
+
+        def Feuv(self, Age):
+            return self.Value(Age=Age, Quantity='Feuv')
+
+        self.__class__.Feuv = Feuv
+
+        def Reuv(self, Age):
+            return self.Value(Age=Age, Quantity='Reuv')
+
+        self.__class__.Reuv = Reuv
+
+        def Lly(self, Age):
+            return self.Value(Age=Age, Quantity='Lly')
+
+        self.__class__.Lly = Lly
+
+        def Fly(self, Age):
+            return self.Value(Age=Age, Quantity='Fly')
+
+        self.__class__.Fly = Fly
+
+        def Rly(self, Age):
+            return self.Value(Age=Age, Quantity='Rly')
+
+        self.__class__.Rly = Rly
+
+        def FxHZ(self, Age):
+            return self.Value(Age=Age, Quantity='FxHZ')
+
+        self.__class__.FxHZ = FxHZ
+
+        def Feuv1HZ(self, Age):
+            return self.Value(Age=Age, Quantity='Feuv1HZ')
+
+        self.__class__.Feuv1HZ = Feuv1HZ
+
+        def Feuv2HZ(self, Age):
+            return self.Value(Age=Age, Quantity='Feuv2HZ')
+
+        self.__class__.Feuv2HZ = Feuv2HZ
+
+        def FeuvHZ(self, Age):
+            return self.Value(Age=Age, Quantity='FeuvHZ')
+
+        self.__class__.FeuvHZ = FeuvHZ
+
+        def FlyHZ(self, Age):
+            return self.Value(Age=Age, Quantity='FlyHZ')
+
+        self.__class__.FlyHZ = FlyHZ
+
+        def nAge(self, Age):
+            return self.Value(Age=Age, Quantity='nAge')
+
+        self.__class__.nAge = nAge
 
         return
 
-    def Value(self,Age=None,Quantity=None):
+    def Value(self, Age=None, Quantity=None):
         """Takes age in Myr and a string with name of quantity to output, returns value of that quantity at specified age."""
 
         # Do 1D linear interpolation to get value
-        value = SE._Interpolate1D( self.Tracks['Age'] , self.Tracks[Quantity] , Age )
+        value = SE._Interpolate1D(self.Tracks['Age'], self.Tracks[Quantity], Age)
 
         return value
 
-    def Track(self,Quantity=None):
+    def Track(self, Quantity=None):
         """Takes a quantity string, return evolutionary track for that quantity."""
 
         # Make sure Quantity is set
         if Quantity is None:
-            raise Exception("Quantity not set in call to function")
+            raise Exception('Quantity not set in call to function')
 
         # Make sure Quantity is string
-        if not isinstance(Quantity,str):
-            raise Exception("Quantity must be string")
+        if not isinstance(Quantity, str):
+            raise Exception('Quantity must be string')
 
         # Make sure Quantity is a valid quantity with a track
         if Quantity not in self.Tracks:
-            raise Exception("no available track for "+Quantity)
+            raise Exception('no available track for ' + Quantity)
 
         return self.Tracks[Quantity]
 
@@ -387,40 +524,39 @@ class Star:
         """Prints all quantities that have evolutionary tracks available."""
 
         # Print header
-        log.info("")
-        log.info("EVOLUTIONARY TRACKS AVAILABLE FOR:-")
+        log.info('')
+        log.info('EVOLUTIONARY TRACKS AVAILABLE FOR:-')
 
         # Loop over each element in Tracks and print them but only if they are numpy arrays
         for track in self.Tracks:
-            if ( type(self.Tracks[track]).__module__ == 'numpy' ):
-
+            if type(self.Tracks[track]).__module__ == 'numpy':
                 # Start string with small space and name of quantity
-                outString = "   "+track
+                outString = '   ' + track
 
                 # If the units are given, add that in parentheses
-                if not ( self.Units[track] == '' ):
-                    outString += " ("+self.Units[track]+")"
+                if not (self.Units[track] == ''):
+                    outString += ' (' + self.Units[track] + ')'
 
                 # Print the string
                 log.info(outString)
 
         # A free line at the end to look better
-        log.info("")
+        log.info('')
 
         return
 
-    def Save(self,filename='star.pickle'):
+    def Save(self, filename='star.pickle'):
         """Takes filename (default is 'star.pickle'), saves cluster to this file using pickle."""
-        with open(filename,'wb') as f:
-            pickle.dump(self,f)
+        with open(filename, 'wb') as f:
+            pickle.dump(self, f)
         return
 
-    def save(self,filename='star.pickle'):
+    def save(self, filename='star.pickle'):
         """Same as Save()."""
         self.Save(filename=filename)
         return
 
-    def ActivityLifetime(self,Quantity=None,Threshold=None,AgeMax=None):
+    def ActivityLifetime(self, Quantity=None, Threshold=None, AgeMax=None):
         """Takes threshold value, returns age at which a star last drops below this threshold.
 
         This function can be used to determine when a star's emission crosses a given threshold value for a few
@@ -447,33 +583,63 @@ class Star:
         """
 
         # Allowed quantities
-        QuantitiesAllowed = [ 'Lx' , 'Fx' , 'Rx' , 'FxHZ' , 'Leuv1' , 'Feuv1' , 'Reuv1' , 'Feuv1HZ' , 'Leuv2' , 'Feuv2' , 'Reuv2' , 'Feuv2HZ' ,
-                            'Leuv' , 'Feuv' , 'Reuv' , 'FeuvHZ' , 'Lly' , 'Fly' , 'Rly' , 'FlyHZ' ]
+        QuantitiesAllowed = [
+            'Lx',
+            'Fx',
+            'Rx',
+            'FxHZ',
+            'Leuv1',
+            'Feuv1',
+            'Reuv1',
+            'Feuv1HZ',
+            'Leuv2',
+            'Feuv2',
+            'Reuv2',
+            'Feuv2HZ',
+            'Leuv',
+            'Feuv',
+            'Reuv',
+            'FeuvHZ',
+            'Lly',
+            'Fly',
+            'Rly',
+            'FlyHZ',
+        ]
 
         # Make sure Quantity is set
         if Quantity is None:
-            raise Exception("Quantity not set in call to function")
+            raise Exception('Quantity not set in call to function')
 
         # Make sure Quantity is string
-        if not isinstance(Quantity,str):
-            raise Exception("Quantity must be string")
+        if not isinstance(Quantity, str):
+            raise Exception('Quantity must be string')
 
         # Check input Quantity is valid
         if Quantity not in QuantitiesAllowed:
             QuantitiesString = ''
             for quantity in QuantitiesAllowed:
-                QuantitiesString += quantity + " , "
-            raise Exception("invalid quantity "+Quantity+"\n valid options are "+QuantitiesString[0:-3])
+                QuantitiesString += quantity + ' , '
+            raise Exception(
+                'invalid quantity '
+                + Quantity
+                + '\n valid options are '
+                + QuantitiesString[0:-3]
+            )
 
         # Set tracks
         AgeTrack = self.AgeTrack
         Track = self.Tracks[Quantity]
 
         # If Threshold is 'sat' then normalise track to saturation value and set threshold to unity
-        if ( Threshold == 'sat' ):
-
+        if Threshold == 'sat':
             # Get saturation rotation rate as function of age
-            OmegaSatTrack = phys.OmegaSat( Mstar=self.Mstar , Age=self.AgeTrack , param='XUV' , params=self.params , StarEvo=self.StarEvo )
+            OmegaSatTrack = phys.OmegaSat(
+                Mstar=self.Mstar,
+                Age=self.AgeTrack,
+                param='XUV',
+                params=self.params,
+                StarEvo=self.StarEvo,
+            )
 
             # Make track just OmegaEnv/OmegaSat
             Track = self.OmegaEnvTrack / OmegaSatTrack
@@ -482,11 +648,13 @@ class Star:
             Threshold = 1.0
 
         # Get result
-        AgeActive = misc.ActivityLifetime( Age=AgeTrack , Track=Track , Threshold=Threshold , AgeMax=AgeMax )
+        AgeActive = misc.ActivityLifetime(
+            Age=AgeTrack, Track=Track, Threshold=Threshold, AgeMax=AgeMax
+        )
 
         return AgeActive
 
-    def IntegrateEmission(self,AgeMin=None,AgeMax=None,Band=None,aOrb=None):
+    def IntegrateEmission(self, AgeMin=None, AgeMax=None, Band=None, aOrb=None):
         """Takes age range, calculates integrated emission in band within that range.
 
         This code can be used to integrate a star's luminosity between two ages. This can be applied to any wavelength band
@@ -515,22 +683,24 @@ class Star:
         """
 
         # Allowed quantities
-        BandsAllowed = [ 'XUV', 'Xray', 'EUV1', 'EUV2', 'EUV', 'Lyman', 'bol' ]
+        BandsAllowed = ['XUV', 'Xray', 'EUV1', 'EUV2', 'EUV', 'Lyman', 'bol']
 
         # Make sure Band is set
         if Band is None:
-            raise Exception("Band not set in call to function")
+            raise Exception('Band not set in call to function')
 
         # Make sure Band is string
-        if not isinstance(Band,str):
-            raise Exception("Band must be string")
+        if not isinstance(Band, str):
+            raise Exception('Band must be string')
 
         # Check input Band is valid
         if Band not in BandsAllowed:
             BandsString = ''
             for band in BandsAllowed:
-                BandsString += band + " , "
-            raise Exception("invalid Band "+Band+"\n valid options are "+BandsString[0:-3])
+                BandsString += band + ' , '
+            raise Exception(
+                'invalid Band ' + Band + '\n valid options are ' + BandsString[0:-3]
+            )
 
         # Get luminosity track to use
         if Band == 'XUV':
@@ -548,123 +718,157 @@ class Star:
         elif Band == 'bol':
             Luminosity = self.LbolTrack
         else:
-            raise Exception("did not find right luminosity track")
+            raise Exception('did not find right luminosity track')
 
         # If aOrb was set to a string, do necessary work to get useable aOrb (given by aOrbUse)
-        if isinstance(aOrb,str):
-
+        if isinstance(aOrb, str):
             # Valid options
-            aOrbAllowed = [ 'RecentVenus' , 'RunawayGreenhouse' , 'MoistGreenhouse' , 'MaximumGreenhouse' , 'EarlyMars' , 'HZ' ]
+            aOrbAllowed = [
+                'RecentVenus',
+                'RunawayGreenhouse',
+                'MoistGreenhouse',
+                'MaximumGreenhouse',
+                'EarlyMars',
+                'HZ',
+            ]
 
             # Check input is valid
             if aOrb not in aOrbAllowed:
                 aOrbString = ''
                 for a in aOrbAllowed:
-                    aOrbString += a + " , "
-                raise Exception("invalid aOrb "+aOrb+"\n valid options are a value in AU or "+aOrbString[0:-3])
+                    aOrbString += a + ' , '
+                raise Exception(
+                    'invalid aOrb '
+                    + aOrb
+                    + '\n valid options are a value in AU or '
+                    + aOrbString[0:-3]
+                )
 
             # Get orbital distance
             aOrbUse = self.aOrbHZ[aOrb]
 
         else:
-
             # Just set to input value
             aOrbUse = aOrb
 
         # Do calculation
-        Energy = misc.IntegrateEmission( AgeMin=AgeMin , AgeMax=AgeMax , Age=self.AgeTrack , Luminosity=Luminosity , aOrb=aOrbUse )
+        Energy = misc.IntegrateEmission(
+            AgeMin=AgeMin, AgeMax=AgeMax, Age=self.AgeTrack, Luminosity=Luminosity, aOrb=aOrbUse
+        )
 
         return Energy
+
 
 def _CheckInputMstar(Mstar):
     """Takes stellar mass, checks if value is a valid input mass."""
 
     # Make sure Mstar was set
     if Mstar is None:
-        raise Exception("stellar mass not given")
+        raise Exception('stellar mass not given')
 
     # Make sure it is a float
-    #if not isinstance(Mstar,float):
-        #raise Exception("stellar mass must be given as float")
+    # if not isinstance(Mstar,float):
+    # raise Exception("stellar mass must be given as float")
 
     # Make sure it above minimum
-    if ( Mstar < MstarMin ):
-        raise Exception( "stellar mass cannot be less than lower limit of "+str(MstarMin)+" Msun" )
+    if Mstar < MstarMin:
+        raise Exception(
+            'stellar mass cannot be less than lower limit of ' + str(MstarMin) + ' Msun'
+        )
 
     # Make sure it above minimum
-    if ( Mstar > MstarMax ):
-        raise Exception( "stellar mass cannot be greater than upper limit of "+str(MstarMax)+" Msun" )
+    if Mstar > MstarMax:
+        raise Exception(
+            'stellar mass cannot be greater than upper limit of ' + str(MstarMax) + ' Msun'
+        )
 
     return
 
-def _InputRotation(Mstar,Age,Omega,OmegaEnv,OmegaCore,Prot,percentile,params):
+
+def _InputRotation(Mstar, Age, Omega, OmegaEnv, OmegaCore, Prot, percentile, params):
     """Takes input rotation values, checks sets up values correctly."""
 
     # Make sure percentile and rotation are not both set
     if percentile is not None:
-        if Omega is not None :
-            raise Exception( "cannot set both percentile and Omega as arguments of Star" )
-        if OmegaEnv is not None :
-            raise Exception( "cannot set both percentile and OmegaEnv as arguments of Star" )
-        if OmegaCore is not None :
-            raise Exception( "cannot set both percentile and OmegaCore as arguments of Star" )
-        if Prot is not None :
-            raise Exception( "cannot set both percentile and Prot as arguments of Star" )
+        if Omega is not None:
+            raise Exception('cannot set both percentile and Omega as arguments of Star')
+        if OmegaEnv is not None:
+            raise Exception('cannot set both percentile and OmegaEnv as arguments of Star')
+        if OmegaCore is not None:
+            raise Exception('cannot set both percentile and OmegaCore as arguments of Star')
+        if Prot is not None:
+            raise Exception('cannot set both percentile and Prot as arguments of Star')
 
     # Make sure percentile and OmegaEnv are not both set
-    if ( percentile is not None ) and ( OmegaEnv is not None ):
-        raise Exception( "cannot set both percentile and OmegaEnv as arguments of Star" )
+    if (percentile is not None) and (OmegaEnv is not None):
+        raise Exception('cannot set both percentile and OmegaEnv as arguments of Star')
 
     # If percentile was set to a string, get float version
-    if isinstance(percentile,str):
-        if ( percentile == 'slow' ):
+    if isinstance(percentile, str):
+        if percentile == 'slow':
             percentile = 5.0
-        elif ( percentile == 'medium' ):
+        elif percentile == 'medium':
             percentile = 50.0
-        elif ( percentile == 'fast' ):
+        elif percentile == 'fast':
             percentile = 95.0
         else:
-            raise Exception( "invalid percentile string (options are 'slow', 'medium', or 'fast')" )
+            raise Exception(
+                "invalid percentile string (options are 'slow', 'medium', or 'fast')"
+            )
 
     # If percentile was set, get Omega
     if percentile is not None:
-        Omega = Percentile(Mstar=Mstar,percentile=percentile,params=params)
+        Omega = Percentile(Mstar=Mstar, percentile=percentile, params=params)
 
     # Make sure if Age is set that OmegaCore is not set
-    if ( Age is not None ) and ( OmegaCore is not None ):
-        raise Exception( "cannot set both Age and OmegaCore as arguments of Star" )
+    if (Age is not None) and (OmegaCore is not None):
+        raise Exception('cannot set both Age and OmegaCore as arguments of Star')
 
     # Make sure not both Omega and Prot were set
-    if ( Omega is not None ) and ( Prot is not None ):
-        raise Exception( "cannot set both Omega and Prot as arguments of Star" )
+    if (Omega is not None) and (Prot is not None):
+        raise Exception('cannot set both Omega and Prot as arguments of Star')
 
     # If Prot is set, get Omega
     if Prot is not None:
         Omega = phys._Omega(Prot)
 
     # Make sure at least one rotation rate is set
-    if ( Omega is None ):
-
+    if Omega is None:
         # If Age is set then make sure OmegaEnv is set, otherwise make sure both OmegaEnv and OmegaCore are set
-        if ( Age is not None ):
-            if ( OmegaEnv is None ):
-                raise Exception( "if Age is set then must set either Omega or OmegaEnv as argument of Star" )
-        elif ( OmegaEnv is None ) or ( OmegaCore is None ):
-            raise Exception( "must set either Omega or both OmegaEnv and OmegaCore as argument of Star" )
+        if Age is not None:
+            if OmegaEnv is None:
+                raise Exception(
+                    'if Age is set then must set either Omega or OmegaEnv as argument of Star'
+                )
+        elif (OmegaEnv is None) or (OmegaCore is None):
+            raise Exception(
+                'must set either Omega or both OmegaEnv and OmegaCore as argument of Star'
+            )
 
     else:
-
         # Since Omega is set, make sure both OmegaEnv and OmegaCore are not set
-        if not ( ( OmegaEnv is None ) and ( OmegaCore is None ) ):
-            raise Exception( "cannot set OmegaEnv and OmegaCore when Omega is set as arugment of Star" )
+        if not ((OmegaEnv is None) and (OmegaCore is None)):
+            raise Exception(
+                'cannot set OmegaEnv and OmegaCore when Omega is set as arugment of Star'
+            )
 
         # Set both OmegaEnv and OmegaCore to Omega
         OmegaEnv = Omega
         OmegaCore = Omega
 
-    return Omega , OmegaEnv , OmegaCore
+    return Omega, OmegaEnv, OmegaCore
 
-def Percentile(Mstar=None,Omega=None,Prot=None,percentile=None,MstarDist=None,OmegaDist=None,ProtDist=None,params=params.paramsDefault):
+
+def Percentile(
+    Mstar=None,
+    Omega=None,
+    Prot=None,
+    percentile=None,
+    MstarDist=None,
+    OmegaDist=None,
+    ProtDist=None,
+    params=params.paramsDefault,
+):
     """Gets rotation rate of percentile or percentile of rotation rate in the model rotation distribution.
 
     This function can be used for two purposes
@@ -705,89 +909,87 @@ def Percentile(Mstar=None,Omega=None,Prot=None,percentile=None,MstarDist=None,Om
 
     # Make sure Mstar was set
     if Mstar is None:
-        raise Exception( "keyword argument Mstar must be set" )
+        raise Exception('keyword argument Mstar must be set')
 
     # If percentile is not set, make sure rotation rate is set
     if percentile is None:
         # Not both
         if Omega is not None:
             if Prot is not None:
-                raise Exception( "keyword arguments Omega and Prot cannot both be set" )
+                raise Exception('keyword arguments Omega and Prot cannot both be set')
         # At least one
-        if ( Omega is None ) and ( Prot is None ):
-            raise Exception( "must set either Omega, Prot, or percentile keyword arguments" )
+        if (Omega is None) and (Prot is None):
+            raise Exception('must set either Omega, Prot, or percentile keyword arguments')
         # Set Omega is not set then set it
         if Omega is None:
             Omega = phys._Omega(Prot)
 
     # Setup the distribution
     if MstarDist is None:
-        MstarDist , OmegaDist = misc.ModelCluster()
+        MstarDist, OmegaDist = misc.ModelCluster()
     else:
-
         # Check that one of OmegaDist and ProtDist are set
-        if ( OmegaDist is None ) and ( ProtDist is None ):
-            raise Exception( "one of keyword arguments OmegaDist and ProtDist must be set" )
+        if (OmegaDist is None) and (ProtDist is None):
+            raise Exception('one of keyword arguments OmegaDist and ProtDist must be set')
 
         # Check that OmegaDist and ProtDist are not both set
-        if ( OmegaDist is not None ) and ( ProtDist is not None ):
-            raise Exception( "keyword arguments OmegaDist and ProtDist cannot both be set" )
+        if (OmegaDist is not None) and (ProtDist is not None):
+            raise Exception('keyword arguments OmegaDist and ProtDist cannot both be set')
 
         # Setup OmegaDist if ProtDist was set
         if OmegaDist is None:
             OmegaDist = phys._Omega(ProtDist)
 
         # Make sure arrays are same length
-        if not ( len(MstarDist) == len(OmegaDist) ):
-            raise Exception( "MstarDist and OmegaDist (or ProtDist) must be same length" )
+        if not (len(MstarDist) == len(OmegaDist)):
+            raise Exception('MstarDist and OmegaDist (or ProtDist) must be same length')
 
     # Work out which one to do
     if percentile is not None:
-
         # percentile was set, so get corresponding rotation rates
-        result = _OmegaPercentile(Mstar,percentile,MstarDist,OmegaDist,params)
+        result = _OmegaPercentile(Mstar, percentile, MstarDist, OmegaDist, params)
 
     else:
-
         # Rotation rate was set, so get corresponding percentile
-        result = _PerPercentile(Mstar,Omega,MstarDist,OmegaDist,params)
-
+        result = _PerPercentile(Mstar, Omega, MstarDist, OmegaDist, params)
 
     return result
 
-def _OmegaPercentile(Mstar,percentile,MstarDist,OmegaDist,params):
+
+def _OmegaPercentile(Mstar, percentile, MstarDist, OmegaDist, params):
     """Gets rotation rate that corresponds to a given percentile of the rotation distribution."""
 
     ## If percentile was a string, get actual value
 
     # Get part of distribution to include
-    includeStars = np.where( np.abs(MstarDist-Mstar) <= params['dMstarPer'] )
+    includeStars = np.where(np.abs(MstarDist - Mstar) <= params['dMstarPer'])
 
     # Need at least two stars
-    if ( len(includeStars[0]) < 2 ):
-        raise Exception( "need at least two stars in mass bin to get percentile" )
+    if len(includeStars[0]) < 2:
+        raise Exception('need at least two stars in mass bin to get percentile')
 
     # Get percentile Omega
-    Omega = np.percentile( OmegaDist[includeStars] , percentile )
+    Omega = np.percentile(OmegaDist[includeStars], percentile)
 
     return Omega
 
-def _PerPercentile(Mstar,Omega,MstarDist,OmegaDist,params):
+
+def _PerPercentile(Mstar, Omega, MstarDist, OmegaDist, params):
     """Gets percentile of the rotation distribution for a given mass and rotation rate."""
 
     # Get part of distribution to include
-    includeStars = np.where( np.abs(MstarDist-Mstar) <= params['dMstarPer'] )
+    includeStars = np.where(np.abs(MstarDist - Mstar) <= params['dMstarPer'])
 
     # Need at least two stars
-    if ( len(includeStars[0]) < 2 ):
-        raise Exception( "need at least two stars in mass bin to get percentile" )
+    if len(includeStars[0]) < 2:
+        raise Exception('need at least two stars in mass bin to get percentile')
 
     # If Omega is less than minimum then make this as the 0th percentile
-    if ( Omega <= np.min(OmegaDist[includeStars]) ):
+    if Omega <= np.min(OmegaDist[includeStars]):
         return 0.0
 
     # If Omega is above maximum then make this as the 100th percentile
-    if ( Omega >= np.max(OmegaDist[includeStars]) ):
+    if Omega >= np.max(OmegaDist[includeStars]):
         return 100.0
 
     # Use bisector to invert numpy.percentile function
@@ -798,12 +1000,12 @@ def _PerPercentile(Mstar,Omega,MstarDist,OmegaDist,params):
 
     # Start iterating
     for iIter in range(nIterMax):
-    # Get mid percentile and corresponding Omega
-        perMid = 0.5 * ( perMin + perMax )
-        OmegaMid = np.percentile( OmegaDist[includeStars] , perMid )
+        # Get mid percentile and corresponding Omega
+        perMid = 0.5 * (perMin + perMax)
+        OmegaMid = np.percentile(OmegaDist[includeStars], perMid)
 
         # See if OmegaMid is equal to or close enough to answer
-        if ( abs(OmegaMid/Omega-1.0) < tol ):
+        if abs(OmegaMid / Omega - 1.0) < tol:
             return perMid
 
         # See which limit to change
@@ -814,4 +1016,5 @@ def _PerPercentile(Mstar,Omega,MstarDist,OmegaDist,params):
 
     # If we get here, not converged
     raise Exception(
-        f"did not find percentile for Omega={Omega} (Mstar={Mstar}) after {nIterMax} iterations; last bracket=({perMin},{perMax}), last mid={perMid}")
+        f'did not find percentile for Omega={Omega} (Mstar={Mstar}) after {nIterMax} iterations; last bracket=({perMin},{perMax}), last mid={perMid}'
+    )

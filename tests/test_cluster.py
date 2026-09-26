@@ -137,8 +137,8 @@ def test_construction_populates_stars_and_hz_boundaries(cluster_mod):
     # One star object per input mass, and per-index attribute access.
     assert cluster.nStars == 3
     assert len(cluster.stars) == 3
-    assert isinstance(getattr(cluster, 'star0'), FakeStar)
-    assert isinstance(getattr(cluster, 'star2'), FakeStar)
+    assert isinstance(cluster.star0, FakeStar)
+    assert isinstance(cluster.star2, FakeStar)
     # Habitable-zone boundaries are strictly positive distances (AU).
     assert np.all(cluster.aOrbHZ['HZ'] > 0.0)
     assert np.all(cluster.aOrbHZ['RunawayGreenhouse'] > 0.0)

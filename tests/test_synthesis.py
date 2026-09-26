@@ -13,13 +13,12 @@ pytestmark = [pytest.mark.unit, pytest.mark.timeout(30)]
 
 # GetProperties
 
+
 @pytest.mark.reference_pinned
 @pytest.mark.physics_invariant
 @pytest.mark.parametrize(
-    "Mstar,pctle,age,Lxuv_dict,Lbol_val",
-    (
-        (1.0, 50.0, 1000.0, {"Lx": 1.0e28, "Leuv1": 2.0e28, "Leuv2": 3.0e28}, 1.0),
-    ),
+    'Mstar,pctle,age,Lxuv_dict,Lbol_val',
+    ((1.0, 50.0, 1000.0, {'Lx': 1.0e28, 'Leuv1': 2.0e28, 'Leuv2': 3.0e28}, 1.0),),
 )
 def test_GetProperties_flux_budget(monkeypatch, Mstar, pctle, age, Lxuv_dict, Lbol_val):
     """
@@ -35,35 +34,52 @@ def test_GetProperties_flux_budget(monkeypatch, Mstar, pctle, age, Lxuv_dict, Lb
     """
 
     def fake_Value(Mstar_in, age_in, key):
-        if key == "Rstar":
+        if key == 'Rstar':
             return 1.0  # Rsun
-        if key == "Teff":
+        if key == 'Teff':
             return 5000.0
         raise KeyError(key)
 
-    monkeypatch.setattr(synth, "Value", fake_Value)
-    monkeypatch.setattr(synth, "Percentile", lambda **kwargs: 1.0)
-    monkeypatch.setattr(synth, "Lxuv", lambda **kwargs: dict(Lxuv_dict))
-    monkeypatch.setattr(synth, "Lbol", lambda M, a: Lbol_val)
+    monkeypatch.setattr(synth, 'Value', fake_Value)
+    monkeypatch.setattr(synth, 'Percentile', lambda **kwargs: 1.0)
+    monkeypatch.setattr(synth, 'Lxuv', lambda **kwargs: dict(Lxuv_dict))
+    monkeypatch.setattr(synth, 'Lbol', lambda M, a: Lbol_val)
 
     # Make Planck contribution small: set surface flux = 0 everywhere
-    monkeypatch.setattr(spec, "PlanckFunction_surf", lambda wl, Teff: np.zeros_like(wl, dtype=float))
-    monkeypatch.setattr(spec, "ScaleTo1AU", lambda fl, R_star: fl)
+    monkeypatch.setattr(
+        spec, 'PlanckFunction_surf', lambda wl, Teff: np.zeros_like(wl, dtype=float)
+    )
+    monkeypatch.setattr(spec, 'ScaleTo1AU', lambda fl, R_star: fl)
 
     out = synth.GetProperties(Mstar=Mstar, pctle=pctle, age=age)
 
     # Check keys exist
-    for k in ["age", "radius", "Teff", "L_bo", "L_xr", "L_e1", "L_e2", "L_pl", "L_uv",
-              "F_bo", "F_xr", "F_e1", "F_e2", "F_pl", "F_uv"]:
+    for k in [
+        'age',
+        'radius',
+        'Teff',
+        'L_bo',
+        'L_xr',
+        'L_e1',
+        'L_e2',
+        'L_pl',
+        'L_uv',
+        'F_bo',
+        'F_xr',
+        'F_e1',
+        'F_e2',
+        'F_pl',
+        'F_uv',
+    ]:
         assert k in out
 
     # Recompute expected area and fluxes using same constants as code
     area = 4.0 * synth.const.Pi * synth.const.AU * synth.const.AU
 
     expected_L_bo = Lbol_val * synth.const.LbolSun
-    expected_L_xr = Lxuv_dict["Lx"]
-    expected_L_e1 = Lxuv_dict["Leuv1"]
-    expected_L_e2 = Lxuv_dict["Leuv2"]
+    expected_L_xr = Lxuv_dict['Lx']
+    expected_L_e1 = Lxuv_dict['Leuv1']
+    expected_L_e2 = Lxuv_dict['Leuv2']
 
     expected_F_bo = expected_L_bo / area
     expected_F_xr = expected_L_xr / area
@@ -75,22 +91,38 @@ def test_GetProperties_flux_budget(monkeypatch, Mstar, pctle, age, Lxuv_dict, Lb
     expected_L_pl = 0.0
 
     # UV remainder
-    expected_F_uv = expected_F_bo - expected_F_xr - expected_F_e1 - expected_F_e2 - expected_F_pl
+    expected_F_uv = (
+        expected_F_bo - expected_F_xr - expected_F_e1 - expected_F_e2 - expected_F_pl
+    )
     expected_L_uv = expected_F_uv * area
 
-    ret = (out["F_bo"], out["F_xr"], out["F_e1"], out["F_e2"], out["F_pl"], out["F_uv"])
-    exp = (expected_F_bo, expected_F_xr, expected_F_e1, expected_F_e2, expected_F_pl, expected_F_uv)
+    ret = (out['F_bo'], out['F_xr'], out['F_e1'], out['F_e2'], out['F_pl'], out['F_uv'])
+    exp = (
+        expected_F_bo,
+        expected_F_xr,
+        expected_F_e1,
+        expected_F_e2,
+        expected_F_pl,
+        expected_F_uv,
+    )
     assert_allclose(ret, exp, rtol=1e-12, atol=0.0)
 
-    retL = (out["L_bo"], out["L_xr"], out["L_e1"], out["L_e2"], out["L_pl"], out["L_uv"])
-    expL = (expected_L_bo, expected_L_xr, expected_L_e1, expected_L_e2, expected_L_pl, expected_L_uv)
+    retL = (out['L_bo'], out['L_xr'], out['L_e1'], out['L_e2'], out['L_pl'], out['L_uv'])
+    expL = (
+        expected_L_bo,
+        expected_L_xr,
+        expected_L_e1,
+        expected_L_e2,
+        expected_L_pl,
+        expected_L_uv,
+    )
     assert_allclose(retL, expL, rtol=1e-12, atol=0.0)
 
     # Self-consistency closure: the five sub-band fluxes sum to the bolometric
     # flux, because the UV band is defined as the bolometric remainder. This is
     # the conservation anchor; a regression in any band breaks it.
-    band_sum = out["F_xr"] + out["F_e1"] + out["F_e2"] + out["F_pl"] + out["F_uv"]
-    assert_allclose(band_sum, out["F_bo"], rtol=1e-12, atol=0.0)
+    band_sum = out['F_xr'] + out['F_e1'] + out['F_e2'] + out['F_pl'] + out['F_uv']
+    assert_allclose(band_sum, out['F_bo'], rtol=1e-12, atol=0.0)
 
 
 @pytest.mark.physics_invariant
@@ -103,35 +135,38 @@ def test_GetProperties_planck_trapezoid_constant(monkeypatch):
     weight or a dropped bin width in the band integration.
     """
     # Patch dependencies
-    monkeypatch.setattr(synth, "Value", lambda M, a, k: 1.0 if k == "Rstar" else 5000.0)
-    monkeypatch.setattr(synth, "Percentile", lambda **kwargs: 1.0)
-    monkeypatch.setattr(synth, "Lxuv", lambda **kwargs: {"Lx": 0.0, "Leuv1": 0.0, "Leuv2": 0.0})
-    monkeypatch.setattr(synth, "Lbol", lambda M, a: 1.0)
+    monkeypatch.setattr(synth, 'Value', lambda M, a, k: 1.0 if k == 'Rstar' else 5000.0)
+    monkeypatch.setattr(synth, 'Percentile', lambda **kwargs: 1.0)
+    monkeypatch.setattr(synth, 'Lxuv', lambda **kwargs: {'Lx': 0.0, 'Leuv1': 0.0, 'Leuv2': 0.0})
+    monkeypatch.setattr(synth, 'Lbol', lambda M, a: 1.0)
 
     # Make Planck flux at 1 AU be exactly 1 everywhere in wl_pl
-    monkeypatch.setattr(spec, "PlanckFunction_surf", lambda wl, Teff: np.ones_like(wl, dtype=float))
-    monkeypatch.setattr(spec, "ScaleTo1AU", lambda fl, R_star: fl)
+    monkeypatch.setattr(
+        spec, 'PlanckFunction_surf', lambda wl, Teff: np.ones_like(wl, dtype=float)
+    )
+    monkeypatch.setattr(spec, 'ScaleTo1AU', lambda fl, R_star: fl)
 
     out = synth.GetProperties(Mstar=1.0, pctle=50.0, age=1000.0)
 
-    wlmin, wlmax = spec.bands_limits["pl"]
+    wlmin, wlmax = spec.bands_limits['pl']
     expected_F_pl = wlmax - wlmin  # integral of 1 dlambda over the pl band
 
     # A unit integrand yields a strictly positive band integral.
-    assert out["F_pl"] > 0.0
-    assert_allclose(out["F_pl"], expected_F_pl, rtol=1e-12, atol=0.0)
+    assert out['F_pl'] > 0.0
+    assert_allclose(out['F_pl'], expected_F_pl, rtol=1e-12, atol=0.0)
 
 
 # CalcBandScales
 
+
 @pytest.mark.physics_invariant
 @pytest.mark.parametrize(
-    "modern_dict,hist_dict,expected",
+    'modern_dict,hist_dict,expected',
     (
         (
-            {"F_xr": 1.0, "F_e1": 2.0, "F_e2": 4.0, "F_uv": 8.0, "F_pl": 16.0, "F_bo": 32.0},
-            {"F_xr": 2.0, "F_e1": 6.0, "F_e2": 8.0, "F_uv": 4.0, "F_pl": 8.0, "F_bo": 64.0},
-            {"Q_xr": 2.0, "Q_e1": 3.0, "Q_e2": 2.0, "Q_uv": 0.5, "Q_pl": 0.5, "Q_bo": 2.0},
+            {'F_xr': 1.0, 'F_e1': 2.0, 'F_e2': 4.0, 'F_uv': 8.0, 'F_pl': 16.0, 'F_bo': 32.0},
+            {'F_xr': 2.0, 'F_e1': 6.0, 'F_e2': 8.0, 'F_uv': 4.0, 'F_pl': 8.0, 'F_bo': 64.0},
+            {'Q_xr': 2.0, 'Q_e1': 3.0, 'Q_e2': 2.0, 'Q_uv': 0.5, 'Q_pl': 0.5, 'Q_bo': 2.0},
         ),
     ),
 )
@@ -151,9 +186,10 @@ def test_CalcBandScales(modern_dict, hist_dict, expected):
 
 # CalcScaledSpectrumFromProps
 
+
 @pytest.mark.physics_invariant
 @pytest.mark.parametrize(
-    "wl,fl,expected_mult",
+    'wl,fl,expected_mult',
     (
         (
             # includes overlap (11 nm -> ['xr','e1'] -> uses 'xr')
@@ -179,8 +215,8 @@ def test_CalcScaledSpectrumFromProps_scales_by_first_band(wl, fl, expected_mult)
     """
     modern = spec.Spectrum().LoadDirectly(wl, fl)
 
-    modern_dict = {"F_xr": 1, "F_e1": 1, "F_e2": 1, "F_uv": 1, "F_pl": 1, "F_bo": 1}
-    hist_dict   = {"F_xr": 2, "F_e1": 3, "F_e2": 4, "F_uv": 5, "F_pl": 6, "F_bo": 1}
+    modern_dict = {'F_xr': 1, 'F_e1': 1, 'F_e2': 1, 'F_uv': 1, 'F_pl': 1, 'F_bo': 1}
+    hist_dict = {'F_xr': 2, 'F_e1': 3, 'F_e2': 4, 'F_uv': 5, 'F_pl': 6, 'F_bo': 1}
 
     hist = synth.CalcScaledSpectrumFromProps(modern, modern_dict, hist_dict)
 
@@ -190,8 +226,9 @@ def test_CalcScaledSpectrumFromProps_scales_by_first_band(wl, fl, expected_mult)
 
 # FitModernProperties
 
+
 @pytest.mark.parametrize(
-    "age_in,minimize_x,expected",
+    'age_in,minimize_x,expected',
     (
         # age <= 0 => fit_age False => x0=[1.0], return (x[0], age_in)
         (-1.0, np.array([0.7]), (0.7, -1.0)),
@@ -199,7 +236,9 @@ def test_CalcScaledSpectrumFromProps_scales_by_first_band(wl, fl, expected_mult)
         (1000.0, np.array([0.8, 900.0]), (0.8, 900.0)),
     ),
 )
-def test_FitModernProperties_returns_minimize_solution(monkeypatch, age_in, minimize_x, expected):
+def test_FitModernProperties_returns_minimize_solution(
+    monkeypatch, age_in, minimize_x, expected
+):
     """
     Relates to synthesis.FitModernProperties():
 
@@ -232,15 +271,18 @@ def test_FitModernProperties_returns_minimize_solution(monkeypatch, age_in, mini
             assert_allclose(x0[0], 1.0, rtol=0, atol=0)
         return FakeResult(minimize_x)
 
-    monkeypatch.setattr(synth, "minimize", fake_minimize)
+    monkeypatch.setattr(synth, 'minimize', fake_minimize)
 
     # Patch GetProperties
     monkeypatch.setattr(
         synth,
-        "GetProperties",
+        'GetProperties',
         lambda Mstar, pctle, age: {
             # provide the keys _fev uses
-            "F_xr": 1.0, "F_e1": 1.0, "F_e2": 1.0, "F_uv": 1.0
+            'F_xr': 1.0,
+            'F_e1': 1.0,
+            'F_e2': 1.0,
+            'F_uv': 1.0,
         },
     )
 
@@ -263,8 +305,8 @@ def test_CalcScaledSpectrumFromProps_skips_out_of_band_wavelengths():
     fl = np.ones(10) * 10.0
     modern = spec.Spectrum().LoadDirectly(wl, fl)
 
-    modern_dict = {"F_xr": 1, "F_e1": 1, "F_e2": 1, "F_uv": 1, "F_pl": 1, "F_bo": 1}
-    hist_dict = {"F_xr": 2, "F_e1": 3, "F_e2": 4, "F_uv": 5, "F_pl": 6, "F_bo": 1}
+    modern_dict = {'F_xr': 1, 'F_e1': 1, 'F_e2': 1, 'F_uv': 1, 'F_pl': 1, 'F_bo': 1}
+    hist_dict = {'F_xr': 2, 'F_e1': 3, 'F_e2': 4, 'F_uv': 5, 'F_pl': 6, 'F_bo': 1}
 
     hist = synth.CalcScaledSpectrumFromProps(modern, modern_dict, hist_dict)
 
@@ -282,13 +324,15 @@ def test_CalcScaledSpectrumFromProps_skips_out_of_band_wavelengths():
 
 @pytest.mark.physics_invariant
 @pytest.mark.parametrize(
-    "age_in,x0_expected_len",
+    'age_in,x0_expected_len',
     (
-        (-1.0, 1),      # age <= 0 => fit_age False => single-parameter objective
-        (1000.0, 2),    # age > 0 => fit_age True => two-parameter objective
+        (-1.0, 1),  # age <= 0 => fit_age False => single-parameter objective
+        (1000.0, 2),  # age > 0 => fit_age True => two-parameter objective
     ),
 )
-def test_FitModernProperties_objective_residual_is_nonnegative(monkeypatch, age_in, x0_expected_len):
+def test_FitModernProperties_objective_residual_is_nonnegative(
+    monkeypatch, age_in, x0_expected_len
+):
     """The fit objective returns the root-sum-square band-flux mismatch.
 
     Driving the real objective once (via a minimize stub that evaluates the
@@ -306,15 +350,15 @@ def test_FitModernProperties_objective_residual_is_nonnegative(monkeypatch, age_
     # Fix the measured per-band integrated fluxes to zero so the residual is a
     # closed-form function of the (mocked) model band fluxes only.
     def fake_calc_band_fluxes():
-        modern_spec.fl_integ = {"xr": 0.0, "e1": 0.0, "e2": 0.0, "uv": 0.0}
+        modern_spec.fl_integ = {'xr': 0.0, 'e1': 0.0, 'e2': 0.0, 'uv': 0.0}
 
-    monkeypatch.setattr(modern_spec, "CalcBandFluxes", fake_calc_band_fluxes)
+    monkeypatch.setattr(modern_spec, 'CalcBandFluxes', fake_calc_band_fluxes)
 
     # Model band fluxes [erg s-1 cm-2]; distinct per band so a dropped term shows.
-    model_props = {"F_xr": 1.0, "F_e1": 2.0, "F_e2": 3.0, "F_uv": 4.0}
+    model_props = {'F_xr': 1.0, 'F_e1': 2.0, 'F_e2': 3.0, 'F_uv': 4.0}
     monkeypatch.setattr(
         synth,
-        "GetProperties",
+        'GetProperties',
         lambda Mstar, pctle, age: dict(model_props),
     )
 
@@ -327,22 +371,22 @@ def test_FitModernProperties_objective_residual_is_nonnegative(monkeypatch, age_
 
     def fake_minimize(func, x0, method=None):
         assert len(x0) == x0_expected_len
-        captured["residual"] = func(x0)
+        captured['residual'] = func(x0)
         return FakeResult(np.atleast_1d(x0).astype(float))
 
-    monkeypatch.setattr(synth, "minimize", fake_minimize)
+    monkeypatch.setattr(synth, 'minimize', fake_minimize)
 
     synth.FitModernProperties(modern_spec, Mstar=1.0, age=age_in)
 
     # Closed-form residual: sqrt(sum_k (F_k / width_k)^2) with zero measured flux.
     expected = 0.0
-    for k in ("xr", "e1", "e2", "uv"):
+    for k in ('xr', 'e1', 'e2', 'uv'):
         lim = spec.bands_limits[k]
         wid = lim[1] - lim[0]
-        expected += (model_props["F_" + k] / wid) ** 2
+        expected += (model_props['F_' + k] / wid) ** 2
     expected = np.sqrt(expected)
 
-    residual = captured["residual"]
+    residual = captured['residual']
 
     # The objective is a Euclidean distance, so it is non-negative.
     assert residual >= 0.0
@@ -368,17 +412,17 @@ def test_FitModernProperties_logs_error_on_failed_fit(monkeypatch, caplog):
 
     monkeypatch.setattr(
         synth,
-        "GetProperties",
-        lambda Mstar, pctle, age: {"F_xr": 1.0, "F_e1": 1.0, "F_e2": 1.0, "F_uv": 1.0},
+        'GetProperties',
+        lambda Mstar, pctle, age: {'F_xr': 1.0, 'F_e1': 1.0, 'F_e2': 1.0, 'F_uv': 1.0},
     )
 
     class FailedResult:
         success = False
         x = np.array([0.42])
 
-    monkeypatch.setattr(synth, "minimize", lambda func, x0, method=None: FailedResult())
+    monkeypatch.setattr(synth, 'minimize', lambda func, x0, method=None: FailedResult())
 
-    with caplog.at_level(logging.ERROR, logger="fwl.mors.synthesis"):
+    with caplog.at_level(logging.ERROR, logger='fwl.mors.synthesis'):
         best_pctle, best_age = synth.FitModernProperties(modern_spec, Mstar=1.0, age=-1.0)
 
     # The failure is surfaced as an error-level log record.

@@ -1,39 +1,40 @@
-
 """Module for holding miscellaneous functions that can be used by many other modules."""
 
 # Imports for standard stuff needed here
-import inspect
-import sys
-import numpy as np
-import pickle
+from __future__ import annotations
+
 import copy
 import pathlib
+import pickle
+
+import numpy as np
 
 # Imports for mors modules
 import mors.constants as const
 
+
 def _GetPackageDirectory():
     """Gets path to main directory where the code is installed."""
 
-    return str(pathlib.Path(__file__).parent.absolute())+"/data/"
+    return str(pathlib.Path(__file__).parent.absolute()) + '/data/'
+
 
 def _convertFloatArray(Xin):
     """Takes a value and returns either as float or numpy.ndarray of floats."""
 
     # If input is float or int, return float version
-    if isinstance(Xin,(float,int)):
+    if isinstance(Xin, (float, int)):
         return float(Xin)
 
     # If input is a list, numpy array version (will only work if elements can be converted into floats)
-    if isinstance(Xin,list):
+    if isinstance(Xin, list):
         X = np.zeros(len(Xin))
-        for i in range(0,len(Xin)):
+        for i in range(len(Xin)):
             X[i] = float(Xin[i])
         return X
 
     # If input is a numpy object then do stuff
-    if ( type(Xin).__module__ == 'numpy' ):
-
+    if type(Xin).__module__ == 'numpy':
         # First see if it can be converted into a float (i.e. a 1-element array)
         isNumber = True
         try:
@@ -42,28 +43,30 @@ def _convertFloatArray(Xin):
             isNumber = False
 
         # If it is just a single value, return float version
-        if ( isNumber ):
+        if isNumber:
             return float(X)
 
         # Otherwise, turn it into an array
         X = np.zeros(len(Xin))
-        for i in range(0,len(Xin)):
+        for i in range(len(Xin)):
             X[i] = float(Xin[i])
         return X
 
     return
 
+
 def Load(filename):
     """Takes filename of saved star or cluster and loads object."""
 
     # Load the object
-    with open(filename,'rb') as f:
+    with open(filename, 'rb') as f:
         obj = pickle.load(f)
 
     # Setup the quantity functions (which for some reason do not work on objects loaded from pickle)
     obj._setupQuantityFunctions()
 
     return obj
+
 
 def ModelCluster():
     """Reads the model cluster used in Johnstone et al. (2020)."""
@@ -72,7 +75,7 @@ def ModelCluster():
     packageDir = _GetPackageDirectory()
 
     # Set filename including path
-    filename = packageDir + "ModelDistribution.dat"
+    filename = packageDir + 'ModelDistribution.dat'
 
     # Read lines of file
     with open(filename) as f:
@@ -90,15 +93,16 @@ def ModelCluster():
 
     # Loop over lines and fill arrays
     iStar = 0
-    for line in content[nHeader:len(content)]:
+    for line in content[nHeader : len(content)]:
         data = line.split()
         Mstar[iStar] = data[0]
         Omega[iStar] = data[1]
         iStar += 1
 
-    return Mstar , Omega
+    return Mstar, Omega
 
-def ActivityLifetime(Age=None,Track=None,Threshold=None,AgeMax=None):
+
+def ActivityLifetime(Age=None, Track=None, Threshold=None, AgeMax=None):
     """
     Takes evolutionary track for parameter, calculates when value drops below threshold.
 
@@ -129,45 +133,44 @@ def ActivityLifetime(Age=None,Track=None,Threshold=None,AgeMax=None):
 
     # Make sure parameters set
     if Age is None:
-        raise Exception("required argument Age not set")
+        raise Exception('required argument Age not set')
     if Track is None:
-        raise Exception("required argument Track not set")
+        raise Exception('required argument Track not set')
     if Threshold is None:
-        raise Exception("required argument Threshold not set")
+        raise Exception('required argument Threshold not set')
 
     # Make sure Age and Track same length
-    if not ( len(Age) == len(Track) ):
-        raise Exception("Age and Track are different lengths")
+    if not (len(Age) == len(Track)):
+        raise Exception('Age and Track are different lengths')
 
     # Change Age and Track to only be ages below AgeMax, if AgeMax is set
-    if not AgeMax is None:
-        includeAges = np.where( Age <= AgeMax )
+    if AgeMax is not None:
+        includeAges = np.where(Age <= AgeMax)
         Age = Age[includeAges]
         Track = Track[includeAges]
 
     # See if final value below threshold, otherwise return final age
-    if ( Track[-1] > Threshold ):
+    if Track[-1] > Threshold:
         return Age[-1]
 
     # Start at end of array and loop backwards
-    for iAge in range(len(Age)-1,0,-1):
-
+    for iAge in range(len(Age) - 1, 0, -1):
         # Make sure next one back is not equal to threshold
-        if ( Track[iAge-1] == Threshold ):
-            return Age[iAge-1]
+        if Track[iAge - 1] == Threshold:
+            return Age[iAge - 1]
 
         # Check if this age bin is when it drops past the threshold
-        if ( ( Track[iAge] < Threshold ) and ( Track[iAge-1] > Threshold ) ):
-
+        if (Track[iAge] < Threshold) and (Track[iAge - 1] > Threshold):
             # Do interpoaltion to get when it crosses
             # Assume here Age = m*Track + c
-            mInterp = ( Age[iAge] - Age[iAge-1] ) / ( Track[iAge] - Track[iAge-1] )
+            mInterp = (Age[iAge] - Age[iAge - 1]) / (Track[iAge] - Track[iAge - 1])
             cInterp = Age[iAge] - mInterp * Track[iAge]
-            return mInterp*Threshold + cInterp
+            return mInterp * Threshold + cInterp
 
     return 0.0
 
-def IntegrateEmission(AgeMin=None,AgeMax=None,Age=None,Luminosity=None,aOrb=None):
+
+def IntegrateEmission(AgeMin=None, AgeMax=None, Age=None, Luminosity=None, aOrb=None):
     """
     Takes evolutionary track for parameter, calculates when value drops below threshold.
 
@@ -198,59 +201,59 @@ def IntegrateEmission(AgeMin=None,AgeMax=None,Age=None,Luminosity=None,aOrb=None
 
     # Make sure parameters set
     if AgeMin is None:
-        raise Exception("required argument AgeMin not set")
+        raise Exception('required argument AgeMin not set')
     if AgeMax is None:
-        raise Exception("required argument AgeMax not set")
+        raise Exception('required argument AgeMax not set')
     if Age is None:
-        raise Exception("required argument Age not set")
+        raise Exception('required argument Age not set')
     if Luminosity is None:
-        raise Exception("required argument Luminosity not set")
+        raise Exception('required argument Luminosity not set')
 
     # Make sure Age and Luminosity same length
-    if not ( len(Age) == len(Luminosity) ):
-        raise Exception("Age and Luminosity are different lengths")
+    if not (len(Age) == len(Luminosity)):
+        raise Exception('Age and Luminosity are different lengths')
 
     # Make sure AgeMin and AgeMax is in track
-    if not ( ( AgeMin >= Age[0] ) and ( AgeMin <= Age[-1] ) ):
-        raise Exception("AgeMin not in range of evolutionary track")
-    if not ( ( AgeMax >= Age[0] ) and ( AgeMax <= Age[-1] ) ):
-        raise Exception("AgeMax not in range of evolutionary track")
+    if not ((AgeMin >= Age[0]) and (AgeMin <= Age[-1])):
+        raise Exception('AgeMin not in range of evolutionary track')
+    if not ((AgeMax >= Age[0]) and (AgeMax <= Age[-1])):
+        raise Exception('AgeMax not in range of evolutionary track')
 
     # Get track to actually integrate
     Track = copy.deepcopy(Luminosity)
-    if not aOrb is None:
-        Track *= 1.0 / ( 4.0 * const.Pi * (aOrb*const.AU)**2.0 )
+    if aOrb is not None:
+        Track *= 1.0 / (4.0 * const.Pi * (aOrb * const.AU) ** 2.0)
 
     # Get index of first age bin with age above AgeMin
-    indexMin = _getIndexGT(Age,AgeMin)
+    indexMin = _getIndexGT(Age, AgeMin)
 
     # Get index of final age bin with age below AgeMax
-    indexMax = _getIndexLT(Age,AgeMax)
+    indexMax = _getIndexLT(Age, AgeMax)
 
     # Initially take no energy then add up energy from bins
     Energy = 0.0
 
     # Add energy from first bin if needed (simple assumption for luminosity constant ove age bin)
-    if ( AgeMin < Age[indexMin] ):
-        Energy += ( Age[indexMin] - AgeMin ) * Track[indexMin]
+    if AgeMin < Age[indexMin]:
+        Energy += (Age[indexMin] - AgeMin) * Track[indexMin]
 
     # Intergate over all full bins (only if there is something to integrate)
-    if not ( indexMin == indexMax ):
-        for iAge in range(indexMin,indexMax):
-
+    if not (indexMin == indexMax):
+        for iAge in range(indexMin, indexMax):
             # Do integration using trapezoidal rule (not the chained version)
-            Energy += 0.5 * ( Age[iAge+1] - Age[iAge] ) * ( Track[iAge] + Track[iAge+1] )
+            Energy += 0.5 * (Age[iAge + 1] - Age[iAge]) * (Track[iAge] + Track[iAge + 1])
 
     # Add energy from final bin if needed (simple assumption for luminosity constant ove age bin)
-    if ( AgeMax > Age[indexMax] ):
-        Energy += ( AgeMax - Age[indexMax] ) * Track[indexMax]
+    if AgeMax > Age[indexMax]:
+        Energy += (AgeMax - Age[indexMax]) * Track[indexMax]
 
     # So far, units of Age were in Myr when integrating, so include also Myr to s conversion
     Energy *= const.Myr
 
     return Energy
 
-def _getIndexLTordered(Xarray,X):
+
+def _getIndexLTordered(Xarray, X):
     """Takes min to max ordered array of values and a value, returns index of closest element in array smaller than value."""
 
     # It is assumed that X is between the min and max of Xarray and it is assumed
@@ -258,63 +261,64 @@ def _getIndexLTordered(Xarray,X):
 
     # Initial guesses for i
     i1 = 0
-    i2 = len(Xarray)-1
+    i2 = len(Xarray) - 1
 
     # Check if right value
-    if ( Xarray[i1] == X ):
+    if Xarray[i1] == X:
         return i1
-    if ( Xarray[i2] == X ):
+    if Xarray[i2] == X:
         return i2
 
     # Start iterating
-    for iIter in range(0,len(Xarray)):
-
+    for iIter in range(len(Xarray)):
         # Get iMid
-        iMid = int(0.5*(i1+i2))
+        iMid = int(0.5 * (i1 + i2))
 
         # Check if iMid is right value
-        if ( ( Xarray[iMid] <= X ) and ( Xarray[iMid+1] > X ) ):
+        if (Xarray[iMid] <= X) and (Xarray[iMid + 1] > X):
             return iMid
 
         # Work out if answer is between i1 and iMid or iMid and i2
-        if ( Xarray[iMid] > X ):
+        if Xarray[iMid] > X:
             i2 = iMid
         else:
             i1 = iMid
 
     # It should not get here
-    raise Exception("did not find index")
+    raise Exception('did not find index')
 
     return iMid
 
-def _getIndexLT(Xarray,X):
+
+def _getIndexLT(Xarray, X):
     """Takes array of values and a value, returns index of closest element in array smaller than value."""
 
     # It is assumed that X is greater than the min of Xarray, but check this
-    if ( X < np.min(Xarray) ):
-        raise Exception("X is less than minimum of Xarray")
+    if X < np.min(Xarray):
+        raise Exception('X is less than minimum of Xarray')
 
     # Get smaller value by taking difference of X and all Xarray elements
     # then removing all values smaller than 0.0 (i.e. those larger than X)
     deltaX = X - Xarray
-    deltaX[np.where(deltaX<0.0)] = np.max(deltaX)*1.1+0.1
+    deltaX[np.where(deltaX < 0.0)] = np.max(deltaX) * 1.1 + 0.1
 
     # Get index
     index = np.argmin(deltaX)
 
     return index
 
-def _getIndexGT(Xarray,X):
+
+def _getIndexGT(Xarray, X):
     """Takes array of values and a value, returns index of closest element in array larger than value."""
 
     # It is assumed that X is less than the max of Xarray, but check this
-    if ( X > np.max(Xarray) ):
-        raise Exception("X is more than maximum of Xarray")
+    if X > np.max(Xarray):
+        raise Exception('X is more than maximum of Xarray')
 
     # Get smaller value by taking difference of X and all Xarray elements
     # then removing all values smaller than 0.0 (i.e. those larger than X)
     deltaX = Xarray - X
-    deltaX[np.where(deltaX<0.0)] = np.max(deltaX)*1.1+0.1
+    deltaX[np.where(deltaX < 0.0)] = np.max(deltaX) * 1.1 + 0.1
 
     # Get index
     index = np.argmin(deltaX)

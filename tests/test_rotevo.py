@@ -210,7 +210,7 @@ def test_shouldappend_nonascending_raises():
     function raises rather than silently skipping an output.
     """
     ages_out = np.array([100.0, 2.0])
-    with pytest.raises(Exception, match="indexMin is not zero"):
+    with pytest.raises(Exception, match='indexMin is not zero'):
         rotevo._shouldAppend(2.0, ages_out)
 
 
@@ -242,7 +242,7 @@ def test_gaussian_elimination_zero_pivot_raises():
     """
     A = np.array([[0.0, 1.0], [1.0, 0.0]])
     b = np.array([1.0, 1.0])
-    with pytest.raises(Exception, match="diagonal term"):
+    with pytest.raises(Exception, match='diagonal term'):
         rotevo._GaussianElimination(A, b)
 
 
@@ -277,7 +277,7 @@ def test_checkbaddata_rejects_negative_rotation():
         'OmegaEnv': np.array([-1.0]),
         'OmegaCore': np.array([1.0]),
     }
-    with pytest.raises(Exception, match="bad data"):
+    with pytest.raises(Exception, match='bad data'):
         rotevo._CheckBadData(tracks)
 
 
@@ -288,7 +288,7 @@ def test_checkbaddata_rejects_negative_core():
         'OmegaEnv': np.array([1.0]),
         'OmegaCore': np.array([0.0]),
     }
-    with pytest.raises(Exception, match="bad data"):
+    with pytest.raises(Exception, match='bad data'):
         rotevo._CheckBadData(tracks)
 
 
@@ -303,14 +303,14 @@ def test_checkbaddata_rejects_nan_and_inf():
         'OmegaEnv': np.array([np.nan]),
         'OmegaCore': np.array([1.0]),
     }
-    with pytest.raises(Exception, match="bad data"):
+    with pytest.raises(Exception, match='bad data'):
         rotevo._CheckBadData(tracks_nan)
     tracks_inf = {
         'Age': np.array([np.inf]),
         'OmegaEnv': np.array([1.0]),
         'OmegaCore': np.array([1.0]),
     }
-    with pytest.raises(Exception, match="bad data"):
+    with pytest.raises(Exception, match='bad data'):
         rotevo._CheckBadData(tracks_inf)
 
 
@@ -325,15 +325,15 @@ def test_evolverotationstep_missing_arguments_raise():
     Error contract: missing mass, age, either rotation rate, or both timestep
     controls raises; no partial state is produced.
     """
-    with pytest.raises(Exception, match="Mstar"):
+    with pytest.raises(Exception, match='Mstar'):
         rotevo.EvolveRotationStep(Age=1.0, OmegaEnv=1.0, OmegaCore=1.0, dAge=0.5)
-    with pytest.raises(Exception, match="Age"):
+    with pytest.raises(Exception, match='Age'):
         rotevo.EvolveRotationStep(Mstar=1.0, OmegaEnv=1.0, OmegaCore=1.0, dAge=0.5)
-    with pytest.raises(Exception, match="OmegaEnv"):
+    with pytest.raises(Exception, match='OmegaEnv'):
         rotevo.EvolveRotationStep(Mstar=1.0, Age=1.0, OmegaCore=1.0, dAge=0.5)
-    with pytest.raises(Exception, match="OmegaCore"):
+    with pytest.raises(Exception, match='OmegaCore'):
         rotevo.EvolveRotationStep(Mstar=1.0, Age=1.0, OmegaEnv=1.0, dAge=0.5)
-    with pytest.raises(Exception, match="dAge"):
+    with pytest.raises(Exception, match='dAge'):
         rotevo.EvolveRotationStep(Mstar=1.0, Age=1.0, OmegaEnv=1.0, OmegaCore=1.0)
 
 
@@ -345,10 +345,16 @@ def test_evolverotationstep_invalid_method_raises(monkeypatch):
     monkeypatch.setattr(rotevo.phys, 'dOmegadt', const_rate(-1.0, -1.0))
     p = make_params()
     p['TimeIntegrationMethod'] = 'NotAMethod'
-    with pytest.raises(Exception, match="invalid value of TimeIntegrationMethod"):
+    with pytest.raises(Exception, match='invalid value of TimeIntegrationMethod'):
         rotevo.EvolveRotationStep(
-            Mstar=1.0, Age=100.0, OmegaEnv=10.0, OmegaCore=10.0,
-            dAge=0.5, dAgeMax=1.0, params=p, StarEvo=FakeStarEvo(),
+            Mstar=1.0,
+            Age=100.0,
+            OmegaEnv=10.0,
+            OmegaCore=10.0,
+            dAge=0.5,
+            dAgeMax=1.0,
+            params=p,
+            StarEvo=FakeStarEvo(),
         )
 
 
@@ -365,8 +371,13 @@ def test_forward_euler_step_matches_analytic_update(monkeypatch):
     p = make_params()
     p['TimeIntegrationMethod'] = 'ForwardEuler'
     dAge, dAgeNew, env, core = rotevo.EvolveRotationStep(
-        Mstar=1.0, Age=100.0, OmegaEnv=10.0, OmegaCore=10.0,
-        dAge=0.5, params=p, StarEvo=FakeStarEvo(),
+        Mstar=1.0,
+        Age=100.0,
+        OmegaEnv=10.0,
+        OmegaCore=10.0,
+        dAge=0.5,
+        params=p,
+        StarEvo=FakeStarEvo(),
     )
     assert_allclose(env, 9.0, rtol=1e-12)
     assert_allclose(core, 9.5, rtol=1e-12)
@@ -390,12 +401,22 @@ def test_forward_euler_faster_rotator_brakes_harder(monkeypatch):
     p = make_params()
     p['TimeIntegrationMethod'] = 'ForwardEuler'
     _, _, env_slow, _ = rotevo.EvolveRotationStep(
-        Mstar=1.0, Age=100.0, OmegaEnv=1.0, OmegaCore=1.0,
-        dAge=0.5, params=p, StarEvo=FakeStarEvo(),
+        Mstar=1.0,
+        Age=100.0,
+        OmegaEnv=1.0,
+        OmegaCore=1.0,
+        dAge=0.5,
+        params=p,
+        StarEvo=FakeStarEvo(),
     )
     _, _, env_fast, _ = rotevo.EvolveRotationStep(
-        Mstar=1.0, Age=100.0, OmegaEnv=5.0, OmegaCore=5.0,
-        dAge=0.5, params=p, StarEvo=FakeStarEvo(),
+        Mstar=1.0,
+        Age=100.0,
+        OmegaEnv=5.0,
+        OmegaCore=5.0,
+        dAge=0.5,
+        params=p,
+        StarEvo=FakeStarEvo(),
     )
     drop_slow = 1.0 - env_slow
     drop_fast = 5.0 - env_fast
@@ -417,8 +438,13 @@ def test_runge_kutta4_constant_rate_linear_update(monkeypatch):
     p = make_params()
     p['TimeIntegrationMethod'] = 'RungeKutta4'
     _, _, env, core = rotevo.EvolveRotationStep(
-        Mstar=1.0, Age=100.0, OmegaEnv=10.0, OmegaCore=10.0,
-        dAge=0.5, params=p, StarEvo=FakeStarEvo(),
+        Mstar=1.0,
+        Age=100.0,
+        OmegaEnv=10.0,
+        OmegaCore=10.0,
+        dAge=0.5,
+        params=p,
+        StarEvo=FakeStarEvo(),
     )
     assert_allclose(env, 9.0, rtol=1e-12)
     # Envelope and core share the rate here, so they track each other.
@@ -438,8 +464,14 @@ def test_runge_kutta_fehlberg_step_brakes_and_adapts(monkeypatch):
     p = make_params()
     p['TimeIntegrationMethod'] = 'RungeKuttaFehlberg'
     dAge, dAgeNew, env, core = rotevo.EvolveRotationStep(
-        Mstar=1.0, Age=100.0, OmegaEnv=10.0, OmegaCore=10.0,
-        dAge=0.5, dAgeMax=5.0, params=p, StarEvo=FakeStarEvo(),
+        Mstar=1.0,
+        Age=100.0,
+        OmegaEnv=10.0,
+        OmegaCore=10.0,
+        dAge=0.5,
+        dAgeMax=5.0,
+        params=p,
+        StarEvo=FakeStarEvo(),
     )
     # One step of a -1 rate over 0.5 Myr removes 0.5 from each rate.
     assert_allclose(env, 9.5, rtol=1e-9)
@@ -459,8 +491,14 @@ def test_rosenbrock_adaptive_step_brakes(monkeypatch):
     p = make_params()
     p['TimeIntegrationMethod'] = 'Rosenbrock'
     _, dAgeNew, env, core = rotevo.EvolveRotationStep(
-        Mstar=1.0, Age=100.0, OmegaEnv=10.0, OmegaCore=10.0,
-        dAge=0.5, dAgeMax=5.0, params=p, StarEvo=FakeStarEvo(),
+        Mstar=1.0,
+        Age=100.0,
+        OmegaEnv=10.0,
+        OmegaCore=10.0,
+        dAge=0.5,
+        dAgeMax=5.0,
+        params=p,
+        StarEvo=FakeStarEvo(),
     )
     # Rotation rate decreases under the braking torque.
     assert env < 10.0
@@ -480,8 +518,14 @@ def test_rosenbrock_fixed_step_uses_age_scaled_step(monkeypatch):
     p = make_params()
     p['TimeIntegrationMethod'] = 'RosenbrockFixed'
     dAge, _, env, _ = rotevo.EvolveRotationStep(
-        Mstar=1.0, Age=100.0, OmegaEnv=10.0, OmegaCore=10.0,
-        dAge=0.5, dAgeMax=50.0, params=p, StarEvo=FakeStarEvo(),
+        Mstar=1.0,
+        Age=100.0,
+        OmegaEnv=10.0,
+        OmegaCore=10.0,
+        dAge=0.5,
+        dAgeMax=50.0,
+        params=p,
+        StarEvo=FakeStarEvo(),
     )
     expected_step = 0.1 * 100.0**0.75
     assert_allclose(dAge, expected_step, rtol=1e-9)
@@ -500,7 +544,7 @@ def test_evolverotation_requires_mstar():
     Error contract: mass is mandatory and its absence raises before any track
     is created.
     """
-    with pytest.raises(Exception, match="Mstar"):
+    with pytest.raises(Exception, match='Mstar'):
         rotevo.EvolveRotation(Omega0=1.0)
 
 
@@ -510,9 +554,9 @@ def test_evolverotation_rejects_inconsistent_rotation_arguments():
     Error contract: omitting all three rotation inputs, or setting both the
     lumped ``Omega0`` and a split envelope rate, are each rejected.
     """
-    with pytest.raises(Exception, match="OmegaEnv0 and OmegaCore0"):
+    with pytest.raises(Exception, match='OmegaEnv0 and OmegaCore0'):
         rotevo.EvolveRotation(Mstar=1.0)
-    with pytest.raises(Exception, match="neither OmegaEnv0 nor OmegaCore0"):
+    with pytest.raises(Exception, match='neither OmegaEnv0 nor OmegaCore0'):
         rotevo.EvolveRotation(Mstar=1.0, Omega0=1.0, OmegaEnv0=1.0)
 
 
@@ -528,8 +572,12 @@ def test_evolverotation_spins_down_monotonically(monkeypatch):
     p = make_params()
     p['TimeIntegrationMethod'] = 'ForwardEuler'
     tracks = rotevo.EvolveRotation(
-        Mstar=1.0, Omega0=10.0, AgeMin=1.0, AgeMax=11.0,
-        params=p, StarEvo=FakeStarEvo(),
+        Mstar=1.0,
+        Omega0=10.0,
+        AgeMin=1.0,
+        AgeMax=11.0,
+        params=p,
+        StarEvo=FakeStarEvo(),
     )
     omega = tracks['OmegaEnv']
     # More than the initial sample is recorded.
@@ -553,10 +601,20 @@ def test_evolverotation_faster_start_ends_faster(monkeypatch):
     p = make_params()
     p['TimeIntegrationMethod'] = 'ForwardEuler'
     slow = rotevo.EvolveRotation(
-        Mstar=1.0, Omega0=2.0, AgeMin=1.0, AgeMax=11.0, params=p, StarEvo=FakeStarEvo(),
+        Mstar=1.0,
+        Omega0=2.0,
+        AgeMin=1.0,
+        AgeMax=11.0,
+        params=p,
+        StarEvo=FakeStarEvo(),
     )
     fast = rotevo.EvolveRotation(
-        Mstar=1.0, Omega0=20.0, AgeMin=1.0, AgeMax=11.0, params=p, StarEvo=FakeStarEvo(),
+        Mstar=1.0,
+        Omega0=20.0,
+        AgeMin=1.0,
+        AgeMax=11.0,
+        params=p,
+        StarEvo=FakeStarEvo(),
     )
     assert fast['OmegaEnv'][-1] > slow['OmegaEnv'][-1]
     # Both have braked from their starting rates.
@@ -574,8 +632,13 @@ def test_evolverotation_split_core_envelope_start(monkeypatch):
     p = make_params()
     p['TimeIntegrationMethod'] = 'ForwardEuler'
     tracks = rotevo.EvolveRotation(
-        Mstar=1.0, OmegaEnv0=8.0, OmegaCore0=12.0, AgeMin=1.0, AgeMax=4.0,
-        params=p, StarEvo=FakeStarEvo(),
+        Mstar=1.0,
+        OmegaEnv0=8.0,
+        OmegaCore0=12.0,
+        AgeMin=1.0,
+        AgeMax=4.0,
+        params=p,
+        StarEvo=FakeStarEvo(),
     )
     assert_allclose(tracks['OmegaEnv'][0], 8.0, rtol=1e-12)
     assert_allclose(tracks['OmegaCore'][0], 12.0, rtol=1e-12)
@@ -593,8 +656,12 @@ def test_evolverotation_default_rosenbrock_fixed(monkeypatch):
     monkeypatch.setattr(rotevo.phys, 'dOmegadt', const_rate(-1.0e-3, -1.0e-3))
     p = make_params()
     tracks = rotevo.EvolveRotation(
-        Mstar=1.0, Omega0=10.0, AgeMin=1.0, AgeMax=30.0,
-        params=p, StarEvo=FakeStarEvo(),
+        Mstar=1.0,
+        Omega0=10.0,
+        AgeMin=1.0,
+        AgeMax=30.0,
+        params=p,
+        StarEvo=FakeStarEvo(),
     )
     assert tracks['nAge'] > 1
     # Braking lowers the final rate below the start.
@@ -612,8 +679,12 @@ def test_evolverotation_output_age_array_filters_below_agemin(monkeypatch):
     p = make_params()
     p['TimeIntegrationMethod'] = 'ForwardEuler'
     tracks = rotevo.EvolveRotation(
-        Mstar=1.0, Omega0=10.0, AgeMin=1.0, AgesOut=np.array([0.5, 6.0, 10.0]),
-        params=p, StarEvo=FakeStarEvo(),
+        Mstar=1.0,
+        Omega0=10.0,
+        AgeMin=1.0,
+        AgesOut=np.array([0.5, 6.0, 10.0]),
+        params=p,
+        StarEvo=FakeStarEvo(),
     )
     # Integration ends at the last requested output age.
     assert_allclose(tracks['Age'][-1], 10.0, atol=0.5)
@@ -634,8 +705,12 @@ def test_evolverotation_scalar_output_age(monkeypatch):
     p = make_params()
     p['TimeIntegrationMethod'] = 'ForwardEuler'
     tracks = rotevo.EvolveRotation(
-        Mstar=1.0, Omega0=10.0, AgeMin=1.0, AgesOut=8.0,
-        params=p, StarEvo=FakeStarEvo(),
+        Mstar=1.0,
+        Omega0=10.0,
+        AgeMin=1.0,
+        AgesOut=8.0,
+        params=p,
+        StarEvo=FakeStarEvo(),
     )
     assert_allclose(tracks['Age'][-1], 8.0, atol=0.5)
     assert tracks['OmegaEnv'][-1] < 10.0
@@ -651,10 +726,14 @@ def test_evolverotation_step_ceiling_raises(monkeypatch):
     p = make_params()
     p['TimeIntegrationMethod'] = 'ForwardEuler'
     p['nStepMax'] = 2
-    with pytest.raises(Exception, match="too many timesteps"):
+    with pytest.raises(Exception, match='too many timesteps'):
         rotevo.EvolveRotation(
-            Mstar=1.0, Omega0=10.0, AgeMin=1.0, AgeMax=1000.0,
-            params=p, StarEvo=FakeStarEvo(),
+            Mstar=1.0,
+            Omega0=10.0,
+            AgeMin=1.0,
+            AgeMax=1000.0,
+            params=p,
+            StarEvo=FakeStarEvo(),
         )
 
 
@@ -667,8 +746,9 @@ def test_evolverotation_extended_tracks(monkeypatch):
     """
     monkeypatch.setattr(rotevo.phys, 'dOmegadt', const_rate(-1.0e-3, -1.0e-3))
 
-    def fake_extended(Mstar=None, Age=None, OmegaEnv=None, OmegaCore=None,
-                      params=None, StarEvo=None):
+    def fake_extended(
+        Mstar=None, Age=None, OmegaEnv=None, OmegaCore=None, params=None, StarEvo=None
+    ):
         # Include a core rotation-rate key so the appender exercises its
         # skip-if-already-present branch as well as the new-quantity branch.
         return {'OmegaEnv': OmegaEnv, 'Rstar': 0.95, 'Lx': 1.0e27}
@@ -678,8 +758,12 @@ def test_evolverotation_extended_tracks(monkeypatch):
     p['TimeIntegrationMethod'] = 'ForwardEuler'
     p['ExtendedTracks'] = True
     tracks = rotevo.EvolveRotation(
-        Mstar=1.0, Omega0=10.0, AgeMin=1.0, AgeMax=4.0,
-        params=p, StarEvo=FakeStarEvo(),
+        Mstar=1.0,
+        Omega0=10.0,
+        AgeMin=1.0,
+        AgeMax=4.0,
+        params=p,
+        StarEvo=FakeStarEvo(),
     )
     # The auxiliary quantities are carried alongside the rotation tracks.
     assert 'Rstar' in tracks
@@ -698,17 +782,18 @@ def test_fitrotation_requires_mstar_and_omega():
     Error contract: neither stellar mass nor the target rotation rate may be
     omitted.
     """
-    with pytest.raises(Exception, match="Mstar"):
+    with pytest.raises(Exception, match='Mstar'):
         rotevo.FitRotation(Omega=1.0)
-    with pytest.raises(Exception, match="Omega"):
+    with pytest.raises(Exception, match='Omega'):
         rotevo.FitRotation(Mstar=1.0)
 
 
 def _patch_linear_fit(monkeypatch):
     """Replace EvolveRotation with a monotone map: final rate is half of Omega0."""
 
-    def fake_evolve(Mstar=None, Omega0=None, AgeMin=None, AgeMax=None,
-                    params=None, StarEvo=None):
+    def fake_evolve(
+        Mstar=None, Omega0=None, AgeMin=None, AgeMax=None, params=None, StarEvo=None
+    ):
         return {'OmegaEnv': np.array([Omega0, 0.5 * Omega0])}
 
     monkeypatch.setattr(rotevo, 'EvolveRotation', fake_evolve)
@@ -725,7 +810,12 @@ def test_fitrotation_recovers_initial_rate(monkeypatch):
     p = make_params()
     # Pass an explicit start age so the caller-supplied-AgeMin branch is taken.
     omega0 = rotevo.FitRotation(
-        Mstar=1.0, Age=1000.0, Omega=5.0, AgeMin=1.0, params=p, StarEvo=FakeStarEvo(),
+        Mstar=1.0,
+        Age=1000.0,
+        Omega=5.0,
+        AgeMin=1.0,
+        params=p,
+        StarEvo=FakeStarEvo(),
     )
     assert_allclose(omega0, 10.0, rtol=1e-3)
     # The recovered initial rate is well above the target it maps down to, so a
@@ -742,8 +832,7 @@ def test_fitrotation_converges_on_bracket_collapse(monkeypatch):
     collapse point rather than a no-solution sentinel.
     """
 
-    def fake_gap(Mstar=None, Omega0=None, AgeMin=None, AgeMax=None,
-                 params=None, StarEvo=None):
+    def fake_gap(Mstar=None, Omega0=None, AgeMin=None, AgeMax=None, params=None, StarEvo=None):
         # Lower branch reaches finals up to ~5; upper branch starts at ~10,
         # leaving the interval (5, 10) unreachable.
         final = 0.5 * Omega0 if Omega0 < 10.0 else 0.5 * Omega0 + 5.0
@@ -752,7 +841,11 @@ def test_fitrotation_converges_on_bracket_collapse(monkeypatch):
     monkeypatch.setattr(rotevo, 'EvolveRotation', fake_gap)
     p = make_params()
     result = rotevo.FitRotation(
-        Mstar=1.0, Age=1000.0, Omega=7.0, params=p, StarEvo=FakeStarEvo(),
+        Mstar=1.0,
+        Age=1000.0,
+        Omega=7.0,
+        params=p,
+        StarEvo=FakeStarEvo(),
     )
     # A real (non-sentinel) initial rate is returned at the discontinuity near 10.
     assert result > 0.0
@@ -768,7 +861,11 @@ def test_fitrotation_below_range_returns_minus_one(monkeypatch):
     _patch_linear_fit(monkeypatch)
     p = make_params()
     result = rotevo.FitRotation(
-        Mstar=1.0, Age=1000.0, Omega=0.01, params=p, StarEvo=FakeStarEvo(),
+        Mstar=1.0,
+        Age=1000.0,
+        Omega=0.01,
+        params=p,
+        StarEvo=FakeStarEvo(),
     )
     assert result == -1
     assert result < 0
@@ -782,7 +879,11 @@ def test_fitrotation_above_range_returns_minus_two(monkeypatch):
     _patch_linear_fit(monkeypatch)
     p = make_params()
     result = rotevo.FitRotation(
-        Mstar=1.0, Age=1000.0, Omega=100.0, params=p, StarEvo=FakeStarEvo(),
+        Mstar=1.0,
+        Age=1000.0,
+        Omega=100.0,
+        params=p,
+        StarEvo=FakeStarEvo(),
     )
     assert result == -2
     # Distinct from the below-range sentinel, so the two failure modes are separable.
@@ -799,7 +900,11 @@ def test_fitrotation_no_convergence_returns_minus_three(monkeypatch):
     p = make_params()
     p['nStepMaxFit'] = 0
     result = rotevo.FitRotation(
-        Mstar=1.0, Age=1000.0, Omega=5.0, params=p, StarEvo=FakeStarEvo(),
+        Mstar=1.0,
+        Age=1000.0,
+        Omega=5.0,
+        params=p,
+        StarEvo=FakeStarEvo(),
     )
     assert result == -3
     assert result < 0
@@ -822,7 +927,12 @@ def test_evolverotationstep_builds_default_starevo(monkeypatch):
     p = make_params()
     p['TimeIntegrationMethod'] = 'ForwardEuler'
     _, _, env, core = rotevo.EvolveRotationStep(
-        Mstar=1.0, Age=100.0, OmegaEnv=10.0, OmegaCore=10.0, dAge=0.5, params=p,
+        Mstar=1.0,
+        Age=100.0,
+        OmegaEnv=10.0,
+        OmegaCore=10.0,
+        dAge=0.5,
+        params=p,
     )
     assert_allclose(env, 9.0, rtol=1e-12)
     assert core < 10.0
@@ -872,8 +982,14 @@ def test_runge_kutta_fehlberg_nonzero_error_controls_step(monkeypatch):
     p = make_params()
     p['TimeIntegrationMethod'] = 'RungeKuttaFehlberg'
     _, dAgeNew, env, core = rotevo.EvolveRotationStep(
-        Mstar=1.0, Age=100.0, OmegaEnv=10.0, OmegaCore=10.0,
-        dAge=0.5, dAgeMax=5.0, params=p, StarEvo=FakeStarEvo(),
+        Mstar=1.0,
+        Age=100.0,
+        OmegaEnv=10.0,
+        OmegaCore=10.0,
+        dAge=0.5,
+        dAgeMax=5.0,
+        params=p,
+        StarEvo=FakeStarEvo(),
     )
     assert env < 10.0
     assert core < 10.0
@@ -891,8 +1007,14 @@ def test_rosenbrock_nonzero_error_controls_step(monkeypatch):
     p = make_params()
     p['TimeIntegrationMethod'] = 'Rosenbrock'
     _, dAgeNew, env, core = rotevo.EvolveRotationStep(
-        Mstar=1.0, Age=100.0, OmegaEnv=10.0, OmegaCore=10.0,
-        dAge=0.5, dAgeMax=5.0, params=p, StarEvo=FakeStarEvo(),
+        Mstar=1.0,
+        Age=100.0,
+        OmegaEnv=10.0,
+        OmegaCore=10.0,
+        dAge=0.5,
+        dAgeMax=5.0,
+        params=p,
+        StarEvo=FakeStarEvo(),
     )
     assert env < 10.0
     assert core < 10.0
@@ -910,8 +1032,14 @@ def test_rosenbrock_zero_torque_conserves_rotation(monkeypatch):
     p = make_params()
     p['TimeIntegrationMethod'] = 'Rosenbrock'
     _, dAgeNew, env, core = rotevo.EvolveRotationStep(
-        Mstar=1.0, Age=100.0, OmegaEnv=10.0, OmegaCore=7.0,
-        dAge=0.5, dAgeMax=5.0, params=p, StarEvo=FakeStarEvo(),
+        Mstar=1.0,
+        Age=100.0,
+        OmegaEnv=10.0,
+        OmegaCore=7.0,
+        dAge=0.5,
+        dAgeMax=5.0,
+        params=p,
+        StarEvo=FakeStarEvo(),
     )
     # No torque, no change: angular velocity is conserved for both reservoirs.
     assert_allclose(env, 10.0, rtol=1e-10)

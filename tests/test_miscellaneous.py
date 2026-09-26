@@ -258,17 +258,13 @@ def test_integrate_emission_zero_width_interval_is_zero():
     """Integrating over a degenerate interval pinned to a single node yields zero energy."""
     Age = np.array([0.0, 1.0, 2.0, 3.0, 4.0])
     Luminosity = np.full_like(Age, 5.0e27)
-    energy = misc.IntegrateEmission(
-        AgeMin=2.0, AgeMax=2.0, Age=Age, Luminosity=Luminosity
-    )
+    energy = misc.IntegrateEmission(AgeMin=2.0, AgeMax=2.0, Age=Age, Luminosity=Luminosity)
     assert energy == pytest.approx(0.0, abs=1e-6)
     # A zero-width window cannot accumulate a positive energy.
     assert energy < 1.0
     # A finite window over the same track does accumulate energy, confirming the
     # zero result is the interval, not a broken integrand.
-    finite = misc.IntegrateEmission(
-        AgeMin=1.0, AgeMax=3.0, Age=Age, Luminosity=Luminosity
-    )
+    finite = misc.IntegrateEmission(AgeMin=1.0, AgeMax=3.0, Age=Age, Luminosity=Luminosity)
     assert finite > 0.0
 
 
@@ -285,9 +281,7 @@ def test_integrate_emission_missing_and_out_of_range_raise():
     with pytest.raises(Exception, match='Luminosity not set'):
         misc.IntegrateEmission(AgeMin=0.0, AgeMax=2.0, Age=Age)
     with pytest.raises(Exception, match='different lengths'):
-        misc.IntegrateEmission(
-            AgeMin=0.0, AgeMax=2.0, Age=Age, Luminosity=np.array([1.0, 1.0])
-        )
+        misc.IntegrateEmission(AgeMin=0.0, AgeMax=2.0, Age=Age, Luminosity=np.array([1.0, 1.0]))
     with pytest.raises(Exception, match='AgeMin not in range'):
         misc.IntegrateEmission(AgeMin=-1.0, AgeMax=2.0, Age=Age, Luminosity=Lum)
     with pytest.raises(Exception, match='AgeMax not in range'):

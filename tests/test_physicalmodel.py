@@ -373,12 +373,24 @@ class TestScatter:
         np.random.seed(42)
         params = _default_params()
         avg = {
-            'Lxuv': 3.0e29, 'Lx': 1.0e29, 'Leuv': 2.0e29, 'Leuv1': 1.2e29,
-            'Leuv2': 0.8e29, 'Lly': 5.0e28,
-            'Fxuv': 3.0e5, 'Fx': 1.0e5, 'Feuv': 2.0e5, 'Feuv1': 1.2e5,
-            'Feuv2': 0.8e5, 'Fly': 5.0e4,
-            'Rxuv': 3.0e-4, 'Rx': 1.0e-4, 'Reuv': 2.0e-4, 'Reuv1': 1.2e-4,
-            'Reuv2': 0.8e-4, 'Rly': 5.0e-5,
+            'Lxuv': 3.0e29,
+            'Lx': 1.0e29,
+            'Leuv': 2.0e29,
+            'Leuv1': 1.2e29,
+            'Leuv2': 0.8e29,
+            'Lly': 5.0e28,
+            'Fxuv': 3.0e5,
+            'Fx': 1.0e5,
+            'Feuv': 2.0e5,
+            'Feuv1': 1.2e5,
+            'Feuv2': 0.8e5,
+            'Fly': 5.0e4,
+            'Rxuv': 3.0e-4,
+            'Rx': 1.0e-4,
+            'Reuv': 2.0e-4,
+            'Reuv1': 1.2e-4,
+            'Reuv2': 0.8e-4,
+            'Rly': 5.0e-5,
         }
         delta = pm.XUVScatter(avg, params=params)
         # Reconstruct the scattered composite and its parts.
@@ -402,7 +414,11 @@ class TestTorques:
         scales with the multiplicative Kwind constant.
         """
         state = {
-            'Bdip': 2.0, 'Mdot': 1.0e12, 'Rstar': 1.0, 'OmegaEnv': 5.0, 'vEsc': 6.0e7,
+            'Bdip': 2.0,
+            'Mdot': 1.0e12,
+            'Rstar': 1.0,
+            'OmegaEnv': 5.0,
+            'vEsc': 6.0e7,
         }
         params = _default_params()
         torque = pm._torqueWind(state, params=params)
@@ -423,7 +439,10 @@ class TestTorques:
         envelope the envelope is spun up (positive envelope torque).
         """
         state = {
-            'Icore': 1.0e53, 'Ienv': 5.0e53, 'OmegaCore': 3.0, 'OmegaEnv': 1.0,
+            'Icore': 1.0e53,
+            'Ienv': 5.0e53,
+            'OmegaCore': 3.0,
+            'OmegaEnv': 1.0,
             'Mstar': 1.0,
         }
         params = _default_params()
@@ -440,7 +459,10 @@ class TestTorques:
         reduces the magnitude of the transferred torque.
         """
         state = {
-            'Icore': 1.0e53, 'Ienv': 5.0e53, 'OmegaCore': 3.0, 'OmegaEnv': 1.0,
+            'Icore': 1.0e53,
+            'Ienv': 5.0e53,
+            'OmegaCore': 3.0,
+            'OmegaEnv': 1.0,
             'Mstar': 1.0,
         }
         params_small = _default_params()
@@ -462,8 +484,11 @@ class TestTorques:
         zero.
         """
         state = {
-            'dIenvdt': -5.0e39, 'dIcoredt': 5.0e39, 'dItotaldt': 1.0e40,
-            'OmegaEnv': 1.0, 'OmegaCore': 2.0,
+            'dIenvdt': -5.0e39,
+            'dIcoredt': 5.0e39,
+            'dItotaldt': 1.0e40,
+            'OmegaEnv': 1.0,
+            'OmegaCore': 2.0,
         }
         env_dec, core_dec = pm._torqueMoment(state, True)
         env_cpl, core_cpl = pm._torqueMoment(state, False)
@@ -487,8 +512,11 @@ class TestTorques:
         """Beyond the disk-locking age the disk-locking torque vanishes."""
         params = _default_params()
         state = {
-            'OmegaEnv': 1.0, 'Age': 1000.0,  # Myr, well past the locking age
-            'torqueEnvWind': -1.0e30, 'torqueEnvCE': 0.0, 'torqueEnvCG': 0.0,
+            'OmegaEnv': 1.0,
+            'Age': 1000.0,  # Myr, well past the locking age
+            'torqueEnvWind': -1.0e30,
+            'torqueEnvCE': 0.0,
+            'torqueEnvCG': 0.0,
             'torqueEnvMom': 0.0,
         }
         torque = pm._torqueDiskLocking(state, True, params=params)
@@ -503,16 +531,26 @@ class TestTorques:
         """When core and envelope are coupled the disk balances fewer torque terms."""
         params = _default_params()
         state = {
-            'OmegaEnv': 1.0, 'Age': 1.0,  # Myr, within the locking age
-            'torqueEnvWind': -1.0e30, 'torqueEnvCE': -2.0e30, 'torqueEnvCG': -3.0e30,
+            'OmegaEnv': 1.0,
+            'Age': 1.0,  # Myr, within the locking age
+            'torqueEnvWind': -1.0e30,
+            'torqueEnvCE': -2.0e30,
+            'torqueEnvCG': -3.0e30,
             'torqueEnvMom': -4.0e29,
         }
         decoupled = pm._torqueDiskLocking(state, True, params=params)
         coupled = pm._torqueDiskLocking(state, False, params=params)
         # The decoupled balance includes the core-envelope and core-growth terms.
-        assert_allclose(decoupled,
-                        -(state['torqueEnvWind'] + state['torqueEnvCE']
-                          + state['torqueEnvCG'] + state['torqueEnvMom']), rtol=1e-12)
+        assert_allclose(
+            decoupled,
+            -(
+                state['torqueEnvWind']
+                + state['torqueEnvCE']
+                + state['torqueEnvCG']
+                + state['torqueEnvMom']
+            ),
+            rtol=1e-12,
+        )
         # The coupled balance omits them, giving a different value.
         assert abs(coupled - decoupled) > 0.0
 
@@ -566,7 +604,9 @@ class TestWindHelpers:
         # Choose a rotation rate well above the breakup threshold fraction.
         omega_break = pm.OmegaBreak(1.0, 1.0)
         state = {
-            'Ro': 0.1 * params_on['RoSatMdot'], 'Rstar': 1.0, 'Mstar': 1.0,
+            'Ro': 0.1 * params_on['RoSatMdot'],
+            'Rstar': 1.0,
+            'Mstar': 1.0,
             'OmegaEnv': 0.5 * omega_break,
         }
         Mdot_on = pm._Mdot(dict(state), params=params_on)
@@ -666,8 +706,9 @@ class TestRotationQuantities:
         core derivative comes from the core torque over the core inertia. Radius,
         Rossby number, and moments of inertia are all positive.
         """
-        state = pm.RotationQuantities(Mstar=1.0, Age=100.0, OmegaEnv=1.0,
-                                      OmegaCore=1.0, StarEvo=FakeStarEvo())
+        state = pm.RotationQuantities(
+            Mstar=1.0, Age=100.0, OmegaEnv=1.0, OmegaCore=1.0, StarEvo=FakeStarEvo()
+        )
         assert state['Rstar'] > 0.0 and state['Ro'] > 0.0
         assert state['Ienv'] > 0.0
         # The envelope derivative is the total envelope torque over the envelope inertia.
@@ -682,8 +723,14 @@ class TestRotationQuantities:
         """
         params = _default_params()
         params['CoreEnvelopeDecoupling'] = False
-        state = pm.RotationQuantities(Mstar=1.0, Age=5.0, OmegaEnv=1.0, OmegaCore=1.0,
-                                      params=params, StarEvo=FakeStarEvo())
+        state = pm.RotationQuantities(
+            Mstar=1.0,
+            Age=5.0,
+            OmegaEnv=1.0,
+            OmegaCore=1.0,
+            params=params,
+            StarEvo=FakeStarEvo(),
+        )
         assert_allclose(state['torqueCore'], 0.0, atol=1e-30)
         # Core and envelope rotation rates change together when coupled.
         assert_allclose(state['dOmegaCoredt'], state['dOmegaEnvdt'], rtol=1e-12)
@@ -694,8 +741,14 @@ class TestRotationQuantities:
         params['MomentInertiaChangeTorque'] = False
         params['WindTorque'] = False
         params['DiskLocking'] = False
-        state = pm.RotationQuantities(Mstar=1.0, Age=100.0, OmegaEnv=1.0, OmegaCore=1.0,
-                                      params=params, StarEvo=FakeStarEvo())
+        state = pm.RotationQuantities(
+            Mstar=1.0,
+            Age=100.0,
+            OmegaEnv=1.0,
+            OmegaCore=1.0,
+            params=params,
+            StarEvo=FakeStarEvo(),
+        )
         # The disabled contributions are exactly zero.
         assert_allclose(state['torqueEnvMom'], 0.0, atol=1e-30)
         assert_allclose(state['torqueEnvWind'], 0.0, atol=1e-30)
@@ -704,17 +757,21 @@ class TestRotationQuantities:
     def test_rotation_quantities_rejects_missing_arguments(self):
         """Every required rotation argument is validated before any computation."""
         with pytest.raises(Exception, match='Mstar'):
-            pm.RotationQuantities(Mstar=None, Age=1.0, OmegaEnv=1.0, OmegaCore=1.0,
-                                  StarEvo=FakeStarEvo())
+            pm.RotationQuantities(
+                Mstar=None, Age=1.0, OmegaEnv=1.0, OmegaCore=1.0, StarEvo=FakeStarEvo()
+            )
         with pytest.raises(Exception, match='Age'):
-            pm.RotationQuantities(Mstar=1.0, Age=None, OmegaEnv=1.0, OmegaCore=1.0,
-                                  StarEvo=FakeStarEvo())
+            pm.RotationQuantities(
+                Mstar=1.0, Age=None, OmegaEnv=1.0, OmegaCore=1.0, StarEvo=FakeStarEvo()
+            )
         with pytest.raises(Exception, match='OmegaEnv'):
-            pm.RotationQuantities(Mstar=1.0, Age=1.0, OmegaEnv=None, OmegaCore=1.0,
-                                  StarEvo=FakeStarEvo())
+            pm.RotationQuantities(
+                Mstar=1.0, Age=1.0, OmegaEnv=None, OmegaCore=1.0, StarEvo=FakeStarEvo()
+            )
         with pytest.raises(Exception, match='OmegaCore'):
-            pm.RotationQuantities(Mstar=1.0, Age=1.0, OmegaEnv=1.0, OmegaCore=None,
-                                  StarEvo=FakeStarEvo())
+            pm.RotationQuantities(
+                Mstar=1.0, Age=1.0, OmegaEnv=1.0, OmegaCore=None, StarEvo=FakeStarEvo()
+            )
 
     def test_rotation_quantities_loads_default_starevo_when_absent(self, monkeypatch):
         """Omitting the track model constructs the default one before the computation."""
@@ -722,8 +779,9 @@ class TestRotationQuantities:
         state = pm.RotationQuantities(Mstar=1.0, Age=100.0, OmegaEnv=1.0, OmegaCore=1.0)
         assert state['Rstar'] > 0.0
         # The default-model run reproduces the explicit-model run.
-        explicit = pm.RotationQuantities(Mstar=1.0, Age=100.0, OmegaEnv=1.0, OmegaCore=1.0,
-                                         StarEvo=FakeStarEvo())
+        explicit = pm.RotationQuantities(
+            Mstar=1.0, Age=100.0, OmegaEnv=1.0, OmegaCore=1.0, StarEvo=FakeStarEvo()
+        )
         assert_allclose(state['dOmegaEnvdt'], explicit['dOmegaEnvdt'], rtol=1e-12)
 
     def test_domegadt_returns_envelope_and_core_rates(self, monkeypatch):
@@ -735,10 +793,12 @@ class TestRotationQuantities:
         monkeypatch.setattr('mors.stellarevo.StarEvo', FakeStarEvo)
         d_env, d_core = pm.dOmegadt(Mstar=1.0, Age=100.0, OmegaEnv=1.0, OmegaCore=1.0)
         # A supplied track model gives the same derivatives as the default one.
-        d_env2, d_core2 = pm.dOmegadt(Mstar=1.0, Age=100.0, OmegaEnv=1.0, OmegaCore=1.0,
-                                      StarEvo=FakeStarEvo())
-        full = pm.RotationQuantities(Mstar=1.0, Age=100.0, OmegaEnv=1.0, OmegaCore=1.0,
-                                     StarEvo=FakeStarEvo())
+        d_env2, d_core2 = pm.dOmegadt(
+            Mstar=1.0, Age=100.0, OmegaEnv=1.0, OmegaCore=1.0, StarEvo=FakeStarEvo()
+        )
+        full = pm.RotationQuantities(
+            Mstar=1.0, Age=100.0, OmegaEnv=1.0, OmegaCore=1.0, StarEvo=FakeStarEvo()
+        )
         assert np.isfinite(d_env) and np.isfinite(d_core)
         assert_allclose(d_env, full['dOmegaEnvdt'], rtol=1e-12)
         assert_allclose(d_env2, d_env, rtol=1e-12)
@@ -746,17 +806,13 @@ class TestRotationQuantities:
     def test_domegadt_rejects_missing_arguments(self):
         """The derivative wrapper validates each rotation argument."""
         with pytest.raises(Exception, match='Mstar'):
-            pm.dOmegadt(Mstar=None, Age=1.0, OmegaEnv=1.0, OmegaCore=1.0,
-                        StarEvo=FakeStarEvo())
+            pm.dOmegadt(Mstar=None, Age=1.0, OmegaEnv=1.0, OmegaCore=1.0, StarEvo=FakeStarEvo())
         with pytest.raises(Exception, match='Age'):
-            pm.dOmegadt(Mstar=1.0, Age=None, OmegaEnv=1.0, OmegaCore=1.0,
-                        StarEvo=FakeStarEvo())
+            pm.dOmegadt(Mstar=1.0, Age=None, OmegaEnv=1.0, OmegaCore=1.0, StarEvo=FakeStarEvo())
         with pytest.raises(Exception, match='OmegaEnv'):
-            pm.dOmegadt(Mstar=1.0, Age=1.0, OmegaEnv=None, OmegaCore=1.0,
-                        StarEvo=FakeStarEvo())
+            pm.dOmegadt(Mstar=1.0, Age=1.0, OmegaEnv=None, OmegaCore=1.0, StarEvo=FakeStarEvo())
         with pytest.raises(Exception, match='OmegaCore'):
-            pm.dOmegadt(Mstar=1.0, Age=1.0, OmegaEnv=1.0, OmegaCore=None,
-                        StarEvo=FakeStarEvo())
+            pm.dOmegadt(Mstar=1.0, Age=1.0, OmegaEnv=1.0, OmegaCore=None, StarEvo=FakeStarEvo())
 
 
 class TestExtendedQuantitiesAndUnits:
@@ -806,11 +862,11 @@ class TestExtendedQuantitiesAndUnits:
         monkeypatch.setattr('mors.stellarevo.Lbol', lambda M, A: 1.0)
         monkeypatch.setattr('mors.stellarevo.Teff', lambda M, A: 5700.0)
         star_evo = FakeStarEvo()
-        base = pm.RotationQuantities(Mstar=1.0, Age=100.0, OmegaEnv=1.0, OmegaCore=1.0,
-                                     StarEvo=star_evo)
+        base = pm.RotationQuantities(
+            Mstar=1.0, Age=100.0, OmegaEnv=1.0, OmegaCore=1.0, StarEvo=star_evo
+        )
         rossby_before = base['Ro']
-        extended = pm.ExtendedQuantities(StarState=base, Mstar=1.0, Age=100.0,
-                                         StarEvo=star_evo)
+        extended = pm.ExtendedQuantities(StarState=base, Mstar=1.0, Age=100.0, StarEvo=star_evo)
         # Emission quantities were appended, rotation entries preserved.
         assert extended['Lx'] > 0.0 and extended['Leuv'] > 0.0
         assert_allclose(extended['Ro'], rossby_before, rtol=1e-12)
@@ -840,11 +896,19 @@ class TestSaturationThresholds:
         """The saturation period uses the band-specific Rossby number and rejects an unknown band."""
         params = _default_params()
         star_evo = FakeStarEvo()
-        prot_xuv = pm.ProtSat(Mstar=1.0, Age=100.0, param='XUV', params=params, StarEvo=star_evo)
-        prot_bdip = pm.ProtSat(Mstar=1.0, Age=100.0, param='Bdip', params=params, StarEvo=star_evo)
-        prot_mdot = pm.ProtSat(Mstar=1.0, Age=100.0, param='Mdot', params=params, StarEvo=star_evo)
+        prot_xuv = pm.ProtSat(
+            Mstar=1.0, Age=100.0, param='XUV', params=params, StarEvo=star_evo
+        )
+        prot_bdip = pm.ProtSat(
+            Mstar=1.0, Age=100.0, param='Bdip', params=params, StarEvo=star_evo
+        )
+        prot_mdot = pm.ProtSat(
+            Mstar=1.0, Age=100.0, param='Mdot', params=params, StarEvo=star_evo
+        )
         # The saturation period is the saturation Rossby number times the turnover time.
-        assert_allclose(prot_xuv, params['RoSatXray'] * star_evo.tauConv(1.0, 100.0), rtol=1e-12)
+        assert_allclose(
+            prot_xuv, params['RoSatXray'] * star_evo.tauConv(1.0, 100.0), rtol=1e-12
+        )
         assert prot_bdip > 0.0 and prot_mdot > 0.0
         with pytest.raises(Exception, match='invalid value of param'):
             pm.ProtSat(Mstar=1.0, Age=100.0, param='nonsense', params=params, StarEvo=star_evo)
@@ -855,8 +919,9 @@ class TestSaturationThresholds:
         monkeypatch.setattr('mors.stellarevo.StarEvo', FakeStarEvo)
         params = _default_params()
         omega = pm.OmegaSat(Mstar=1.0, Age=100.0, param='XUV', params=params)
-        prot = pm.ProtSat(Mstar=1.0, Age=100.0, param='XUV', params=params,
-                          StarEvo=FakeStarEvo())
+        prot = pm.ProtSat(
+            Mstar=1.0, Age=100.0, param='XUV', params=params, StarEvo=FakeStarEvo()
+        )
         assert omega > 0.0
         # OmegaSat is the angular velocity corresponding to the saturation period.
         assert_allclose(omega, pm._Omega(prot), rtol=1e-12)
@@ -911,16 +976,26 @@ class TestHabitableZone:
         hz = pm.aOrbHZ(Mstar=0.5, Age=1000.0)
         # Kopparapu runaway-greenhouse coefficients at Tstar = -1780 K.
         tstar = 4000.0 - 5780.0
-        seff = (1.0385 + 1.2456e-4 * tstar + 1.4612e-8 * tstar**2
-                - 7.6345e-12 * tstar**3 - 1.7511e-15 * tstar**4)
+        seff = (
+            1.0385
+            + 1.2456e-4 * tstar
+            + 1.4612e-8 * tstar**2
+            - 7.6345e-12 * tstar**3
+            - 1.7511e-15 * tstar**4
+        )
         expected = (0.1 / seff) ** 0.5
         assert_allclose(hz['RunawayGreenhouse'], expected, rtol=1e-9)
         # Discrimination guard: a linear cubic term (c*Tstar instead of
         # c*Tstar**3) shifts the boundary by more than two percent at this
         # temperature, so an exponent slip fails here even though it is invisible
         # at the solar anchor where Tstar is zero.
-        seff_linear = (1.0385 + 1.2456e-4 * tstar + 1.4612e-8 * tstar**2
-                       - 7.6345e-12 * tstar * 3.0 - 1.7511e-15 * tstar**4)
+        seff_linear = (
+            1.0385
+            + 1.2456e-4 * tstar
+            + 1.4612e-8 * tstar**2
+            - 7.6345e-12 * tstar * 3.0
+            - 1.7511e-15 * tstar**4
+        )
         wrong = (0.1 / seff_linear) ** 0.5
         assert abs(hz['RunawayGreenhouse'] - wrong) > 0.02 * expected
         # Positivity and scale guard for a cool, faint star.
@@ -943,11 +1018,17 @@ class TestHabitableZone:
         hz = pm.aOrbHZ(Mstar=1.0)
         assert hz['RecentVenus'] > 0.0
         # Full ordering from the hottest inner edge to the coolest outer edge.
-        assert (hz['RecentVenus'] < hz['RunawayGreenhouse'] < hz['MoistGreenhouse']
-                < hz['MaximumGreenhouse'] < hz['EarlyMars'])
+        assert (
+            hz['RecentVenus']
+            < hz['RunawayGreenhouse']
+            < hz['MoistGreenhouse']
+            < hz['MaximumGreenhouse']
+            < hz['EarlyMars']
+        )
         # The adopted HZ distance is the mean of the moist and maximum greenhouse edges.
-        assert_allclose(hz['HZ'], 0.5 * (hz['MoistGreenhouse'] + hz['MaximumGreenhouse']),
-                        rtol=1e-12)
+        assert_allclose(
+            hz['HZ'], 0.5 * (hz['MoistGreenhouse'] + hz['MaximumGreenhouse']), rtol=1e-12
+        )
 
     def test_habitable_zone_defaults_age_and_requires_mass(self, monkeypatch):
         """The boundary call falls back to the default age and rejects a missing mass."""

@@ -103,9 +103,7 @@ def update_threshold_in_pyproject(target: str, new_threshold: float) -> bool:
             raise ValueError('[tool.mors] section not found in pyproject.toml')
         coverage_fast = mors_section.get('coverage_fast')
         if coverage_fast is None:
-            raise ValueError(
-                '[tool.mors.coverage_fast] section not found in pyproject.toml'
-            )
+            raise ValueError('[tool.mors.coverage_fast] section not found in pyproject.toml')
         section = coverage_fast
     else:
         raise ValueError(f"Unknown target '{target}'")

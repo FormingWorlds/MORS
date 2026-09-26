@@ -14,13 +14,25 @@ import mors.parameters as params
 import mors.physicalmodel as phys
 import mors.star as star
 
-log = logging.getLogger("fwl." + __name__)
+log = logging.getLogger('fwl.' + __name__)
+
 
 class Cluster:
-    """A class for star objects that hold all information about a star.
-    """
+    """A class for star objects that hold all information about a star."""
 
-    def __init__(self,Mstar=None,Age=None,Omega=None,OmegaEnv=None,OmegaCore=None,AgesOut=None,starEvoDir=None,evoModels=None,params=params.paramsDefault,verbose=False):
+    def __init__(
+        self,
+        Mstar=None,
+        Age=None,
+        Omega=None,
+        OmegaEnv=None,
+        OmegaCore=None,
+        AgesOut=None,
+        starEvoDir=None,
+        evoModels=None,
+        params=params.paramsDefault,
+        verbose=False,
+    ):
         """Initialises instance of Cluster class.
 
         This is the main function that is run when creating an instance of the Cluster class and it sets up all
@@ -38,19 +50,19 @@ class Cluster:
 
         # Make sure Mstar was set
         if Mstar is None:
-            raise Exception("Mstar keyword argument not set")
+            raise Exception('Mstar keyword argument not set')
 
         # Make sure Omega, OmegaEnv, and OmegaCore are well set
         # (if Omega is set, OmegaEnv and OmegaCore will both be set to that value)
-        Omega , OmegaEnv , OmegaCore = _CheckInputRotation(Age,Omega,OmegaEnv,OmegaCore)
+        Omega, OmegaEnv, OmegaCore = _CheckInputRotation(Age, Omega, OmegaEnv, OmegaCore)
 
         # Make sure arrays all same length
-        if not ( len(Mstar) == len(Omega) ):
-            raise Exception("Mstar and Omega have different lengths")
-        if not ( len(Mstar) == len(OmegaEnv) ):
-            raise Exception("Mstar and OmegaEnv have different lengths")
-        if not ( len(Mstar) == len(OmegaCore) ):
-            raise Exception("Mstar and OmegaCore have different lengths")
+        if not (len(Mstar) == len(Omega)):
+            raise Exception('Mstar and Omega have different lengths')
+        if not (len(Mstar) == len(OmegaEnv)):
+            raise Exception('Mstar and OmegaEnv have different lengths')
+        if not (len(Mstar) == len(OmegaCore)):
+            raise Exception('Mstar and OmegaCore have different lengths')
 
         # Set number of stars
         self.nStars = len(Mstar)
@@ -74,24 +86,25 @@ class Cluster:
         self.evoModels = evoModels
 
         # Get evolutionary tracks
-        self._LoadEvoTracks(Age,OmegaEnv,OmegaCore,verbose)
+        self._LoadEvoTracks(Age, OmegaEnv, OmegaCore, verbose)
 
         # Get HZ boundaries
-        self.aOrbHZ = phys.aOrbHZ(Mstar=self.Mstar,params=self.params)
+        self.aOrbHZ = phys.aOrbHZ(Mstar=self.Mstar, params=self.params)
 
         return
 
-    def _LoadEvoTracks(self,Age,OmegaEnv0,OmegaCore0,verbose):
+    def _LoadEvoTracks(self, Age, OmegaEnv0, OmegaCore0, verbose):
         """Loads rotation and activity tracks for each star."""
 
         # Start dictionary holding stars
         self.stars = []
 
         # Loop over each star and load each one
-        for iStar in range(0,len(self.Mstar)):
-
+        for iStar in range(len(self.Mstar)):
             # Print to screen if verbose was set by user
-            log.debug("Loading star "+str(iStar)+" out of "+str(self.nStars)+" in cluster")
+            log.debug(
+                'Loading star ' + str(iStar) + ' out of ' + str(self.nStars) + ' in cluster'
+            )
 
             # Get parameters for this star in right type
             MstarStar = float(self.Mstar[iStar])
@@ -101,20 +114,28 @@ class Cluster:
             # Get Age depending on if it is an array or a float/int
             if Age is None:
                 AgeIn = None
-            elif isinstance(Age,(float,int)):
+            elif isinstance(Age, (float, int)):
                 AgeIn = Age
             else:
                 AgeIn = Age[iStar]
 
             # Create instance of star class for this star
-            starTemp = star.Star(Mstar=MstarStar,Age=AgeIn,OmegaEnv=OmegaEnvStar,OmegaCore=OmegaCoreStar,
-                                AgesOut=self.AgesOut,starEvoDir=self.starEvoDir,evoModels=self.evoModels,params=self.params)
+            starTemp = star.Star(
+                Mstar=MstarStar,
+                Age=AgeIn,
+                OmegaEnv=OmegaEnvStar,
+                OmegaCore=OmegaCoreStar,
+                AgesOut=self.AgesOut,
+                starEvoDir=self.starEvoDir,
+                evoModels=self.evoModels,
+                params=self.params,
+            )
 
             # Append dictionary
             self.stars.append(starTemp)
 
             # Also make this star an attribute of the class
-            setattr( self , "star"+str(iStar) , starTemp )
+            setattr(self, 'star' + str(iStar), starTemp)
 
         # Make functions for each quantity that return this quantity at a given age as attributes of class
         self._setupQuantityFunctions()
@@ -134,7 +155,7 @@ class Cluster:
 
         return
 
-    def Values(self,Age=None,Quantity=None):
+    def Values(self, Age=None, Quantity=None):
         """Takes age in Myr and a string with name of quantity to output, returns value of that quantity at specified age for all stars.
 
         Parameters
@@ -153,16 +174,16 @@ class Cluster:
 
         # Make sure input parameters are set
         if Age is None:
-            raise Exception("keyword parameter Age not set in call to function")
+            raise Exception('keyword parameter Age not set in call to function')
         if Quantity is None:
-            raise Exception("keyword parameter Quantity not set in call to function")
+            raise Exception('keyword parameter Quantity not set in call to function')
 
         # Make array to hold values
         values = np.zeros(self.nStars)
 
         # Loop over stars and get values for each
-        for iStar in range(0,self.nStars):
-            values[iStar] = self.stars[iStar].Value(Age=Age,Quantity=Quantity)
+        for iStar in range(self.nStars):
+            values[iStar] = self.stars[iStar].Value(Age=Age, Quantity=Quantity)
 
         return values
 
@@ -170,31 +191,31 @@ class Cluster:
         """Prints list of stars in cluster to screen."""
 
         # Header
-        log.info("The following is a list of masses for stars in this cluster.")
+        log.info('The following is a list of masses for stars in this cluster.')
 
         # Loop over each star and print basic parameters
-        for iStar in range(0,self.nStars):
-            log.info("   "+str(iStar)+". "+str(self.Mstar[iStar])+" Msun")
+        for iStar in range(self.nStars):
+            log.info('   ' + str(iStar) + '. ' + str(self.Mstar[iStar]) + ' Msun')
 
         # Total number of stars
-        log.info("Number of stars in cluster = "+str(self.nStars))
+        log.info('Number of stars in cluster = ' + str(self.nStars))
 
         return
 
-    def Save(self,filename='cluster.pickle'):
+    def Save(self, filename='cluster.pickle'):
         """Takes filename (default is 'cluster.pickle'), saves cluster to this file using pickle."""
 
-        with open(filename,'wb') as f:
-            pickle.dump(self,f)
+        with open(filename, 'wb') as f:
+            pickle.dump(self, f)
 
         return
 
-    def save(self,filename='cluster.pickle'):
+    def save(self, filename='cluster.pickle'):
         """Same as Save()."""
         self.Save(filename=filename)
         return
 
-    def Percentile(self,Mstar=None,Age=None,Omega=None,Prot=None,percentile=None):
+    def Percentile(self, Mstar=None, Age=None, Omega=None, Prot=None, percentile=None):
         """Gets rotation rate of percentile or percentile of rotation rate in the rotation distribution at given age.
 
         This function can be used for two purposes
@@ -227,29 +248,38 @@ class Cluster:
 
         # Make sure the age is specified
         if Age is None:
-            raise Exception("keyword parameter Age not set in call to function")
+            raise Exception('keyword parameter Age not set in call to function')
 
         # If percentile was set to a string, get float version
-        if isinstance(percentile,str):
-            if ( percentile == 'slow' ):
+        if isinstance(percentile, str):
+            if percentile == 'slow':
                 percentile = 5.0
-            elif ( percentile == 'medium' ):
+            elif percentile == 'medium':
                 percentile = 50.0
-            elif ( percentile == 'fast' ):
+            elif percentile == 'fast':
                 percentile = 95.0
             else:
-                raise Exception( "invalid percentile string (options are 'slow', 'medium', or 'fast')" )
+                raise Exception(
+                    "invalid percentile string (options are 'slow', 'medium', or 'fast')"
+                )
 
         # Get the rotation distribution at this age
-        OmegaDist = self.Values( Age=Age , Quantity='OmegaEnv' )
+        OmegaDist = self.Values(Age=Age, Quantity='OmegaEnv')
 
         # Get the result
-        result = star.Percentile( Mstar=Mstar , Omega=Omega , Prot=Prot , percentile=percentile ,
-                                MstarDist=self.Mstar , OmegaDist=OmegaDist , params=self.params )
+        result = star.Percentile(
+            Mstar=Mstar,
+            Omega=Omega,
+            Prot=Prot,
+            percentile=percentile,
+            MstarDist=self.Mstar,
+            OmegaDist=OmegaDist,
+            params=self.params,
+        )
 
         return result
 
-    def ActivityLifetime(self,Quantity=None,Threshold=None,AgeMax=None):
+    def ActivityLifetime(self, Quantity=None, Threshold=None, AgeMax=None):
         """Takes threshold value, returns ages at which each star last drops below this threshold.
 
         This function can be used to determine when each star's emission crosses a given threshold value for a few
@@ -277,22 +307,24 @@ class Cluster:
 
         # Make sure Quantity is set
         if Quantity is None:
-            raise Exception("Quantity not set in call to function")
+            raise Exception('Quantity not set in call to function')
 
         # Make sure Quantity is string
-        if not isinstance(Quantity,str):
-            raise Exception("Quantity must be string")
+        if not isinstance(Quantity, str):
+            raise Exception('Quantity must be string')
 
         # Make array
         AgeActive = np.zeros(self.nStars)
 
         # Loop over stars and get each
         for iStar in range(self.nStars):
-            AgeActive[iStar] = self.stars[iStar].ActivityLifetime(Quantity=Quantity,Threshold=Threshold,AgeMax=AgeMax)
+            AgeActive[iStar] = self.stars[iStar].ActivityLifetime(
+                Quantity=Quantity, Threshold=Threshold, AgeMax=AgeMax
+            )
 
         return AgeActive
 
-    def IntegrateEmission(self,AgeMin=None,AgeMax=None,Band=None,aOrb=None):
+    def IntegrateEmission(self, AgeMin=None, AgeMax=None, Band=None, aOrb=None):
         """Takes age range, returns integrated emission in band within that range for each star.
 
         This code can be used to the luminosities of the stars between two ages. This can be applied to any wavelength band
@@ -325,32 +357,37 @@ class Cluster:
 
         # Loop over stars and get each
         for iStar in range(self.nStars):
-            Energy[iStar] = self.stars[iStar].IntegrateEmission(AgeMin=AgeMin,AgeMax=AgeMax,Band=Band,aOrb=aOrb)
+            Energy[iStar] = self.stars[iStar].IntegrateEmission(
+                AgeMin=AgeMin, AgeMax=AgeMax, Band=Band, aOrb=aOrb
+            )
 
         return Energy
 
-def _CheckInputRotation(Age,Omega,OmegaEnv,OmegaCore):
-  """Takes input rotation, checks if values are setup correctly."""
 
-  # Make sure if Age is set that OmegaCore is not set
-  if ( Age is not None ) and ( OmegaCore is not None ):
-    raise Exception( "cannot set both Age and OmegaCore as arguments of Cluster" )
+def _CheckInputRotation(Age, Omega, OmegaEnv, OmegaCore):
+    """Takes input rotation, checks if values are setup correctly."""
 
-  # Make sure at least one rotation rate is set
-  if ( Omega is None ):
+    # Make sure if Age is set that OmegaCore is not set
+    if (Age is not None) and (OmegaCore is not None):
+        raise Exception('cannot set both Age and OmegaCore as arguments of Cluster')
 
-    # Since Omega is not set, make sure both OmegaEnv and OmegaCore are set
-    if ( OmegaEnv is None ) or ( OmegaCore is None ):
-      raise Exception( "must set either Omega or both OmegaEnv and OmegaCore as arugment of Star" )
+    # Make sure at least one rotation rate is set
+    if Omega is None:
+        # Since Omega is not set, make sure both OmegaEnv and OmegaCore are set
+        if (OmegaEnv is None) or (OmegaCore is None):
+            raise Exception(
+                'must set either Omega or both OmegaEnv and OmegaCore as arugment of Star'
+            )
 
-  else:
+    else:
+        # Since Omega is set, make sure both OmegaEnv and OmegaCore are not set
+        if not ((OmegaEnv is None) and (OmegaCore is None)):
+            raise Exception(
+                'cannot set OmegaEnv and OmegaCore when Omega is set as arugment of Star'
+            )
 
-    # Since Omega is set, make sure both OmegaEnv and OmegaCore are not set
-    if not ( ( OmegaEnv is None ) and ( OmegaCore is None ) ):
-      raise Exception( "cannot set OmegaEnv and OmegaCore when Omega is set as arugment of Star" )
+        # Set both OmegaEnv and OmegaCore to Omega
+        OmegaEnv = Omega
+        OmegaCore = Omega
 
-    # Set both OmegaEnv and OmegaCore to Omega
-    OmegaEnv = Omega
-    OmegaCore = Omega
-
-  return Omega , OmegaEnv , OmegaCore
+    return Omega, OmegaEnv, OmegaCore

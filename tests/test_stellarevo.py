@@ -32,8 +32,21 @@ SOLAR_MODEL_SET = 'X0p70952_Z0p01631_A1p875'
 
 # All per-quantity accessor names exposed both as StarEvo methods and module functions.
 QUANTITY_NAMES = (
-    'Rstar', 'Lbol', 'Teff', 'Itotal', 'Icore', 'Ienv', 'Mcore', 'Menv',
-    'Rcore', 'tauConv', 'dItotaldt', 'dIcoredt', 'dIenvdt', 'dMcoredt', 'dRcoredt',
+    'Rstar',
+    'Lbol',
+    'Teff',
+    'Itotal',
+    'Icore',
+    'Ienv',
+    'Mcore',
+    'Menv',
+    'Rcore',
+    'tauConv',
+    'dItotaldt',
+    'dIcoredt',
+    'dIenvdt',
+    'dMcoredt',
+    'dRcoredt',
 )
 
 
@@ -136,8 +149,9 @@ def test_grid_compiled_from_raw_tracks_matches_saved_grid(tmp_path, monkeypatch)
     # Re-constructing now loads the saved pickle; the grids must agree at 1 Msun.
     reloaded = mors.StarEvo(starEvoDir=str(grid_dir), evoModels=SOLAR_MODEL_SET)
     assert_allclose(reloaded.Lbol(1.0, SOLAR_AGE_MYR), lbol, rtol=1e-12)
-    assert_allclose(reloaded.Teff(1.0, SOLAR_AGE_MYR),
-                    compiled.Teff(1.0, SOLAR_AGE_MYR), rtol=1e-12)
+    assert_allclose(
+        reloaded.Teff(1.0, SOLAR_AGE_MYR), compiled.Teff(1.0, SOLAR_AGE_MYR), rtol=1e-12
+    )
 
 
 def test_grid_cache_write_failure_does_not_break_construction(tmp_path, monkeypatch, caplog):
@@ -181,8 +195,18 @@ def test_starevo_methods_return_physical_solar_quantities(default_star_evo):
     assert_allclose(se_obj.Value(1.0, SOLAR_AGE_MYR, 'Lbol'), vals['Lbol'], rtol=1e-12)
 
     # Strictly positive structural quantities.
-    for key in ('Rstar', 'Lbol', 'Teff', 'Itotal', 'Icore', 'Ienv',
-                'Mcore', 'Menv', 'Rcore', 'tauConv'):
+    for key in (
+        'Rstar',
+        'Lbol',
+        'Teff',
+        'Itotal',
+        'Icore',
+        'Ienv',
+        'Mcore',
+        'Menv',
+        'Rcore',
+        'tauConv',
+    ):
         assert vals[key] > 0.0, key
 
     # Envelope mass fraction is bounded; the solar core radius is inside the star.
@@ -217,10 +241,22 @@ def test_module_level_wrappers_match_default_grid():
     instance.
     """
     mors.DownloadEvolutionTracks('Spada')
-    module_vals = {name: float(getattr(mors, name)(1.0, SOLAR_AGE_MYR)) for name in QUANTITY_NAMES}
+    module_vals = {
+        name: float(getattr(mors, name)(1.0, SOLAR_AGE_MYR)) for name in QUANTITY_NAMES
+    }
 
-    for key in ('Rstar', 'Lbol', 'Teff', 'Itotal', 'Icore', 'Ienv',
-                'Mcore', 'Menv', 'Rcore', 'tauConv'):
+    for key in (
+        'Rstar',
+        'Lbol',
+        'Teff',
+        'Itotal',
+        'Icore',
+        'Ienv',
+        'Mcore',
+        'Menv',
+        'Rcore',
+        'tauConv',
+    ):
         assert module_vals[key] > 0.0, key
 
     # Same structural constraints as the class accessors.

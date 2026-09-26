@@ -1,4 +1,5 @@
 """Module for loading the stellar evolution tracks and retrieving basic stellar properties."""
+
 from __future__ import annotations
 
 import copy
@@ -16,8 +17,9 @@ from mors.data import spada_data_dir
 
 log = logging.getLogger('fwl.' + __name__)
 
-#----------------------------------------------------------
+# ----------------------------------------------------------
 # Parameters for stellar evolution models
+
 
 # Directory for stellar evolution models
 def _defaultStarEvoDir():
@@ -29,10 +31,11 @@ def __getattr__(name):
     """Resolve ``starEvoDirDefault`` on access, so importing fetches nothing."""
     if name == 'starEvoDirDefault':
         return _defaultStarEvoDir()
-    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+    raise AttributeError(f'module {__name__!r} has no attribute {name!r}')
+
 
 # Set which set of models to use, i.e. which X, Z, and A values (set to X0p70952_Z0p01631_A1p875 for closest to solar)
-evoModelsDefault = "X0p70952_Z0p01631_A1p875"
+evoModelsDefault = 'X0p70952_Z0p01631_A1p875'
 
 # Initially set default model data to None so we know it has not been set
 ModelDataDefault = None
@@ -40,7 +43,8 @@ ModelDataDefault = None
 # Number of decimal places to represent masses and ages when doing interpolations
 nDecValue = 7
 
-#----------------------------------------------------------
+# ----------------------------------------------------------
+
 
 class StarEvo:
     """Class to hold complete information about stellar evolution models.
@@ -57,7 +61,7 @@ class StarEvo:
 
     """
 
-    def __init__(self,starEvoDir=None,evoModels=evoModelsDefault):
+    def __init__(self, starEvoDir=None, evoModels=evoModelsDefault):
         """Initialises instance of StarEvo class."""
 
         # If starEvoDir and evoModels are None, use defaults
@@ -67,11 +71,11 @@ class StarEvo:
             evoModels = evoModelsDefault
 
         # Load the models
-        self.ModelData = _LoadModels( starEvoDir=starEvoDir , evoModels=evoModels )
+        self.ModelData = _LoadModels(starEvoDir=starEvoDir, evoModels=evoModels)
 
         return
 
-    def LoadTrack(self,Mstar,ClearData=False):
+    def LoadTrack(self, Mstar, ClearData=False):
         """Takes stellar mass, loads evolutionary track for a specific mass into the model data.
 
         This can be useful if the user wants to load a specific evolutionary track into a model data for a specific mass
@@ -91,11 +95,11 @@ class StarEvo:
 
         """
 
-        self.ModelData = LoadTrack(Mstar,ModelData=self.ModelData,ClearData=ClearData)
+        self.ModelData = LoadTrack(Mstar, ModelData=self.ModelData, ClearData=ClearData)
 
         return
 
-    def Value(self, Mstar,Age,ParamString):
+    def Value(self, Mstar, Age, ParamString):
         """Takes stellar mass, age, and a parameter string, returns values corresponding to named parameter.
 
         The set of models should have already been loaded. With this function, the user can ask for a value
@@ -123,105 +127,108 @@ class StarEvo:
         """
 
         # Call Value() outside this class to get the value with this model
-        value = Value(Mstar,Age,ParamString,ModelData=self.ModelData)
+        value = Value(Mstar, Age, ParamString, ModelData=self.ModelData)
 
         return value
 
     # The following functions are for individual parameters that can be called
-    def Rstar(self,Mstar,Age,ModelData=ModelDataDefault):
+    def Rstar(self, Mstar, Age, ModelData=ModelDataDefault):
         """Takes mass and age, returns stellar radius."""
-        return Value( Mstar , Age , 'Rstar' , ModelData=self.ModelData )
+        return Value(Mstar, Age, 'Rstar', ModelData=self.ModelData)
 
-    def Lbol(self,Mstar,Age,ModelData=ModelDataDefault):
+    def Lbol(self, Mstar, Age, ModelData=ModelDataDefault):
         """Takes mass and age, returns bolometric luminosity."""
-        return Value( Mstar , Age , 'Lbol' , ModelData=self.ModelData )
+        return Value(Mstar, Age, 'Lbol', ModelData=self.ModelData)
 
-    def Teff(self,Mstar,Age,ModelData=ModelDataDefault):
+    def Teff(self, Mstar, Age, ModelData=ModelDataDefault):
         """Takes mass and age, returns effective temperature."""
-        return Value( Mstar , Age , 'Teff' , ModelData=self.ModelData )
+        return Value(Mstar, Age, 'Teff', ModelData=self.ModelData)
 
-    def Itotal(self,Mstar,Age,ModelData=ModelDataDefault):
+    def Itotal(self, Mstar, Age, ModelData=ModelDataDefault):
         """Takes mass and age, returns total moment of interia."""
-        return Value( Mstar , Age , 'Itotal' , ModelData=self.ModelData )
+        return Value(Mstar, Age, 'Itotal', ModelData=self.ModelData)
 
-    def Icore(self,Mstar,Age,ModelData=ModelDataDefault):
+    def Icore(self, Mstar, Age, ModelData=ModelDataDefault):
         """Takes mass and age, returns core moment of interia."""
-        return Value( Mstar , Age , 'Icore' , ModelData=self.ModelData )
+        return Value(Mstar, Age, 'Icore', ModelData=self.ModelData)
 
-    def Ienv(self,Mstar,Age,ModelData=ModelDataDefault):
+    def Ienv(self, Mstar, Age, ModelData=ModelDataDefault):
         """Takes mass and age, returns envelope moment of interia."""
-        return Value( Mstar , Age , 'Ienv' , ModelData=self.ModelData )
+        return Value(Mstar, Age, 'Ienv', ModelData=self.ModelData)
 
-    def Mcore(self,Mstar,Age,ModelData=ModelDataDefault):
+    def Mcore(self, Mstar, Age, ModelData=ModelDataDefault):
         """Takes mass and age, returns core mass."""
-        return Value( Mstar , Age , 'Mcore' , ModelData=self.ModelData )
+        return Value(Mstar, Age, 'Mcore', ModelData=self.ModelData)
 
-    def Menv(self,Mstar,Age,ModelData=ModelDataDefault):
+    def Menv(self, Mstar, Age, ModelData=ModelDataDefault):
         """Takes mass and age, returns envelope mass."""
-        return Value( Mstar , Age , 'Menv' , ModelData=self.ModelData )
+        return Value(Mstar, Age, 'Menv', ModelData=self.ModelData)
 
-    def Rcore(self,Mstar,Age,ModelData=ModelDataDefault):
+    def Rcore(self, Mstar, Age, ModelData=ModelDataDefault):
         """Takes mass and age, returns core radius."""
-        return Value( Mstar , Age , 'Rcore' , ModelData=self.ModelData )
+        return Value(Mstar, Age, 'Rcore', ModelData=self.ModelData)
 
-    def tauConv(self,Mstar,Age,ModelData=ModelDataDefault):
+    def tauConv(self, Mstar, Age, ModelData=ModelDataDefault):
         """Takes mass and age, returns convective turnover time."""
-        return Value( Mstar , Age , 'tauConv' , ModelData=self.ModelData )
+        return Value(Mstar, Age, 'tauConv', ModelData=self.ModelData)
 
-    def dItotaldt(self,Mstar,Age,ModelData=ModelDataDefault):
+    def dItotaldt(self, Mstar, Age, ModelData=ModelDataDefault):
         """Takes mass and age, returns rate of change of total moment of inertia."""
-        return Value( Mstar , Age , 'dItotaldt' , ModelData=self.ModelData )
+        return Value(Mstar, Age, 'dItotaldt', ModelData=self.ModelData)
 
-    def dIcoredt(self,Mstar,Age,ModelData=ModelDataDefault):
+    def dIcoredt(self, Mstar, Age, ModelData=ModelDataDefault):
         """Takes mass and age, returns rate of change of core moment of inertia."""
-        return Value( Mstar , Age , 'dIcoredt' , ModelData=self.ModelData )
+        return Value(Mstar, Age, 'dIcoredt', ModelData=self.ModelData)
 
-    def dIenvdt(self,Mstar,Age,ModelData=ModelDataDefault):
+    def dIenvdt(self, Mstar, Age, ModelData=ModelDataDefault):
         """Takes mass and age, returns rate of change of envelope moment of inertia."""
-        return Value( Mstar , Age , 'dIenvdt' , ModelData=self.ModelData )
+        return Value(Mstar, Age, 'dIenvdt', ModelData=self.ModelData)
 
-    def dMcoredt(self,Mstar,Age,ModelData=ModelDataDefault):
+    def dMcoredt(self, Mstar, Age, ModelData=ModelDataDefault):
         """Takes mass and age, returns rate of change of core mass."""
-        return Value( Mstar , Age , 'dMcoredt' , ModelData=self.ModelData )
+        return Value(Mstar, Age, 'dMcoredt', ModelData=self.ModelData)
 
-    def dRcoredt(self,Mstar,Age,ModelData=ModelDataDefault):
+    def dRcoredt(self, Mstar, Age, ModelData=ModelDataDefault):
         """Takes mass and age, returns rate of change of core radius."""
-        return Value( Mstar , Age , 'dRcoredt' , ModelData=self.ModelData )
+        return Value(Mstar, Age, 'dRcoredt', ModelData=self.ModelData)
 
-def _LoadModels(starEvoDir=None,evoModels=evoModelsDefault):
+
+def _LoadModels(starEvoDir=None, evoModels=evoModelsDefault):
     """Loads evolutionary tracks as a grid of parameters at each mass and age."""
 
     if starEvoDir is None:
         starEvoDir = _defaultStarEvoDir()
 
     # Check if should compile new grid of evolutionary models or load previous grid
-    if _shouldCompileNew(starEvoDir,evoModels):
-        ModelData = _CompileNewGrid(starEvoDir,evoModels)
+    if _shouldCompileNew(starEvoDir, evoModels):
+        ModelData = _CompileNewGrid(starEvoDir, evoModels)
     else:
-        ModelData = _LoadSavedGrid(starEvoDir,evoModels)
+        ModelData = _LoadSavedGrid(starEvoDir, evoModels)
 
     return ModelData
+
 
 def _starEvoDirFingerprint(starEvoDir):
     """Digest the names, sizes and modification times of the files under a track directory."""
 
     entries = []
-    for root,_dirs,files in os.walk(starEvoDir):
+    for root, _dirs, files in os.walk(starEvoDir):
         for name in files:
-            path = os.path.join(root,name)
+            path = os.path.join(root, name)
             try:
                 st = os.stat(path)
             except OSError:
                 continue
-            entries.append((os.path.relpath(path,starEvoDir),st.st_size,st.st_mtime_ns))
+            entries.append((os.path.relpath(path, starEvoDir), st.st_size, st.st_mtime_ns))
     entries.sort()
 
     digest = hashlib.sha256()
-    for relpath,size,mtime_ns in entries:
+    for relpath, size, mtime_ns in entries:
         digest.update(f'{relpath}|{size}|{mtime_ns}\n'.encode())
     return digest.hexdigest()
 
-def _gridCacheFile(starEvoDir,evoModels):
+
+def _gridCacheFile(starEvoDir, evoModels):
     """Return the path of the compiled-grid cache file for a track directory.
 
     The cache lives in the user cache directory, never inside the track
@@ -233,28 +240,84 @@ def _gridCacheFile(starEvoDir,evoModels):
     realDir = os.path.realpath(str(starEvoDir))
     fingerprint = _starEvoDirFingerprint(realDir)
     key = hashlib.sha256(f'{realDir}|{fingerprint}'.encode()).hexdigest()[:16]
-    return os.path.join(platformdirs.user_cache_dir('mors'),'stellarevo',key,evoModels+".pickle")
+    return os.path.join(
+        platformdirs.user_cache_dir('mors'), 'stellarevo', key, evoModels + '.pickle'
+    )
 
-def _shouldCompileNew(starEvoDir,evoModels):
+
+def _shouldCompileNew(starEvoDir, evoModels):
     """Takes directory for stellar evo models, returns if new grid needs to be compiled."""
 
     # Initially assume need to compile new
     compileNew = True
 
     # Check if previously compiled models already exist
-    if os.path.isfile(_gridCacheFile(starEvoDir,evoModels)):
+    if os.path.isfile(_gridCacheFile(starEvoDir, evoModels)):
         compileNew = False
 
     return compileNew
 
-def _CompileNewGrid(starEvoDir,evoModels):
+
+def _CompileNewGrid(starEvoDir, evoModels):
     """Compiles new dictionary of stellar evo models."""
 
     # List all masses to load
-    MstarAll = np.array([ 0.1 , 0.15 , 0.2 , 0.25 , 0.3 , 0.35 , 0.4 , 0.45 , 0.5 , 0.55 , 0.6 , 0.65 , 0.7 , 0.75 , 0.8 , 0.85 , 0.9 , 0.95 , 1.0 , 1.05 , 1.1 , 1.15 , 1.2 , 1.25 ])
+    MstarAll = np.array(
+        [
+            0.1,
+            0.15,
+            0.2,
+            0.25,
+            0.3,
+            0.35,
+            0.4,
+            0.45,
+            0.5,
+            0.55,
+            0.6,
+            0.65,
+            0.7,
+            0.75,
+            0.8,
+            0.85,
+            0.9,
+            0.95,
+            1.0,
+            1.05,
+            1.1,
+            1.15,
+            1.2,
+            1.25,
+        ]
+    )
 
     # Mass components of the filenames for these masses
-    MstarFilenameMiddle = [ '0p10' , '0p15' , '0p20' , '0p25' , '0p30' , '0p35' , '0p40' , '0p45' , '0p50' , '0p55' , '0p60' , '0p65' , '0p70' , '0p75' , '0p80' , '0p85' , '0p90' , '0p95' , '1p00' , '1p05' , '1p10' , '1p15' , '1p20' , '1p25' ]
+    MstarFilenameMiddle = [
+        '0p10',
+        '0p15',
+        '0p20',
+        '0p25',
+        '0p30',
+        '0p35',
+        '0p40',
+        '0p45',
+        '0p50',
+        '0p55',
+        '0p60',
+        '0p65',
+        '0p70',
+        '0p75',
+        '0p80',
+        '0p85',
+        '0p90',
+        '0p95',
+        '1p00',
+        '1p05',
+        '1p10',
+        '1p15',
+        '1p20',
+        '1p25',
+    ]
 
     # Start empty dictionary
     ModelData = {}
@@ -263,30 +326,49 @@ def _CompileNewGrid(starEvoDir,evoModels):
     ModelData['MstarAll'] = MstarAll
 
     # Add a list of strings holding each of the parameters
-    ModelData['ParamsAll'] = [ 'Mstar' , 'Age' , 'Rstar' , 'Lbol' , 'Teff' , 'Itotal' , 'Icore' , 'Ienv' , 'Mcore' , 'Menv' , 'Rcore' ,
-                                'tauConv' , 'dItotaldt' , 'dIcoredt' , 'dIenvdt' , 'dMcoredt' , 'dRcoredt' ]
+    ModelData['ParamsAll'] = [
+        'Mstar',
+        'Age',
+        'Rstar',
+        'Lbol',
+        'Teff',
+        'Itotal',
+        'Icore',
+        'Ienv',
+        'Mcore',
+        'Menv',
+        'Rcore',
+        'tauConv',
+        'dItotaldt',
+        'dIcoredt',
+        'dIenvdt',
+        'dMcoredt',
+        'dRcoredt',
+    ]
 
     # Loop over masses and add each one to dictionary
-    for iMstar in range(0,len(MstarAll)):
-        ModelData[MstarAll[iMstar]] = _ReadEvolutionTrack( starEvoDir , evoModels , MstarAll[iMstar] , MstarFilenameMiddle[iMstar] )
+    for iMstar in range(len(MstarAll)):
+        ModelData[MstarAll[iMstar]] = _ReadEvolutionTrack(
+            starEvoDir, evoModels, MstarAll[iMstar], MstarFilenameMiddle[iMstar]
+        )
 
     # Save compiled models; a cache that cannot be written only costs a recompile.
     # Each writer gets its own temp file, so concurrent compiles of the same
     # grid never open and truncate one another's file before the atomic replace.
-    cacheFile = _gridCacheFile(starEvoDir,evoModels)
+    cacheFile = _gridCacheFile(starEvoDir, evoModels)
     cacheDir = os.path.dirname(cacheFile)
     tmpFile = None
     try:
-        os.makedirs(cacheDir,exist_ok=True)
-        fd,tmpFile = tempfile.mkstemp(dir=cacheDir,prefix=os.path.basename(cacheFile)+'.')
-        with os.fdopen(fd,'wb') as f:
-            pickle.dump(ModelData,f)
+        os.makedirs(cacheDir, exist_ok=True)
+        fd, tmpFile = tempfile.mkstemp(dir=cacheDir, prefix=os.path.basename(cacheFile) + '.')
+        with os.fdopen(fd, 'wb') as f:
+            pickle.dump(ModelData, f)
             f.flush()
             os.fsync(f.fileno())
-        os.replace(tmpFile,cacheFile)
+        os.replace(tmpFile, cacheFile)
         tmpFile = None
     except OSError as exc:
-        log.warning('Could not write the compiled grid cache %s: %s',cacheFile,exc)
+        log.warning('Could not write the compiled grid cache %s: %s', cacheFile, exc)
     finally:
         if tmpFile is not None:
             try:
@@ -296,34 +378,35 @@ def _CompileNewGrid(starEvoDir,evoModels):
 
     return ModelData
 
-def _ReadEvolutionTrack(starEvoDir,evoModels,Mstar,MstarFilenameMiddle):
+
+def _ReadEvolutionTrack(starEvoDir, evoModels, Mstar, MstarFilenameMiddle):
     """Loads the stellar evolution models from Spada et al. (2013) for a mass bin and puts it into a dictionary."""
 
     # Set strings for starting and ending of filenames
-    filename_prefix = starEvoDir + "/" + evoModels + "/M"
-    filename_postfix1 = "_" + evoModels + ".track1"
-    filename_postfix2 = "_" + evoModels + ".track2"
+    filename_prefix = starEvoDir + '/' + evoModels + '/M'
+    filename_postfix1 = '_' + evoModels + '.track1'
+    filename_postfix2 = '_' + evoModels + '.track2'
 
     # Get names of data files holding evo models
     filename1 = filename_prefix + MstarFilenameMiddle + filename_postfix1
     filename2 = filename_prefix + MstarFilenameMiddle + filename_postfix2
 
     # Read contents of files
-    with open(filename1,'r') as f:
+    with open(filename1) as f:
         content1 = f.readlines()
-    with open(filename2,'r') as f:
+    with open(filename2) as f:
         content2 = f.readlines()
 
     # Number of header lines
     nHeader = 1
 
     # Remove any duplicate ages
-    content1 = _RemoveDuplicateAges(nHeader,content1)
-    content2 = _RemoveDuplicateAges(nHeader,content2)
+    content1 = _RemoveDuplicateAges(nHeader, content1)
+    content2 = _RemoveDuplicateAges(nHeader, content2)
 
     # Make sure they are the same lengths
-    if not ( len(content1) == len(content2) ):
-        raise Exception("two evo files not same length")
+    if not (len(content1) == len(content2)):
+        raise Exception('two evo files not same length')
 
     # Get number of age bins
     nAge = len(content1) - nHeader
@@ -348,8 +431,7 @@ def _ReadEvolutionTrack(starEvoDir,evoModels,Mstar,MstarFilenameMiddle):
 
     # Read quantities from first file into the arrays (has age, Lbol, and Rstar)
     iAge = 0
-    for line in content1[nHeader:len(content1)]:
-
+    for line in content1[nHeader : len(content1)]:
         # Split data into list
         data = line.split()
 
@@ -364,8 +446,7 @@ def _ReadEvolutionTrack(starEvoDir,evoModels,Mstar,MstarFilenameMiddle):
 
     # Read quantities from second file into the arrays (has Itotal, Ienv, Menv, Rcore, and tauConv)
     iAge = 0
-    for line in content2[nHeader:len(content2)]:
-
+    for line in content2[nHeader : len(content2)]:
         # Split data into list
         data = line.split()
 
@@ -380,26 +461,26 @@ def _ReadEvolutionTrack(starEvoDir,evoModels,Mstar,MstarFilenameMiddle):
         iAge += 1
 
     # Change some units and convert from log to lin
-    Age[:] = Age[:] * 1000.0 # convert from Gyr into Myr
-    Rstar[:] = 10.0**Rstar[:] # convert into linear since Spada has in log
-    Lbol[:] = 10.0**Lbol[:] # also this one
-    Teff[:] = 10.0**Teff[:] # also this one
+    Age[:] = Age[:] * 1000.0  # convert from Gyr into Myr
+    Rstar[:] = 10.0 ** Rstar[:]  # convert into linear since Spada has in log
+    Lbol[:] = 10.0 ** Lbol[:]  # also this one
+    Teff[:] = 10.0 ** Teff[:]  # also this one
 
     # Get some core quantities
     Icore[:] = Itotal[:] - Ienv[:]
-    Mcore[:] = ( 1.0 - Menv[:] ) * Mstar
+    Mcore[:] = (1.0 - Menv[:]) * Mstar
     Rcore[:] = Rcore[:] * Rstar[:]
 
     # Get gradients
-    dItotaldt[:] = _CalculateGradient( Age , Itotal )
-    dIcoredt[:] = _CalculateGradient( Age , Icore )
-    dIenvdt[:] = _CalculateGradient( Age , Ienv )
-    dMcoredt[:] = _CalculateGradient( Age , Mcore )
-    dRcoredt[:] = _CalculateGradient( Age , Rcore )
+    dItotaldt[:] = _CalculateGradient(Age, Itotal)
+    dIcoredt[:] = _CalculateGradient(Age, Icore)
+    dIenvdt[:] = _CalculateGradient(Age, Ienv)
+    dMcoredt[:] = _CalculateGradient(Age, Mcore)
+    dRcoredt[:] = _CalculateGradient(Age, Rcore)
 
     # Round mass and ages to nDecValue decimal places as specified at top of file
-    Mstar = np.round( Mstar , decimals=nDecValue )
-    Age = np.round( Age , decimals=nDecValue )
+    Mstar = np.round(Mstar, decimals=nDecValue)
+    Age = np.round(Age, decimals=nDecValue)
 
     # Add all quantities to the dictionary
     Data = {}
@@ -423,7 +504,8 @@ def _ReadEvolutionTrack(starEvoDir,evoModels,Mstar,MstarFilenameMiddle):
 
     return Data
 
-def _RemoveDuplicateAges(nHeader,content):
+
+def _RemoveDuplicateAges(nHeader, content):
     """Takes lines from evo file, removes duplicate ages."""
 
     # This is necessary because one of the Spada files has an age repeated a few times.
@@ -440,14 +522,13 @@ def _RemoveDuplicateAges(nHeader,content):
     AgeLast = float(data[0])
 
     # Loop over remaning lines and decide which to add (all but duplicate ages)
-    for line in content[nHeader+1:len(content)]:
-
+    for line in content[nHeader + 1 : len(content)]:
         # Get age
         data = line.split()
         Age = float(data[0])
 
         # Add line if not same age (within some tolerance)
-        if not ( abs(Age/AgeLast-1.0) < 1.0e-5 ):
+        if not (abs(Age / AgeLast - 1.0) < 1.0e-5):
             contentNew.append(line)
 
         # Update AgeLast
@@ -455,7 +536,8 @@ def _RemoveDuplicateAges(nHeader,content):
 
     return contentNew
 
-def _CalculateGradient(Age,X):
+
+def _CalculateGradient(Age, X):
     """Takes an evolutionary track for quantity, returns evolution of rate of change of quantity."""
 
     # Number of age bins
@@ -465,37 +547,51 @@ def _CalculateGradient(Age,X):
     dXdt = np.zeros(nAge)
 
     # Set first and last elements
-    dXdt[0] = ( X[1] - X[0] ) / ( Age[1] - Age[0] )
-    dXdt[nAge-1] = ( X[nAge-1] - X[nAge-2] ) / ( Age[nAge-1] - Age[nAge-2] )
+    dXdt[0] = (X[1] - X[0]) / (Age[1] - Age[0])
+    dXdt[nAge - 1] = (X[nAge - 1] - X[nAge - 2]) / (Age[nAge - 1] - Age[nAge - 2])
 
     # Do rest of ages
-    dXdt[1:nAge-1] = ( X[2:nAge] - X[0:nAge-2] ) / ( Age[2:nAge] - Age[0:nAge-2] )
+    dXdt[1 : nAge - 1] = (X[2:nAge] - X[0 : nAge - 2]) / (Age[2:nAge] - Age[0 : nAge - 2])
 
     dAge = np.zeros(nAge)
     dAge[0] = Age[1] - Age[0]
-    dAge[1:nAge-1] = Age[2:nAge] - Age[0:nAge-2]
-    dAge[nAge-1] = Age[nAge-1] - Age[nAge-2]
+    dAge[1 : nAge - 1] = Age[2:nAge] - Age[0 : nAge - 2]
+    dAge[nAge - 1] = Age[nAge - 1] - Age[nAge - 2]
 
     return dXdt
 
-def _LoadSavedGrid(starEvoDir,evoModels):
+
+def _LoadSavedGrid(starEvoDir, evoModels):
     """Takes filename for stellar evo model, returns grid of models."""
 
-    cacheFile = _gridCacheFile(starEvoDir,evoModels)
+    cacheFile = _gridCacheFile(starEvoDir, evoModels)
     try:
-        with open(cacheFile,'rb') as f:
+        with open(cacheFile, 'rb') as f:
             ModelData = pickle.load(f)
-    except (OSError,EOFError,pickle.UnpicklingError,AttributeError,ImportError,IndexError,ValueError) as exc:
-        log.warning('Could not load the compiled grid cache %s (%s); deleting it and recompiling',cacheFile,exc)
+    except (
+        OSError,
+        EOFError,
+        pickle.UnpicklingError,
+        AttributeError,
+        ImportError,
+        IndexError,
+        ValueError,
+    ) as exc:
+        log.warning(
+            'Could not load the compiled grid cache %s (%s); deleting it and recompiling',
+            cacheFile,
+            exc,
+        )
         try:
             os.remove(cacheFile)
         except OSError:
             pass
-        ModelData = _CompileNewGrid(starEvoDir,evoModels)
+        ModelData = _CompileNewGrid(starEvoDir, evoModels)
 
     return ModelData
 
-def LoadTrack(Mstar,ModelData=None,ClearData=False):
+
+def LoadTrack(Mstar, ModelData=None, ClearData=False):
     global ModelDataDefault
     """Takes stellar mass, loads evolutionary track for a specific mass into the model data.
 
@@ -531,15 +627,14 @@ def LoadTrack(Mstar,ModelData=None,ClearData=False):
 
     # Only do something if Mstar is not already in ModelData
     if Mstar not in ModelData:
-
         # Get evo tracks for this mass and add it to the dictionary
-        Data = _LoadTrack(Mstar,ModelData)
+        Data = _LoadTrack(Mstar, ModelData)
 
         # Add extra term to ModelData
         ModelData[Mstar] = Data
 
         # Add this mass to MstarAll in ModelData
-        ModelData['MstarAll'] = np.sort( np.append( ModelData['MstarAll'] , Mstar ) )
+        ModelData['MstarAll'] = np.sort(np.append(ModelData['MstarAll'], Mstar))
 
         # If ModelDataDefault is not None, add this also to that
         if ModelDataDefault is not None:
@@ -547,7 +642,6 @@ def LoadTrack(Mstar,ModelData=None,ClearData=False):
 
     # If ClearData is set, remove all other tracks from return dictionary, but not ModelDataDefault
     if ClearData:
-
         # Do this by making a new dictionary and copying stuff in
 
         # Make deepcopy of dictionary
@@ -567,21 +661,22 @@ def LoadTrack(Mstar,ModelData=None,ClearData=False):
 
     return ModelData
 
-def _LoadTrack(Mstar,ModelData):
+
+def _LoadTrack(Mstar, ModelData):
     """Takes stellar mass and model data dictionary, returns dictionary with track for this mass."""
 
     # Round mass to nDecValue decimal places specified at top of this file
-    Mstar = np.round( Mstar , decimals=nDecValue )
+    Mstar = np.round(Mstar, decimals=nDecValue)
 
     # Make sure within mass limit
-    _CheckMassLimit( ModelData['MstarAll'] , Mstar )
+    _CheckMassLimit(ModelData['MstarAll'], Mstar)
 
     # Get nearest mass bin below
-    iMin = misc._getIndexLT( ModelData['MstarAll'] , Mstar )
+    iMin = misc._getIndexLT(ModelData['MstarAll'], Mstar)
     MstarMin = ModelData['MstarAll'][iMin]
 
     # Get nearest mass bin above
-    iMax = misc._getIndexGT( ModelData['MstarAll'] , Mstar )
+    iMax = misc._getIndexGT(ModelData['MstarAll'], Mstar)
     MstarMax = ModelData['MstarAll'][iMax]
 
     # Get dictionaries for masses below and above Mstar
@@ -591,17 +686,17 @@ def _LoadTrack(Mstar,ModelData):
     # Get min and max ages to include
     #   for min, this is the maximum starting age of the two tracks
     #   for max, this is the minimum ending age of the two tracks
-    AgeMin = np.max( [ DataMin['Age'][0] , DataMax['Age'][0] ] )
-    AgeMax = np.min( [ DataMin['Age'][-1] , DataMax['Age'][-1] ] )
+    AgeMin = np.max([DataMin['Age'][0], DataMax['Age'][0]])
+    AgeMax = np.min([DataMin['Age'][-1], DataMax['Age'][-1]])
 
     # Number of age bins to use, just make this minimum of the number in the two tracks
-    nAge = np.min( [ len(DataMin['Age']) , len(DataMax['Age']) ] )
+    nAge = np.min([len(DataMin['Age']), len(DataMax['Age'])])
 
     # Make age array, log spacing
-    Age = np.logspace( np.log10(AgeMin) , np.log10(AgeMax) , nAge )
+    Age = np.logspace(np.log10(AgeMin), np.log10(AgeMax), nAge)
 
     # Round ages to nDecValue decimal placed specified at top of this file
-    Age = np.round( Age , decimals=nDecValue )
+    Age = np.round(Age, decimals=nDecValue)
 
     # Start the output dictionary
     Data = {}
@@ -612,18 +707,18 @@ def _LoadTrack(Mstar,ModelData):
 
     # Loop over parameters and get tracks for each (do parameters in DataMin)
     for param in DataMin:
-
         # Skip parameter if already added (so don't do Mstar and Age again)
-        if ( param in Data ):
+        if param in Data:
             continue
 
         # Get track
-        track = Value( Mstar , Age , param , ModelData=ModelData )
+        track = Value(Mstar, Age, param, ModelData=ModelData)
 
         # Add to dictionary
         Data[param] = track
 
     return Data
+
 
 def _LoadDefaultModelData():
     global ModelDataDefault
@@ -637,7 +732,8 @@ def _LoadDefaultModelData():
 
     return ModelDataDefault
 
-def Value(MstarIn,AgeIn,ParamString,ModelData=ModelDataDefault):
+
+def Value(MstarIn, AgeIn, ParamString, ModelData=ModelDataDefault):
     """Takes stellar mass, age, and a parameter string, returns values corresponding to named parameter.
 
     The set of models should have already been loaded. With this function, the user can ask for a value
@@ -686,18 +782,16 @@ def Value(MstarIn,AgeIn,ParamString,ModelData=ModelDataDefault):
 
     # Make sure Mstar and Age are correct types
     if Mstar is None:
-        raise Exception("argument Mstar has invalid type")
+        raise Exception('argument Mstar has invalid type')
     if Age is None:
-        raise Exception("argument Age has invalid type")
+        raise Exception('argument Age has invalid type')
 
     # Find if scenario 1 (most likely)
-    if ( isinstance(Mstar,float) and isinstance(Age,float) and isinstance(ParamString,str) ):
-
+    if isinstance(Mstar, float) and isinstance(Age, float) and isinstance(ParamString, str):
         # Scenario 1 so just get value
-        value = _ValueSingle( Mstar , Age , ParamString , ModelData=ModelData )
+        value = _ValueSingle(Mstar, Age, ParamString, ModelData=ModelData)
 
     else:
-
         # In this case, the output will be an array with up to three dimensions, so first make 3D array
         # and then remove dimensions with only one element
 
@@ -712,212 +806,258 @@ def Value(MstarIn,AgeIn,ParamString,ModelData=ModelDataDefault):
         except TypeError:
             nAge = 1
 
-        if isinstance(ParamString,list):
+        if isinstance(ParamString, list):
             nParam = len(ParamString)
         else:
             nParam = 1
 
         # Make array
-        value = np.zeros((nMstar,nAge,nParam))
+        value = np.zeros((nMstar, nAge, nParam))
 
         # Loop over values
-        for iMstar in range(0,nMstar):
-            for iAge in range(0,nAge):
-                for iParam in range(0,nParam):
-
+        for iMstar in range(nMstar):
+            for iAge in range(nAge):
+                for iParam in range(nParam):
                     # Get values of Mstar, Age, and ParamString
-                    if isinstance(Mstar,float):
+                    if isinstance(Mstar, float):
                         MstarValue = Mstar
                     else:
                         MstarValue = Mstar[iMstar]
 
-                    if isinstance(Age,float):
+                    if isinstance(Age, float):
                         AgeValue = Age
                     else:
                         AgeValue = Age[iAge]
 
-                    if isinstance(ParamString,str):
+                    if isinstance(ParamString, str):
                         ParamStringValue = ParamString
                     else:
                         ParamStringValue = ParamString[iParam]
 
                     # Now get the value
-                    value[iMstar,iAge,iParam] = _ValueSingle( MstarValue , AgeValue , ParamStringValue , ModelData=ModelData )
+                    value[iMstar, iAge, iParam] = _ValueSingle(
+                        MstarValue, AgeValue, ParamStringValue, ModelData=ModelData
+                    )
 
         # Now get rid of unwanted dimensions
         value = np.squeeze(value)
 
     return value
 
-def _ValueSingle(Mstar,Age,ParamString,ModelData=ModelDataDefault):
+
+def _ValueSingle(Mstar, Age, ParamString, ModelData=ModelDataDefault):
     """Takes stellar mass and age and parameter string, returns value of that parameter at that mass and age."""
 
     ## Make sure Mstar and age are floats
-    #if not isinstance(Mstar,float):
-        #raise Exception("argument Mstar must be float in call to Value")
-    #if not isinstance(Age,float):
-        #raise Exception("argument Age must be float in call to Value")
+    # if not isinstance(Mstar,float):
+    # raise Exception("argument Mstar must be float in call to Value")
+    # if not isinstance(Age,float):
+    # raise Exception("argument Age must be float in call to Value")
 
     # Make sure ParamString is indeed a string
-    if not isinstance(ParamString,str):
-        raise Exception("argument ParamString must be string in call to Value")
+    if not isinstance(ParamString, str):
+        raise Exception('argument ParamString must be string in call to Value')
 
     # Make sure ParamString corresponds to a valid parameter
     if ParamString not in ModelData['ParamsAll']:
-        raise Exception("parameter '"+ParamString+"' is not valid")
+        raise Exception("parameter '" + ParamString + "' is not valid")
 
     # Check if an evolutionary track for this exact stellar mass is present
-    if ( Mstar in ModelData ):
-
+    if Mstar in ModelData:
         # In this case, an evo track for this exact stellar mass is already loaded and all is needed is an interpolation
         # but first check the age is within the correct age limit
-        _CheckAgeLimit( ModelData[Mstar]['Age'] , Age )
-        value = _Interpolate1D( ModelData[Mstar]['Age'] , ModelData[Mstar][ParamString] , Age )
+        _CheckAgeLimit(ModelData[Mstar]['Age'], Age)
+        value = _Interpolate1D(ModelData[Mstar]['Age'], ModelData[Mstar][ParamString], Age)
 
     else:
-
         # In this case, no evo track for this specific mass is loaded and so a 2D interpolation between values from two
         # separate mass bins is needed
         # Note, it is not assumed that the mass bins are loaded into the dictionary in ascending order
 
         # Make sure within mass limit
-        _CheckMassLimit( ModelData['MstarAll'] , Mstar )
+        _CheckMassLimit(ModelData['MstarAll'], Mstar)
 
         # Get nearest mass bin below
-        iMin = misc._getIndexLT( ModelData['MstarAll'] , Mstar )
+        iMin = misc._getIndexLT(ModelData['MstarAll'], Mstar)
         MstarMin = ModelData['MstarAll'][iMin]
 
         # Get nearest mass bin above
-        iMax = misc._getIndexGT( ModelData['MstarAll'] , Mstar )
+        iMax = misc._getIndexGT(ModelData['MstarAll'], Mstar)
         MstarMax = ModelData['MstarAll'][iMax]
 
         # Check age ranges for both (max first since the upper limit is likely lower)
-        _CheckAgeLimit( ModelData[MstarMax]['Age'] , Age )
-        _CheckAgeLimit( ModelData[MstarMin]['Age'] , Age )
+        _CheckAgeLimit(ModelData[MstarMax]['Age'], Age)
+        _CheckAgeLimit(ModelData[MstarMin]['Age'], Age)
 
         # Do interpolation
-        value = _Interpolate2D( MstarMin , MstarMax , Mstar ,
-                                ModelData[MstarMin]['Age'] , ModelData[MstarMax]['Age'] , Age ,
-                                ModelData[MstarMin][ParamString] , ModelData[MstarMax][ParamString] )
+        value = _Interpolate2D(
+            MstarMin,
+            MstarMax,
+            Mstar,
+            ModelData[MstarMin]['Age'],
+            ModelData[MstarMax]['Age'],
+            Age,
+            ModelData[MstarMin][ParamString],
+            ModelData[MstarMax][ParamString],
+        )
 
     return value
 
-def _CheckAgeLimit(AgeArray,Age):
+
+def _CheckAgeLimit(AgeArray, Age):
     """Takes age track and an age, outputs error and stops code if age is not within limits."""
 
     # Round the age to decimal places determined by nDecValue at top of file
-    Age = np.round( Age , decimals=nDecValue )
+    Age = np.round(Age, decimals=nDecValue)
 
     # Do check
-    if not ( AgeArray[0] <= Age <= AgeArray[-1] ):
-        raise Exception("input age "+str(Age)+" is not within limits of "+str(AgeArray[0])+" to "+str(AgeArray[-1]))
+    if not (AgeArray[0] <= Age <= AgeArray[-1]):
+        raise Exception(
+            'input age '
+            + str(Age)
+            + ' is not within limits of '
+            + str(AgeArray[0])
+            + ' to '
+            + str(AgeArray[-1])
+        )
 
     return
 
-def _CheckMassLimit(MstarArray,Mstar):
+
+def _CheckMassLimit(MstarArray, Mstar):
     """Takes array of masses and an age, outputs error and stops code if mass is not within limits."""
 
-    if not ( np.min(MstarArray) <= Mstar <= np.max(MstarArray) ):
-        raise Exception("input stellar mass "+str(Mstar)+" is not within limits of "+str(np.min(MstarArray))+" to "+str(np.max(MstarArray)))
+    if not (np.min(MstarArray) <= Mstar <= np.max(MstarArray)):
+        raise Exception(
+            'input stellar mass '
+            + str(Mstar)
+            + ' is not within limits of '
+            + str(np.min(MstarArray))
+            + ' to '
+            + str(np.max(MstarArray))
+        )
 
     return
 
-def _Interpolate2D(Z1,Z2,Z,Xarray1,Xarray2,X,Yarray1,Yarray2):
+
+def _Interpolate2D(Z1, Z2, Z, Xarray1, Xarray2, X, Yarray1, Yarray2):
     """Takes two sets of 1D arrays for corresponding X and Y values, returns interpolated Y value corresponding to input X."""
 
     # Do interpolations to get Y at X for both tracks
-    Y1 = _Interpolate1D( Xarray1 , Yarray1 , X )
-    Y2 = _Interpolate1D( Xarray2 , Yarray2 , X )
+    Y1 = _Interpolate1D(Xarray1, Yarray1, X)
+    Y2 = _Interpolate1D(Xarray2, Yarray2, X)
 
     # Do linear interpolation between Y1 and Y2 in Z direction
-    delta = (Z-Z1)/(Z2-Z1)
-    Y = Y2*delta + Y1*(1-delta)
+    delta = (Z - Z1) / (Z2 - Z1)
+    Y = Y2 * delta + Y1 * (1 - delta)
 
     return Y
 
-def _Interpolate1D(Xarray,Yarray,X):
+
+def _Interpolate1D(Xarray, Yarray, X):
     """Takes 1D arrays for corresponding X and Y values, returns interpolated Y value corresponding to input X."""
 
     # Note that it is assumed here that Xarray is in ascending order and this won't work if it is not
 
     # Make sure X is in limits
-    if not ( Xarray[0] <= X <= Xarray[-1] ):
-        raise Exception("input value "+str(X)+" is not within limits of "+str(Xarray[0])+" to "+str(Xarray[-1]))
+    if not (Xarray[0] <= X <= Xarray[-1]):
+        raise Exception(
+            'input value '
+            + str(X)
+            + ' is not within limits of '
+            + str(Xarray[0])
+            + ' to '
+            + str(Xarray[-1])
+        )
 
     # Get index of X closest to but smaller than value
-    iMin = misc._getIndexLTordered(Xarray,X)
+    iMin = misc._getIndexLTordered(Xarray, X)
     iMax = iMin + 1
 
     # Check if X is an element in Xarray
-    if ( Xarray[iMin] == X ):
+    if Xarray[iMin] == X:
         return Yarray[iMin]
-    elif ( Xarray[iMax] == X ):
+    elif Xarray[iMax] == X:
         return Yarray[iMax]
     else:
-
         # Do linear interpolation
-        delta = (X-Xarray[iMin])/(Xarray[iMax]-Xarray[iMin])
-        Y = Yarray[iMax]*delta + Yarray[iMin]*(1-delta)
+        delta = (X - Xarray[iMin]) / (Xarray[iMax] - Xarray[iMin])
+        Y = Yarray[iMax] * delta + Yarray[iMin] * (1 - delta)
 
     return Y
 
+
 # The following functions are for individual parameters that can be called
-def Rstar(Mstar,Age,ModelData=ModelDataDefault):
+def Rstar(Mstar, Age, ModelData=ModelDataDefault):
     """Takes mass and age, returns stellar radius."""
-    return Value( Mstar , Age , 'Rstar' , ModelData=ModelData )
+    return Value(Mstar, Age, 'Rstar', ModelData=ModelData)
 
-def Lbol(Mstar,Age,ModelData=ModelDataDefault):
+
+def Lbol(Mstar, Age, ModelData=ModelDataDefault):
     """Takes mass and age, returns bolometric luminosity."""
-    return Value( Mstar , Age , 'Lbol' , ModelData=ModelData )
+    return Value(Mstar, Age, 'Lbol', ModelData=ModelData)
 
-def Teff(Mstar,Age,ModelData=ModelDataDefault):
+
+def Teff(Mstar, Age, ModelData=ModelDataDefault):
     """Takes mass and age, returns effective temperature."""
-    return Value( Mstar , Age , 'Teff' , ModelData=ModelData )
+    return Value(Mstar, Age, 'Teff', ModelData=ModelData)
 
-def Itotal(Mstar,Age,ModelData=ModelDataDefault):
+
+def Itotal(Mstar, Age, ModelData=ModelDataDefault):
     """Takes mass and age, returns total moment of interia."""
-    return Value( Mstar , Age , 'Itotal' , ModelData=ModelData )
+    return Value(Mstar, Age, 'Itotal', ModelData=ModelData)
 
-def Icore(Mstar,Age,ModelData=ModelDataDefault):
+
+def Icore(Mstar, Age, ModelData=ModelDataDefault):
     """Takes mass and age, returns core moment of interia."""
-    return Value( Mstar , Age , 'Icore' , ModelData=ModelData )
+    return Value(Mstar, Age, 'Icore', ModelData=ModelData)
 
-def Ienv(Mstar,Age,ModelData=ModelDataDefault):
+
+def Ienv(Mstar, Age, ModelData=ModelDataDefault):
     """Takes mass and age, returns envelope moment of interia."""
-    return Value( Mstar , Age , 'Ienv' , ModelData=ModelData )
+    return Value(Mstar, Age, 'Ienv', ModelData=ModelData)
 
-def Mcore(Mstar,Age,ModelData=ModelDataDefault):
+
+def Mcore(Mstar, Age, ModelData=ModelDataDefault):
     """Takes mass and age, returns core mass."""
-    return Value( Mstar , Age , 'Mcore' , ModelData=ModelData )
+    return Value(Mstar, Age, 'Mcore', ModelData=ModelData)
 
-def Menv(Mstar,Age,ModelData=ModelDataDefault):
+
+def Menv(Mstar, Age, ModelData=ModelDataDefault):
     """Takes mass and age, returns envelope mass."""
-    return Value( Mstar , Age , 'Menv' , ModelData=ModelData )
+    return Value(Mstar, Age, 'Menv', ModelData=ModelData)
 
-def Rcore(Mstar,Age,ModelData=ModelDataDefault):
+
+def Rcore(Mstar, Age, ModelData=ModelDataDefault):
     """Takes mass and age, returns core radius."""
-    return Value( Mstar , Age , 'Rcore' , ModelData=ModelData )
+    return Value(Mstar, Age, 'Rcore', ModelData=ModelData)
 
-def tauConv(Mstar,Age,ModelData=ModelDataDefault):
+
+def tauConv(Mstar, Age, ModelData=ModelDataDefault):
     """Takes mass and age, returns convective turnover time."""
-    return Value( Mstar , Age , 'tauConv' , ModelData=ModelData )
+    return Value(Mstar, Age, 'tauConv', ModelData=ModelData)
 
-def dItotaldt(Mstar,Age,ModelData=ModelDataDefault):
+
+def dItotaldt(Mstar, Age, ModelData=ModelDataDefault):
     """Takes mass and age, returns rate of change of total moment of inertia."""
-    return Value( Mstar , Age , 'dItotaldt' , ModelData=ModelData )
+    return Value(Mstar, Age, 'dItotaldt', ModelData=ModelData)
 
-def dIcoredt(Mstar,Age,ModelData=ModelDataDefault):
+
+def dIcoredt(Mstar, Age, ModelData=ModelDataDefault):
     """Takes mass and age, returns rate of change of core moment of inertia."""
-    return Value( Mstar , Age , 'dIcoredt' , ModelData=ModelData )
+    return Value(Mstar, Age, 'dIcoredt', ModelData=ModelData)
 
-def dIenvdt(Mstar,Age,ModelData=ModelDataDefault):
+
+def dIenvdt(Mstar, Age, ModelData=ModelDataDefault):
     """Takes mass and age, returns rate of change of envelope moment of inertia."""
-    return Value( Mstar , Age , 'dIenvdt' , ModelData=ModelData )
+    return Value(Mstar, Age, 'dIenvdt', ModelData=ModelData)
 
-def dMcoredt(Mstar,Age,ModelData=ModelDataDefault):
+
+def dMcoredt(Mstar, Age, ModelData=ModelDataDefault):
     """Takes mass and age, returns rate of change of core mass."""
-    return Value( Mstar , Age , 'dMcoredt' , ModelData=ModelData )
+    return Value(Mstar, Age, 'dMcoredt', ModelData=ModelData)
 
-def dRcoredt(Mstar,Age,ModelData=ModelDataDefault):
+
+def dRcoredt(Mstar, Age, ModelData=ModelDataDefault):
     """Takes mass and age, returns rate of change of core radius."""
-    return Value( Mstar , Age , 'dRcoredt' , ModelData=ModelData )
+    return Value(Mstar, Age, 'dRcoredt', ModelData=ModelData)

@@ -270,8 +270,8 @@ def test_all_quantity_getters_return_finite_positive_values(solar_star):
         assert 4000.0 < values['Teff'] < 7000.0
     # The core has formed and grown strictly positive by the main-sequence age,
     # having started at zero for the fully-convective 1 Myr star.
-    icore_young = getattr(type(solar_star), 'Icore')(solar_star, solar_star.AgeMin)
-    icore_ms = getattr(type(solar_star), 'Icore')(solar_star, 1000.0)
+    icore_young = type(solar_star).Icore(solar_star, solar_star.AgeMin)
+    icore_ms = type(solar_star).Icore(solar_star, 1000.0)
     assert icore_young == pytest.approx(0.0, abs=1e40)
     assert icore_ms > 1.0e50
 

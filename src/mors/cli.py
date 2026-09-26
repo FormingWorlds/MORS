@@ -1,31 +1,41 @@
+from __future__ import annotations
+
 import click
+
 
 @click.group()
 def cli():
     pass
 
+
 @click.group()
 def download():
     """Download data"""
-    pass
+
 
 @click.command()
 def spada():
     """Download Spada evolution tracks."""
     from .data import DownloadEvolutionTracks
-    DownloadEvolutionTracks("Spada")
+
+    DownloadEvolutionTracks('Spada')
+
 
 @click.command()
 def baraffe():
     """Download Baraffe evolution tracks."""
     from .data import DownloadEvolutionTracks
-    DownloadEvolutionTracks("Baraffe")
+
+    DownloadEvolutionTracks('Baraffe')
+
 
 @click.command()
 def all():
     """Download all evolution tracks."""
     from .data import DownloadEvolutionTracks
+
     DownloadEvolutionTracks()
+
 
 @click.command()
 def env():
@@ -33,6 +43,7 @@ def env():
     from mors.data import FWL_DATA_DIR
 
     click.echo(f'FWL_DATA location: {FWL_DATA_DIR}')
+
 
 cli.add_command(download)
 download.add_command(spada)
