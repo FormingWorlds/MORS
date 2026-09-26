@@ -211,7 +211,7 @@ def PrintParams(params=paramsDefault):
 
     # Loop over parameters and print each
     for param in params:
-        log.info('%s = %s' % (param, params[param]))
+        log.info(f'{param} = {params[param]}')
 
     return
 

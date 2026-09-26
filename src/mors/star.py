@@ -999,7 +999,7 @@ def _PerPercentile(Mstar, Omega, MstarDist, OmegaDist, params):
     nIterMax = 10000
 
     # Start iterating
-    for iIter in range(nIterMax):
+    for _iIter in range(nIterMax):
         # Get mid percentile and corresponding Omega
         perMid = 0.5 * (perMin + perMax)
         OmegaMid = np.percentile(OmegaDist[includeStars], perMid)

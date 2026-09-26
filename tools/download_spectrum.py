@@ -76,12 +76,10 @@ def DownloadModernSpectrum(name, distance):
     elif (len(name_split) == 2) and (name_split[1] == 'lowres'):
         lowres = True
     else:
-        raise Exception("Invalid unable to parse star name '%s'!" % name)
+        raise Exception(f"Invalid unable to parse star name '{name}'!")
     name = name_split[0]
 
-    print(
-        '\tParameters: [star = %s, distance = %1.2e ly, lowres = %s]' % (name, distance, lowres)
-    )
+    print(f'\tParameters: [star = {name}, distance = {distance:1.2e} ly, lowres = {lowres}]')
 
     r_scale = 1.496e13  # 1 AU in cm
 
@@ -95,54 +93,38 @@ def DownloadModernSpectrum(name, distance):
             database = k
             break
     if database == '':
-        raise Exception("Could not find star '%s' in stellar databases!" % name)
+        raise Exception(f"Could not find star '{name}' in stellar databases!")
     else:
-        print("\tFound star in '%s' database" % database)
+        print(f"\tFound star in '{database}' database")
 
     # Convert data from database source format to plain text file
-    plaintext_spectrum = 'spec_%s.txt' % star
-    database_spectrum = 'spec_%s.%s' % (star, database)
-    print("\tDownloading spectrum and writing file '%s'" % plaintext_spectrum)
+    plaintext_spectrum = f'spec_{star}.txt'
+    database_spectrum = f'spec_{star}.{database}'
+    print(f"\tDownloading spectrum and writing file '{plaintext_spectrum}'")
 
     if os.path.isfile(plaintext_spectrum):
         print('\t(Overwriting existing file)')
 
-    new_str = '# Spectrum of %s (%s) at 1 AU\n# WL(nm)\tFlux(ergs/cm**2/s/nm)\n' % (
-        star,
-        database,
-    )
+    new_str = f'# Spectrum of {star} ({database}) at 1 AU\n# WL(nm)\tFlux(ergs/cm**2/s/nm)\n'
     match database:
         case 'muscles':
             cert = certifi.where()
             if lowres:
-                source = (
-                    'https://archive.stsci.edu/missions/hlsp/muscles/%s/hlsp_muscles_multi_multi_%s_broadband_v23_adapt-const-res-sed.fits'
-                    % (star, star)
-                )
+                source = f'https://archive.stsci.edu/missions/hlsp/muscles/{star}/hlsp_muscles_multi_multi_{star}_broadband_v23_adapt-const-res-sed.fits'
             else:
-                source = (
-                    'https://archive.stsci.edu/missions/hlsp/muscles/%s/hlsp_muscles_multi_multi_%s_broadband_v23_adapt-var-res-sed.fits'
-                    % (star, star)
-                )
+                source = f'https://archive.stsci.edu/missions/hlsp/muscles/{star}/hlsp_muscles_multi_multi_{star}_broadband_v23_adapt-var-res-sed.fits'
             resp = requests.get(source, verify=cert)  # Download file
 
             if resp.status_code == 404:  # Try other possible option (v22 instead of v23)
                 if lowres:
-                    source = (
-                        'https://archive.stsci.edu/missions/hlsp/muscles/%s/hlsp_muscles_multi_multi_%s_broadband_v22_adapt-const-res-sed.fits'
-                        % (star, star)
-                    )
+                    source = f'https://archive.stsci.edu/missions/hlsp/muscles/{star}/hlsp_muscles_multi_multi_{star}_broadband_v22_adapt-const-res-sed.fits'
                 else:
-                    source = (
-                        'https://archive.stsci.edu/missions/hlsp/muscles/%s/hlsp_muscles_multi_multi_%s_broadband_v22_adapt-var-res-sed.fits'
-                        % (star, star)
-                    )
+                    source = f'https://archive.stsci.edu/missions/hlsp/muscles/{star}/hlsp_muscles_multi_multi_{star}_broadband_v22_adapt-var-res-sed.fits'
             resp = requests.get(source, verify=cert)  # Download file
 
             if resp.status_code != 200:
                 print(
-                    "\t WARNING: Request returned with status code '%d' (should be 200/OK)"
-                    % resp.status_code
+                    f"\t WARNING: Request returned with status code '{int(resp.status_code)}' (should be 200/OK)"
                 )
 
             with open(database_spectrum, 'wb') as f:
@@ -177,7 +159,7 @@ def DownloadModernSpectrum(name, distance):
 
                 fl_abs = max(0.0, fl)
 
-                new_str += '%1.7e\t%1.7e \n' % (wl, fl_abs)
+                new_str += f'{wl:1.7e}\t{fl_abs:1.7e} \n'
 
             with open(plaintext_spectrum, 'w') as f:
                 f.write(new_str)
@@ -190,13 +172,12 @@ def DownloadModernSpectrum(name, distance):
 
         case 'vpl':
             cert = False  # This is not good, but it will stay for now.
-            source = 'https://vpl.astro.washington.edu/spectra/stellar/%sum.txt' % star
+            source = f'https://vpl.astro.washington.edu/spectra/stellar/{star}um.txt'
             resp = requests.get(source, verify=cert)  # Download file
 
             if resp.status_code != 200:
                 print(
-                    "\t WARNING: Request returned with status code '%d' (should be 200/OK)"
-                    % resp.status_code
+                    f"\t WARNING: Request returned with status code '{int(resp.status_code)}' (should be 200/OK)"
                 )
 
             with open(database_spectrum, 'wb') as f:
@@ -212,7 +193,7 @@ def DownloadModernSpectrum(name, distance):
                             float(li[1]) * 1.0e4 * (distance / r_scale) ** 2
                         )  # Convert units and scale flux
 
-                        new_str += '%1.7e\t%1.7e \n' % (wl, fl)
+                        new_str += f'{wl:1.7e}\t{fl:1.7e} \n'
 
             with open(plaintext_spectrum, 'w') as f:
                 f.write(new_str)
@@ -224,8 +205,7 @@ def DownloadModernSpectrum(name, distance):
 
             if resp.status_code != 200:
                 print(
-                    "\t WARNING: Request returned with status code '%d' (should be 200/OK)"
-                    % resp.status_code
+                    f"\t WARNING: Request returned with status code '{int(resp.status_code)}' (should be 200/OK)"
                 )
 
             with open(database_spectrum, 'wb') as f:
@@ -245,7 +225,7 @@ def DownloadModernSpectrum(name, distance):
                         float(li[1]) * 1.0e3
                     )  # Convert [W m-2 nm-1] -> [erg s-1 cm-2 nm-1], already at 1 AU
 
-                    new_str += '%1.7e\t%1.7e \n' % (wl, fl)
+                    new_str += f'{wl:1.7e}\t{fl:1.7e} \n'
 
             with open(plaintext_spectrum, 'w') as f:
                 f.write(new_str)
@@ -289,7 +269,7 @@ if __name__ == '__main__':
             print('Available stars:')
             for k in stars_online.keys():
                 for s in stars_online[k]:
-                    print('%12s    (%7s)' % (s, k))
+                    print(f'{s:>12}    ({k:>7})')
 
         case 'get':
             star = str(sys.argv[2])

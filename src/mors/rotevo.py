@@ -118,7 +118,7 @@ def FitRotation(
     found = False
 
     # Start looping until solution has been found
-    for iStep in range(params['nStepMaxFit']):
+    for _iStep in range(params['nStepMaxFit']):
         # Get middle Omega0
         Omega0Mid = 0.5 * (Omega0Min + Omega0Max)
 

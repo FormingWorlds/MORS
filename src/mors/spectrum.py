@@ -133,10 +133,10 @@ class Spectrum:
         # Check length
         if len(spec_wl) != len(spec_fl):
             raise Exception(
-                'Stellar spectrum size mismatch (%d and %d)' % (len(spec_wl), len(spec_fl))
+                f'Stellar spectrum size mismatch ({len(spec_wl)} and {len(spec_fl)})'
             )
         if len(spec_wl) < 10:
-            raise Exception('Stellar spectrum size too small (%d bins)' % len(spec_wl))
+            raise Exception(f'Stellar spectrum size too small ({len(spec_wl)} bins)')
 
         # Check reversal (should be wl ascending)
         if spec_wl[4] < spec_wl[0]:
@@ -179,7 +179,7 @@ class Spectrum:
         # Check path
         fp = os.path.abspath(fp)
         if not os.path.isfile(fp):
-            raise Exception("Cannot find TSV file at '%s'" % fp)
+            raise Exception(f"Cannot find TSV file at '{fp}'")
 
         # Load file
         spec_data = np.loadtxt(fp).T

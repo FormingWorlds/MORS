@@ -392,7 +392,7 @@ def test_integrated_emission_bands_are_additive(solar_star):
     EUV is the sum of its two sub-bands. Integrating each band between the same two
     ages must respect that additive budget, which pins the band-dispatch mapping.
     """
-    kw = dict(AgeMin=100.0, AgeMax=1000.0)
+    kw = {'AgeMin': 100.0, 'AgeMax': 1000.0}
     e_xuv = solar_star.IntegrateEmission(Band='XUV', **kw)
     e_xray = solar_star.IntegrateEmission(Band='Xray', **kw)
     e_euv = solar_star.IntegrateEmission(Band='EUV', **kw)
@@ -418,7 +418,7 @@ def test_integrated_emission_orbital_distance(solar_star):
     integrated luminosity (erg) into a fluence (erg/cm^2); both are positive and
     the closer 1 AU point receives a larger fluence than the more distant HZ edge.
     """
-    kw = dict(AgeMin=100.0, AgeMax=1000.0, Band='XUV')
+    kw = {'AgeMin': 100.0, 'AgeMax': 1000.0, 'Band': 'XUV'}
     energy = solar_star.IntegrateEmission(**kw)
     fluence_1au = solar_star.IntegrateEmission(aOrb=1.0, **kw)
     fluence_hz = solar_star.IntegrateEmission(aOrb='HZ', **kw)
@@ -521,16 +521,16 @@ def test_check_input_mstar_enforces_grid_bounds():
 
 def _input_rotation(**overrides):
     """Call ``_InputRotation`` with all-None defaults, overriding named arguments."""
-    base = dict(
-        Mstar=1.0,
-        Age=None,
-        Omega=None,
-        OmegaEnv=None,
-        OmegaCore=None,
-        Prot=None,
-        percentile=None,
-        params=dict(paramsDefault),
-    )
+    base = {
+        'Mstar': 1.0,
+        'Age': None,
+        'Omega': None,
+        'OmegaEnv': None,
+        'OmegaCore': None,
+        'Prot': None,
+        'percentile': None,
+        'params': dict(paramsDefault),
+    }
     base.update(overrides)
     return star_mod._InputRotation(**base)
 
@@ -605,7 +605,7 @@ def test_percentile_validates_arguments(kwargs, match):
     Determining a percentile needs a mass and exactly one rotation specification;
     a missing mass, both Omega and Prot, or neither each raise.
     """
-    base = dict(Mstar=1.0)
+    base = {'Mstar': 1.0}
     base.update(kwargs)
     with pytest.raises(Exception, match=match):
         mors.Percentile(**base)

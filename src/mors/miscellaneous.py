@@ -270,7 +270,7 @@ def _getIndexLTordered(Xarray, X):
         return i2
 
     # Start iterating
-    for iIter in range(len(Xarray)):
+    for _iIter in range(len(Xarray)):
         # Get iMid
         iMid = int(0.5 * (i1 + i2))
 

@@ -253,7 +253,7 @@ def test_modern_spectrum_load_reads_and_copies(tmp_path):
     fl = np.array([1.0e-3, 5.0e-3, 2.0e-3, 4.0e-4])
     with open(src, 'w') as fh:
         fh.write('# header line one\n# header line two\n')
-        for w, f in zip(wl, fl):
+        for w, f in zip(wl, fl, strict=False):
             fh.write(f'{w}\t{f}\n')
     out_wl, out_fl = baraffe.ModernSpectrumLoad(str(src), str(dst))
     # The destination is a faithful byte copy of the source input.

@@ -192,10 +192,10 @@ class BaraffeTrack:
 
         # Get time and check that it is in range
         if tstar < self.tmin:
-            log.warning('Star age too low! Clipping to %.1g Myr' % int(self.tmin * 1.0e-6))
+            log.warning(f'Star age too low! Clipping to {int(self.tmin * 1.0e-6):.1g} Myr')
             tstar = self.tmin
         if tstar > self.tmax:
-            log.warning('Star age too high! Clipping to %.1g Myr' % int(self.tmax * 1.0e-6))
+            log.warning(f'Star age too high! Clipping to {int(self.tmax * 1.0e-6):.1g} Myr')
             tstar = self.tmax
 
         # Find closest row in track
@@ -247,10 +247,10 @@ class BaraffeTrack:
 
         # Get time and check that it is in range
         if tstar < self.tmin:
-            log.warning('Star age too low! Clipping to %.1g Myr' % int(self.tmin * 1.0e-6))
+            log.warning(f'Star age too low! Clipping to {int(self.tmin * 1.0e-6):.1g} Myr')
             tstar = self.tmin
         if tstar > self.tmax:
-            log.warning('Star age too high! Clipping to %.1g Myr' % int(self.tmax * 1.0e-6))
+            log.warning(f'Star age too high! Clipping to {int(self.tmax * 1.0e-6):.1g} Myr')
             tstar = self.tmax
 
         # Find closest row in track
@@ -275,10 +275,10 @@ class BaraffeTrack:
 
         # Get time and check that it is in range
         if tstar < self.tmin:
-            log.warning('Star age too low! Clipping to %.1g Myr' % int(self.tmin * 1.0e-6))
+            log.warning(f'Star age too low! Clipping to {int(self.tmin * 1.0e-6):.1g} Myr')
             tstar = self.tmin
         if tstar > self.tmax:
-            log.warning('Star age too high! Clipping to %.1g Myr' % int(self.tmax * 1.0e-6))
+            log.warning(f'Star age too high! Clipping to {int(self.tmax * 1.0e-6):.1g} Myr')
             tstar = self.tmax
 
         # Find closest row in track

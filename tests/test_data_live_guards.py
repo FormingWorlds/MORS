@@ -202,7 +202,7 @@ def test_the_retry_waits_longer_after_each_attempt(monkeypatch):
     # One wait fewer than attempts: the last failure skips instead of sleeping.
     assert len(waits) == live.FETCH_ATTEMPTS - 1
     assert waits[0] > 0
-    assert all(later > earlier for earlier, later in zip(waits, waits[1:]))
+    assert all(later > earlier for earlier, later in zip(waits, waits[1:], strict=False))
 
 
 def test_missing_record_fails_the_live_check(monkeypatch):

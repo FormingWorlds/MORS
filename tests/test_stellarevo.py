@@ -98,7 +98,7 @@ def test_stellarevo_luminosity_increases_with_mass():
     lums = [mors.Value(m, age, 'Lbol') for m in masses]
     # Positivity and strict monotone increase with mass.
     assert all(lum > 0.0 for lum in lums)
-    assert all(lo < hi for lo, hi in zip(lums, lums[1:]))
+    assert all(lo < hi for lo, hi in zip(lums, lums[1:], strict=False))
     # The 1.2 Msun track outshines the 0.3 Msun track by well over 100x.
     assert lums[-1] > 100.0 * lums[0]
 
