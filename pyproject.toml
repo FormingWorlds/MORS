@@ -148,6 +148,12 @@ ignore = [
     "E501",  # Line too long
 ]
 
+# The global np.random stream draws the X-ray luminosity scatter,
+# and the tests seed it with np.random.seed.
+[tool.ruff.lint.per-file-ignores]
+"src/mors/physicalmodel.py" = ["NPY002"]
+"tests/test_physicalmodel.py" = ["NPY002"]
+
 [tool.ruff.lint.isort]
 known-first-party = ["mors"]
 required-imports = ["from __future__ import annotations"]
