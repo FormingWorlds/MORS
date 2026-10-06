@@ -11,10 +11,9 @@ log = logging.getLogger('fwl.' + __name__)
 
 FWL_DATA_DIR = Path(os.environ.get('FWL_DATA', platformdirs.user_data_dir('fwl_data')))
 
-# The stellar evolution tracks are fetched through fwl-io into the versioned
-# data layout (star/tracks/<dataset>/r<record-id>), declared in
-# mors_manifest.toml so the location and Zenodo pin have a single source of
-# truth: fwl-io derives the location from the table key, so it cannot drift.
+# The stellar evolution tracks are fetched through fwl-io into the versioned layout
+# (star/tracks/<dataset>/r<record-id>); mors_manifest.toml holds the location and the
+# Zenodo and DataverseNL pins, and fwl-io derives the location from the table key.
 _BARAFFE_KEY = 'star.tracks.baraffe_2015'
 _SPADA_KEY = 'star.tracks.spada_2013'
 
@@ -80,6 +79,7 @@ def _fetcher(key: str):
     return create_fetcher(
         subdir=ds.subdir,
         zenodo=ds.zenodo,
+        dataverse=ds.dataverse,
         registry=ds.registry(),
         data_root=GetFWLData(),
         extract=ds.extract,

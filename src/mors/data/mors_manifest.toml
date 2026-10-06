@@ -13,10 +13,12 @@
 [star.tracks.baraffe_2015]
 name = "Baraffe et al. (2015) stellar evolution tracks (BHAC15)"
 zenodo = "10.5281/zenodo.15729114"
+dataverse = "10.34894/FS9ZDM"
 required_by = ["mors"]
 
 [star.tracks.spada_2013]
 name = "Spada et al. (2013) stellar evolution tracks"
 zenodo = "10.5281/zenodo.15729101"
+dataverse = "10.34894/WEMRPG"
 extract = "tar"
 required_by = ["mors"]
