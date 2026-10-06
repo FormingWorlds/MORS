@@ -97,7 +97,7 @@ def test_download_tracks_fetches_the_requested_grids(monkeypatch, tmp_path, name
 
 
 def test_fetcher_forwards_the_archive_setting(monkeypatch, tmp_path):
-    """The fetcher is built with the manifest's extract setting and the data root."""
+    """The fetcher is built with the manifest's extract setting, mirror pin and data root."""
     import fwl_io
 
     monkeypatch.setattr(data, 'FWL_DATA_DIR', tmp_path, raising=False)
@@ -114,12 +114,15 @@ def test_fetcher_forwards_the_archive_setting(monkeypatch, tmp_path):
     # The Spada archive is unpacked by fwl-io, so the setting must reach it.
     assert seen['extract'] == 'tar'
     assert seen['zenodo'] == '10.5281/zenodo.15729101'
+    # Each dataset reaches its own DataverseNL mirror, the fallback when Zenodo fails.
+    assert seen['dataverse'] == '10.34894/WEMRPG'
     assert seen['data_root'] == tmp_path.absolute()
     # Discrimination: a plain-file dataset passes no extraction.
     seen.clear()
     data._fetcher(data._BARAFFE_KEY)
     assert seen['extract'] is None
     assert seen['zenodo'] == '10.5281/zenodo.15729114'
+    assert seen['dataverse'] == '10.34894/FS9ZDM'
 
 
 def test_baraffe_data_dir_is_versioned(monkeypatch, tmp_path):

@@ -75,7 +75,7 @@ MORS requires a set of pre-computed stellar evolution tracks. After installation
 mors download all
 ```
 
-This fetches both the [Spada](https://zenodo.org/records/15729101) and [Baraffe](https://zenodo.org/records/15729114) track sets. Both are fetched and hash-verified through fwl-io from their Zenodo records into `$FWL_DATA/star/tracks/`; the Spada grid is a single archive that fwl-io unpacks. If you only need one set, you can download them individually:
+This fetches both the [Spada](https://zenodo.org/records/15729101) and [Baraffe](https://zenodo.org/records/15729114) track sets. Both are fetched and hash-verified through fwl-io from their Zenodo records into `$FWL_DATA/star/tracks/`, with their DataverseNL mirrors ([Spada](https://doi.org/10.34894/WEMRPG), [Baraffe](https://doi.org/10.34894/FS9ZDM)) as the fallback when Zenodo cannot be reached; the Spada grid is a single archive that fwl-io unpacks. If you only need one set, you can download them individually:
 
 ```sh
 mors download spada

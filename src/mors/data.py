@@ -80,6 +80,7 @@ def _fetcher(key: str):
     return create_fetcher(
         subdir=ds.subdir,
         zenodo=ds.zenodo,
+        dataverse=ds.dataverse,
         registry=ds.registry(),
         data_root=GetFWLData(),
         extract=ds.extract,
