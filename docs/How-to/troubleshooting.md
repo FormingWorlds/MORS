@@ -77,7 +77,7 @@ star = mors.Star(Mstar=1.0, Omega=1.0, starEvoDir="/path/to/tracks")
 
 **Symptom:** `mors download` exits with an error, or the data directory exists but is empty or missing files.
 
-**Cause:** Both track sets are fetched, hash-verified, through fwl-io from their Zenodo records, with their DataverseNL mirrors tried for any file Zenodo does not serve. fwl-io retries a transient network issue or rate-limit a few times and then raises, and a corrupt file is re-fetched automatically on the next run.
+**Cause:** Both track sets are fetched, hash-verified, through fwl-io from their Zenodo records, with their DataverseNL mirrors tried for any file Zenodo does not serve. When neither source serves a file, fwl-io raises a `DownloadError` that lists the failure from each source, and a corrupt file is re-fetched automatically on the next run.
 
 **Fix:** Wait a few minutes and retry:
 
