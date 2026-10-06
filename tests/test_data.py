@@ -114,7 +114,6 @@ def test_fetcher_forwards_the_archive_setting(monkeypatch, tmp_path):
     # The Spada archive is unpacked by fwl-io, so the setting must reach it.
     assert seen['extract'] == 'tar'
     assert seen['zenodo'] == '10.5281/zenodo.15729101'
-    # Each dataset reaches its own DataverseNL mirror, the fallback when Zenodo fails.
     assert seen['dataverse'] == '10.34894/WEMRPG'
     assert seen['data_root'] == tmp_path.absolute()
     # Discrimination: a plain-file dataset passes no extraction.
@@ -327,6 +326,22 @@ def test_manifest_path_loads_both_track_datasets():
     # Spada is one tarball, Baraffe is a set of plain files.
     assert spada.extract == 'tar'
     assert baraffe.extract is None
+    # Each grid has its own DataverseNL mirror, the fallback after Zenodo.
+    assert (baraffe.dataverse, spada.dataverse) == ('10.34894/FS9ZDM', '10.34894/WEMRPG')
+
+
+def test_real_fetcher_tries_zenodo_before_the_dataverse_mirror(monkeypatch, tmp_path):
+    """The fetcher fwl-io builds from each manifest entry lists Zenodo first, then the
+    dataset's own DataverseNL mirror; building it does not touch the network."""
+    monkeypatch.setattr(data, 'FWL_DATA_DIR', tmp_path, raising=False)
+    assert data._fetcher(data._BARAFFE_KEY).mirrors == [
+        'doi:10.5281/zenodo.15729114/',
+        'doi:10.34894/FS9ZDM/',
+    ]
+    assert data._fetcher(data._SPADA_KEY).mirrors == [
+        'doi:10.5281/zenodo.15729101/',
+        'doi:10.34894/WEMRPG/',
+    ]
 
 
 def test_baraffe_registry_pins_committed_checksums():
