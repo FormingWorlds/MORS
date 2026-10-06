@@ -77,9 +77,9 @@ star = mors.Star(Mstar=1.0, Omega=1.0, starEvoDir="/path/to/tracks")
 
 **Symptom:** `mors download` exits with an error, or the data directory exists but is empty or missing files.
 
-**Cause:** Both track sets are fetched, hash-verified, through fwl-io from their Zenodo records, with their DataverseNL mirrors tried for any file Zenodo does not serve. When neither source serves a file, fwl-io raises a `DownloadError` that lists the failure from each source, and a corrupt file is re-fetched automatically on the next run.
+**Cause:** Both track sets are fetched, hash-verified, through fwl-io from their Zenodo records, with their DataverseNL mirrors tried for any file Zenodo does not serve. When neither source serves a file, fwl-io raises a `DownloadError` that lists the failure from each source. A Baraffe file that fails its checksum is re-fetched on the next run; the Spada grid is checked only for the presence of its files, so a damaged Spada file stays until you remove the directory (below).
 
-**Fix:** Wait a few minutes and retry:
+**Fix:** If the `DownloadError` shows a timeout, a connection error or an HTTP 429 or 5xx, wait a few minutes and retry. If both sources report a 404 or a checksum mismatch, retrying does not help: the record or the registry is wrong, so report it as an issue. To retry:
 
 ```sh
 mors download spada
