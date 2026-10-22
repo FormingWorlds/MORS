@@ -277,7 +277,7 @@ def test_declared_floor_matches_the_error_message_floor():
 
 
 def test_nightly_keys_fetches_and_checks_the_mors_datasets():
-    """The nightly keys, restores, fetches and checks one selection in one tree."""
+    """The nightly keys, restores, fetches and checks one selection in one tree, every run."""
     import re
 
     import yaml
@@ -286,35 +286,47 @@ def test_nightly_keys_fetches_and_checks_the_mors_datasets():
     workflow = yaml.safe_load(
         (repo_root / '.github' / 'workflows' / 'nightly.yml').read_text(encoding='utf-8')
     )
-    steps = [step for job in workflow['jobs'].values() for step in job['steps']]
-    order, calls, cache, tests = [], {}, None, None
+    jobs = list(workflow['jobs'].values())
+    steps = [step for job in jobs for step in job['steps']]
+    calls = {}
     for i, step in enumerate(steps):
-        if step.get('uses', '').startswith('actions/cache@'):
-            order.append(('restore', i))
-            cache = step
-        if tests is None and 'pytest' in step.get('run', ''):
-            tests = step
         for line in step.get('run', '').splitlines():
             m = re.match(r'\s*fwl-io cache (key|fetch|check)\b(.*)', line)
             if m:
-                order.append((m[1], i))
-                calls[m[1]] = m[2]
-    # Every step runs once, keyed before the restore and filled before the tests.
-    assert [name for name, _ in order] == ['key', 'restore', 'fetch', 'check']
-    assert order[-1][1] < steps.index(tests)
+                # One call each, on one line, whose exit status the step returns.
+                assert m[1] not in calls and not re.search(r'[|;&]|\\$', m[2]), line
+                calls[m[1]] = (i, m[2])
+    assert list(calls) == ['key', 'fetch', 'check']
+    key_id = steps[calls['key'][0]]['id']
+    out = {k: f'${{{{ steps.{key_id}.outputs.{k} }}}}' for k in ('key', 'restore-keys')}
+    caches = [
+        i
+        for i, s in enumerate(steps)
+        if s.get('uses', '').startswith('actions/cache@') and s['with'].get('key') == out['key']
+    ]
+    tests = next(i for i, s in enumerate(steps) if 'pytest' in s.get('run', ''))
+    assert len(caches) == 1
+    cache = steps[caches[0]]['with']
+    # Keyed before the restore, filled and checked before the tests.
+    assert calls['key'][0] < caches[0] < calls['fetch'][0] <= calls['check'][0] < tests
+    # Both keys from the key step and nothing else: lookup-only would skip the save.
+    assert cache == {'path': cache['path'], **out}
+    # A skipped or failure-tolerant step leaves an unchecked tree saved and the run green.
+    for i in (calls['key'][0], caches[0], calls['fetch'][0], calls['check'][0]):
+        assert not {'if', 'continue-on-error'} & steps[i].keys(), steps[i].get('name')
+    assert 'env' not in steps[calls['fetch'][0]] and 'env' not in steps[calls['check'][0]]
+    assert not any('continue-on-error' in job for job in jobs)
     # One selection: a key over other data than the fetch fills leaves a stale tree saved.
-    for args in calls.values():
+    assert re.findall(r'--prefix (\S+)', calls['key'][1]) == ['mors-fwl-data-']
+    for _, args in calls.values():
         assert re.findall(r'--(provider|key) (\S+)', args) == [('provider', 'mors')]
-    key_step = steps[order[0][1]]
-    assert cache['with']['key'] == f'${{{{ steps.{key_step["id"]}.outputs.key }}}}'
-    assert cache['with']['restore-keys'] == (
-        f'${{{{ steps.{key_step["id"]}.outputs.restore-keys }}}}'
-    )
     # Fetch, check, cache and tests share one data root.
-    root = cache['with']['path']
-    assert tests['env']['FWL_DATA'] == root
+    root = cache['path']
+    assert steps[tests]['env']['FWL_DATA'] == root
     for name in ('fetch', 'check'):
-        assert calls[name].split('--data-root ')[1].strip() == root
+        args = calls[name][1]
+        assert args.count('--data-root') == 1, name
+        assert re.search(rf'--data-root {re.escape(root)}(\s|$)', args), name
 
 
 def test_manifest_path_loads_both_track_datasets():
