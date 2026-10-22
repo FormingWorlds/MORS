@@ -39,46 +39,25 @@ jobs:
           python -m pip install --upgrade pip
           pip install -e ".[develop]"
 
-      # The key carries the dataset pins and the per-file checksums MORS ships,
-      # so it moves when a dataset moves and stays put otherwise.
-      # actions/cache only writes on an exact-key miss, so a key that never
-      # changes is never rewritten and its tree cannot follow the data. An empty
-      # hash would be such a key, and would also collide with the restore-key
-      # prefix, so the step below refuses to build one. Both inputs are required
-      # rather than either, because hashFiles digests whatever subset it matches:
-      # a renamed registry would otherwise leave a key that still moves with the
-      # pin but no longer tracks the checksums, and nothing would say so.
+      # fwl-io builds the key from the folders, checksums and extract kinds
+      # the manifest pins plus its own release, and picks the restore-keys.
       - name: Resolve the track-data cache key
         id: cachekey
-        run: |
-          if [ ! -f src/mors/data/mors_manifest.toml ] \
-             || ! ls src/mors/data/*.registry.txt >/dev/null 2>&1; then
-            echo "The dataset manifest and its registry are what this key tracks, and" >&2
-            echo "at least one of them is not under src/mors/data/. Point the hashFiles" >&2
-            echo "patterns in this workflow at wherever those files now live." >&2
-            exit 1
-          fi
-          hash="${{ hashFiles('src/mors/data/mors_manifest.toml', 'src/mors/data/*.registry.txt') }}"
-          if [ -z "${hash}" ]; then
-            echo "hashFiles matched nothing under src/mors/data/, so the cache key has" >&2
-            echo "nothing to track. Point the hashFiles patterns in this workflow at" >&2
-            echo "wherever the manifest and registry now live." >&2
-            exit 1
-          fi
-          echo "key=mors-fwl-data-${hash}" >> "${GITHUB_OUTPUT}"
+        run: fwl-io cache key --prefix mors-fwl-data- --provider mors
 
-      # A re-pinned dataset lands in a new r<record-id> directory, so its files
-      # come down in full however warm the cache is. The prefix restore-key
-      # seeds the new entry from the previous tree anyway, which is what spares
-      # the data whose own path did not move (any dataset other than the one
-      # being re-pinned) from being refetched alongside it.
       - name: Cache evolution-track data
         uses: actions/cache@v4
         with:
           path: ${{ github.workspace }}/fwl_data
           key: ${{ steps.cachekey.outputs.key }}
-          restore-keys: |
-            mors-fwl-data-
+          restore-keys: ${{ steps.cachekey.outputs.restore-keys }}
+
+      # actions/cache never saves over an entry it hit, so the tree is
+      # completed and checked on every run, before the save.
+      - name: Fetch and check the track data
+        run: |
+          fwl-io cache fetch --provider mors --data-root ${{ github.workspace }}/fwl_data
+          fwl-io cache check --provider mors --data-root ${{ github.workspace }}/fwl_data
 
       - name: Run unit + smoke + integration + slow tests with coverage
         env:
