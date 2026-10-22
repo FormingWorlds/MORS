@@ -276,34 +276,45 @@ def test_declared_floor_matches_the_error_message_floor():
     assert lower_bounds == [data._FWL_IO_FLOOR]
 
 
-def test_nightly_cache_key_tracks_the_files_that_pin_the_tracks():
-    """The nightly cache key hashes exactly the manifest and registry MORS ships."""
+def test_nightly_keys_fetches_and_checks_the_mors_datasets():
+    """The nightly keys, restores, fetches and checks one selection in one tree."""
     import re
 
+    import yaml
+
     repo_root = Path(__file__).parents[1]
-    workflow = (repo_root / '.github' / 'workflows' / 'nightly.yml').read_text(encoding='utf-8')
-    call = re.search(r'hashFiles\(([^)]*)\)', workflow)
-    # A cache key that stops tracking the data does not fail: the nightly stays
-    # green and quietly refetches every run, so the coupling is pinned here.
-    assert call is not None, 'the nightly no longer derives its cache key from hashFiles'
-    patterns = re.findall(r"'([^']+)'", call.group(1))
-    assert patterns, 'the hashFiles call declares no patterns'
-
-    from fwl_io import load_manifest
-
-    hashed = {path.resolve() for pattern in patterns for path in repo_root.glob(pattern)}
-    manifest = data.manifest_path().resolve()
-    # Every declared dataset, not just Baraffe, so a dataset added to the
-    # manifest later is covered by this test rather than tripping it.
-    registries = {ds.registry_path.resolve() for ds in load_manifest(manifest)}
-    assert registries, 'the manifest declares no dataset to track'
-    # The Zenodo pin lives in the manifest, so a re-pin has to move the key.
-    assert manifest in hashed
-    # The per-file checksums live in the registries, so a re-sync has to move it too.
-    assert registries <= hashed
-    # Nothing else: an over-broad pattern would bust the cache on edits that
-    # leave the data untouched, which costs a full refetch from a single mirror.
-    assert hashed == {manifest} | registries
+    workflow = yaml.safe_load(
+        (repo_root / '.github' / 'workflows' / 'nightly.yml').read_text(encoding='utf-8')
+    )
+    steps = [step for job in workflow['jobs'].values() for step in job['steps']]
+    order, calls, cache, tests = [], {}, None, None
+    for i, step in enumerate(steps):
+        if step.get('uses', '').startswith('actions/cache@'):
+            order.append(('restore', i))
+            cache = step
+        if tests is None and 'pytest' in step.get('run', ''):
+            tests = step
+        for line in step.get('run', '').splitlines():
+            m = re.match(r'\s*fwl-io cache (key|fetch|check)\b(.*)', line)
+            if m:
+                order.append((m[1], i))
+                calls[m[1]] = m[2]
+    # Every step runs once, keyed before the restore and filled before the tests.
+    assert [name for name, _ in order] == ['key', 'restore', 'fetch', 'check']
+    assert order[-1][1] < steps.index(tests)
+    # One selection: a key over other data than the fetch fills leaves a stale tree saved.
+    for args in calls.values():
+        assert re.findall(r'--(provider|key) (\S+)', args) == [('provider', 'mors')]
+    key_step = steps[order[0][1]]
+    assert cache['with']['key'] == f'${{{{ steps.{key_step["id"]}.outputs.key }}}}'
+    assert cache['with']['restore-keys'] == (
+        f'${{{{ steps.{key_step["id"]}.outputs.restore-keys }}}}'
+    )
+    # Fetch, check, cache and tests share one data root.
+    root = cache['with']['path']
+    assert tests['env']['FWL_DATA'] == root
+    for name in ('fetch', 'check'):
+        assert calls[name].split('--data-root ')[1].strip() == root
 
 
 def test_manifest_path_loads_both_track_datasets():
