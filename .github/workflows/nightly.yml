@@ -46,14 +46,21 @@ jobs:
         run: fwl-io cache key --prefix mors-fwl-data- --provider mors
 
       - name: Cache evolution-track data
+        id: cache-fwl-data
         uses: actions/cache@v4
         with:
           path: ${{ github.workspace }}/fwl_data
           key: ${{ steps.cachekey.outputs.key }}
           restore-keys: ${{ steps.cachekey.outputs.restore-keys }}
 
+      # An exact hit is never saved again, so fetch would repair a damaged entry
+      # every night without a word; fail instead, and delete the entry to recover.
+      - name: Check an exact cache hit
+        if: steps.cache-fwl-data.outputs.cache-hit == 'true'
+        run: fwl-io cache check --provider mors --data-root ${{ github.workspace }}/fwl_data
+
       # Every run: a tree restored from an older entry is completed and checked
-      # before the save; an exact hit is not saved again, so fetch completes it here.
+      # before the save.
       - name: Fetch and check the track data
         run: |
           fwl-io cache fetch --provider mors --data-root ${{ github.workspace }}/fwl_data
