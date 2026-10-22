@@ -288,16 +288,17 @@ def test_nightly_keys_fetches_and_checks_the_mors_datasets():
     )
     jobs = list(workflow['jobs'].values())
     steps = [step for job in jobs for step in job['steps']]
-    calls = {}
+    calls = []
     for i, step in enumerate(steps):
         for line in step.get('run', '').splitlines():
             m = re.match(r'\s*fwl-io cache (key|fetch|check)\b(.*)', line)
             if m:
-                # One call each, on one line, whose exit status the step returns.
-                assert m[1] not in calls and not re.search(r'[|;&]|\\$', m[2]), line
-                calls[m[1]] = (i, m[2])
-    assert list(calls) == ['key', 'fetch', 'check']
-    key_id = steps[calls['key'][0]]['id']
+                # One call per line, whose exit status the step returns.
+                assert not re.search(r'[|;&]|\\$', m[2]), line
+                calls.append((m[1], i, m[2]))
+    assert [c[0] for c in calls] == ['key', 'check', 'fetch', 'check']
+    (_, i_key, key_args), (_, i_hit, _), (_, i_fetch, _), (_, i_check, _) = calls
+    key_id = steps[i_key]['id']
     out = {k: f'${{{{ steps.{key_id}.outputs.{k} }}}}' for k in ('key', 'restore-keys')}
     caches = [
         i
@@ -306,27 +307,33 @@ def test_nightly_keys_fetches_and_checks_the_mors_datasets():
     ]
     tests = next(i for i, s in enumerate(steps) if 'pytest' in s.get('run', ''))
     assert len(caches) == 1
-    cache = steps[caches[0]]['with']
-    # Keyed before the restore, filled and checked before the tests.
-    assert calls['key'][0] < caches[0] < calls['fetch'][0] <= calls['check'][0] < tests
+    i_cache = caches[0]
+    cache = steps[i_cache]['with']
+    # Keyed, restored, an exact hit checked, then filled and checked before the tests.
+    assert i_key < i_cache < i_hit < i_fetch <= i_check < tests
     # Both keys from the key step and nothing else: lookup-only would skip the save.
     assert cache == {'path': cache['path'], **out}
+    # An exact hit is never saved again, so a damaged one must fail before fetch repairs it.
+    hit = f"steps.{steps[i_cache]['id']}.outputs.cache-hit == 'true'"
+    assert steps[i_hit].get('if') == hit
     # A skipped or failure-tolerant step leaves an unchecked tree saved and the run green.
-    for i in (calls['key'][0], caches[0], calls['fetch'][0], calls['check'][0]):
-        assert not {'if', 'continue-on-error'} & steps[i].keys(), steps[i].get('name')
-    assert 'env' not in steps[calls['fetch'][0]] and 'env' not in steps[calls['check'][0]]
+    for i in (i_key, i_cache, i_hit, i_fetch, i_check):
+        assert 'continue-on-error' not in steps[i], steps[i].get('name')
+    for i in (i_key, i_cache, i_fetch, i_check):
+        assert 'if' not in steps[i], steps[i].get('name')
+    for i in (i_hit, i_fetch, i_check):
+        assert 'env' not in steps[i], steps[i].get('name')
     assert not any('continue-on-error' in job for job in jobs)
     # One selection: a key over other data than the fetch fills leaves a stale tree saved.
-    assert re.findall(r'--prefix (\S+)', calls['key'][1]) == ['mors-fwl-data-']
-    for _, args in calls.values():
+    assert re.findall(r'--prefix (\S+)', key_args) == ['mors-fwl-data-']
+    for _, _, args in calls:
         assert re.findall(r'--(provider|key) (\S+)', args) == [('provider', 'mors')]
-    # Fetch, check, cache and tests share one data root.
+    # Both checks, the fetch, the cache and the tests share one data root.
     root = cache['path']
     assert steps[tests]['env']['FWL_DATA'] == root
-    for name in ('fetch', 'check'):
-        args = calls[name][1]
-        assert args.count('--data-root') == 1, name
-        assert re.search(rf'--data-root {re.escape(root)}(\s|$)', args), name
+    for kind, _, args in calls[1:]:
+        assert args.count('--data-root') == 1, kind
+        assert re.search(rf'--data-root {re.escape(root)}(\s|$)', args), kind
 
 
 def test_manifest_path_loads_both_track_datasets():
