@@ -20,7 +20,7 @@ Luminosity, radius and effective temperature of the 1 Msun Spada et al. (2013) t
 - Reference: Spada et al. (2013) [^cite-spada2013] solar-calibrated tracks; solar effective temperature 5772 K
 - Tolerance: `atol=0.15` Lsun on L, `atol=0.05` Rsun on R, `rtol=0.03` on Teff at 4.57 Gyr
 - Test id: `tests/test_stellarevo.py::test_stellarevo_solar_calibration`
-- Command: `pytest tests/test_stellarevo.py::test_stellarevo_solar_calibration` (needs `FWL_DATA` with the tracks)
+- Command: `pytest tests/test_stellarevo.py::test_stellarevo_solar_calibration --validation-plots` (needs `FWL_DATA` with the tracks; without `--validation-plots` the test writes no plot)
 
 ### Grid compiled from the raw tracks
 
