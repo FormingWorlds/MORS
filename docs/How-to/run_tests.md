@@ -134,7 +134,8 @@ nightly.
 ## Validation anchors
 
 Each physics source has a validation page naming the published benchmark or
-analytical limit that anchors its reference-pinned test:
+analytical limit that anchors its reference-pinned test. The
+[Validation overview](../Validation/index.md) lists every case; the pages are
 [Baraffe tracks](../Validation/baraffe.md),
 [stellar evolution tracks](../Validation/stellarevo.md),
 [Star model](../Validation/star.md),

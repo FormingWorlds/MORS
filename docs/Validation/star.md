@@ -7,14 +7,23 @@ behaviour of `mors.star` against a published source.
 |---|---|---|---|
 | `tests/test_star.py::test_star_reproduces_solar_luminosity_at_solar_age` | Spada et al. (2013) [^cite-spada2013] solar-calibrated tracks; IAU 2015 Resolution B3 nominal solar luminosity | [2013ApJ...776...87S](https://ui.adsabs.harvard.edu/abs/2013ApJ...776...87S/abstract) | Checks that a 1 Msun star at the solar age (4.57 Gyr) reproduces the nominal solar luminosity in erg/s to within 15%, validating both the track calibration and the internal Lsun-to-erg/s conversion, with a 0.3 Msun discrimination guard. |
 
+## Cases
+
+### Solar luminosity at the solar age
+
+- Reference: Spada et al. (2013) [^cite-spada2013] tracks; IAU 2015 Resolution B3 nominal solar luminosity 3.828e33 erg/s
+- Tolerance: `rtol=0.15` on Lbol in erg/s; the Lbol of a 0.3 Msun star must be below 0.1 of the 1 Msun value
+- Test id: `tests/test_star.py::test_star_reproduces_solar_luminosity_at_solar_age`
+- Command: `pytest tests/test_star.py::test_star_reproduces_solar_luminosity_at_solar_age` (needs `FWL_DATA` with the tracks)
+
 ## Re-derivation note
 
 The `Star` class couples the Spada et al. (2013) stellar-structure tracks with a
-rotation-and-activity model and exposes `Star.Value(age, key)`. Structural keys
-(`Rstar`, `Lbol`) are returned in cgs units: `Lbol` in erg/s, converted from the
-tracks' native solar-luminosity units by multiplying by the nominal solar
-luminosity. Activity keys (`Leuv`) depend on the rotation history the chosen
-time integrator produces.
+rotation-and-activity model and exposes `Star.Value(age, key)`. `Lbol` is
+returned in erg/s, converted from the tracks' native solar-luminosity units by
+multiplying by the nominal solar luminosity; `Rstar` is returned in solar
+radii. Activity keys (`Leuv`) depend on the rotation history the chosen time
+integrator produces.
 
 The Spada et al. (2013) models are solar-calibrated: a 1 Msun star at the solar
 age reproduces the Sun. In this implementation the solar-mass track at 4.57 Gyr

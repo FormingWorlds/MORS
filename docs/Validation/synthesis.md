@@ -7,6 +7,15 @@ behaviour of `mors.synthesis` against a self-consistency identity.
 |---|---|---|---|
 | `tests/test_synthesis.py::test_GetProperties_flux_budget` | Self-consistency: the band fluxes sum to the bolometric flux | closed form | Pins the band luminosities and fluxes returned by `GetProperties` against a hand-computed budget and asserts the five sub-band fluxes sum exactly to the bolometric flux, because the UV band is defined as the bolometric remainder. |
 
+## Cases
+
+### Flux budget closure
+
+- Reference: self-consistency: the 5 sub-band fluxes sum to the bolometric flux
+- Tolerance: `rtol=1e-12` on each band flux, each band luminosity and the closure
+- Test id: `tests/test_synthesis.py::test_GetProperties_flux_budget`
+- Command: `pytest tests/test_synthesis.py::test_GetProperties_flux_budget`
+
 ## Re-derivation note
 
 `synthesis.GetProperties` builds the stellar high-energy budget from the
@@ -21,13 +30,18 @@ F_uv = F_bo - F_xr - F_e1 - F_e2 - F_pl
 
 By construction this makes the five sub-band fluxes sum to the bolometric flux
 exactly. The test mocks the stellar-model inputs (`Value`, `Percentile`,
-`Lxuv`, `Lbol`) and the Planck surface flux with physically plausible constants,
-recomputes the expected per-band fluxes and luminosities from the same physical
-constants the source uses (`AU`, `LbolSun`), and pins the result. The final
+`Lxuv`, `Lbol`) with physically plausible constants, sets the Planck surface
+flux to zero and `ScaleTo1AU` to the identity, so `F_pl` is zero in this case.
+It recomputes the expected per-band fluxes and luminosities from the same
+physical constants the source uses (`AU`, `LbolSun`), and pins the result. The final
 assertion checks the closure `sum(sub-bands) == F_bo` directly.
 
-Scale: a regression that drops a band from the remainder, or that double-counts
-a contribution, breaks the closure by more than the `rtol=1e-12` tolerance.
+Scale: the closure holds by construction of `F_uv`, so the pins of the
+individual band fluxes and luminosities carry the check: a wrong X-ray or EUV
+flux, or a wrong luminosity conversion, moves a pinned value by more than the
+`rtol=1e-12` tolerance. With `F_pl` set to zero, this case does not check the
+photospheric term of the remainder; `test_GetProperties_planck_trapezoid_constant`
+pins the `F_pl` integral, and no test checks its subtraction from `F_bo`.
 
 ## Anchor type
 

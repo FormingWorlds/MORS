@@ -27,13 +27,30 @@ pytestmark = [pytest.mark.integration, pytest.mark.timeout(300)]
 SOLAR_AGE_MYR = 4570.0
 # Solar effective temperature (K), the standard photospheric value.
 T_EFF_SUN = 5772.0
+# Solar calibration tolerances, shared by the assertions and the validation plot.
+SOLAR_L_ATOL = 0.15  # Lsun
+SOLAR_R_ATOL = 0.05  # Rsun
+SOLAR_TEFF_RTOL = 0.03
 # Default Spada model set, closest to solar composition.
 SOLAR_MODEL_SET = 'X0p70952_Z0p01631_A1p875'
 
 # All per-quantity accessor names exposed both as StarEvo methods and module functions.
 QUANTITY_NAMES = (
-    'Rstar', 'Lbol', 'Teff', 'Itotal', 'Icore', 'Ienv', 'Mcore', 'Menv',
-    'Rcore', 'tauConv', 'dItotaldt', 'dIcoredt', 'dIenvdt', 'dMcoredt', 'dRcoredt',
+    'Rstar',
+    'Lbol',
+    'Teff',
+    'Itotal',
+    'Icore',
+    'Ienv',
+    'Mcore',
+    'Menv',
+    'Rcore',
+    'tauConv',
+    'dItotaldt',
+    'dIcoredt',
+    'dIenvdt',
+    'dMcoredt',
+    'dRcoredt',
 )
 
 
@@ -46,7 +63,7 @@ def default_star_evo():
 
 @pytest.mark.reference_pinned
 @pytest.mark.physics_invariant
-def test_stellarevo_solar_calibration():
+def test_stellarevo_solar_calibration(validation_plot):
     """The Spada 1 Msun track reproduces the Sun at the solar age.
 
     Reference: Spada et al. (2013) solar-calibrated tracks, with the solar
@@ -64,10 +81,41 @@ def test_stellarevo_solar_calibration():
     assert lbol > 0.0
     assert rstar > 0.0
     assert teff > 0.0
-    # Solar calibration: within 0.15 Lsun, 0.05 Rsun, and 3% in Teff.
-    assert_allclose(lbol, 1.0, atol=0.15)
-    assert_allclose(rstar, 1.0, atol=0.05)
-    assert_allclose(teff, T_EFF_SUN, rtol=0.03)
+    assert_allclose(lbol, 1.0, atol=SOLAR_L_ATOL)
+    assert_allclose(rstar, 1.0, atol=SOLAR_R_ATOL)
+    assert_allclose(teff, T_EFF_SUN, rtol=SOLAR_TEFF_RTOL)
+
+    def figure():
+        import matplotlib.pyplot as plt
+
+        ages = np.geomspace(100.0, 8000.0, 60)
+        rows = (
+            ('Lbol', 'L [Lsun]', lbol, 1.0, SOLAR_L_ATOL),
+            ('Rstar', 'R [Rsun]', rstar, 1.0, SOLAR_R_ATOL),
+            ('Teff', 'Teff [K]', teff, T_EFF_SUN, SOLAR_TEFF_RTOL * T_EFF_SUN),
+        )
+        fig, axes = plt.subplots(3, 1, sharex=True, figsize=(6.4, 6.4))
+        for ax, (key, label, value, ref, tol) in zip(axes, rows):
+            ax.plot(ages, mors.Value(1.0, ages, key), label='Spada 1 Msun track')
+            ax.errorbar(
+                SOLAR_AGE_MYR,
+                ref,
+                yerr=tol,
+                fmt='o',
+                ms=5,
+                capsize=4,
+                label='Sun and tolerance',
+            )
+            ax.plot(SOLAR_AGE_MYR, value, 'x', ms=9, mew=2, zorder=3, label='track at 4.57 Gyr')
+            ax.set_ylabel(label)
+        axes[0].legend()
+        axes[-1].set(xscale='log', xlabel='Age [Myr]')
+        for ax in axes:
+            ax.minorticks_off()
+        fig.tight_layout()
+        return fig
+
+    validation_plot(figure, 'stellarevo_solar_calibration')
 
 
 @pytest.mark.physics_invariant
@@ -99,11 +147,13 @@ def test_grid_compiled_from_raw_tracks_matches_saved_grid(tmp_path, monkeypatch)
     pre-pickled grid; here the raw ``.track1`` / ``.track2`` files are read and
     the grid is compiled from scratch (the code path that produced that pickle).
     The pickle is written to the user cache directory, never into the track
-    directory, which holds immutable fetched data. The freshly compiled 1 Msun track must still land near L = 1 Lsun and
-    R = 1 Rsun at the solar age, and a second construction from the pickle it
-    just wrote must return the identical grid. A wrong column index in the raw
-    reader, a dropped log-to-linear conversion, or a Gyr-to-Myr slip would move
-    the solar luminosity far outside the tolerance.
+    directory, which holds immutable fetched data. The freshly compiled 1 Msun
+    track must still land near L = 1 Lsun and R = 1 Rsun at the solar age, and a
+    second construction must return the same Lbol and Teff at 1 Msun and the
+    solar age; the test does not check that the second construction reads the
+    pickle. A wrong column index in the raw reader, a dropped log-to-linear
+    conversion, or a Gyr-to-Myr slip would move the solar luminosity far outside
+    the tolerance.
     """
     real_model_dir = os.path.join(se.starEvoDirDefault, SOLAR_MODEL_SET)
     # Point a private grid directory at the real raw tracks with no pickle present,
@@ -136,8 +186,9 @@ def test_grid_compiled_from_raw_tracks_matches_saved_grid(tmp_path, monkeypatch)
     # Re-constructing now loads the saved pickle; the grids must agree at 1 Msun.
     reloaded = mors.StarEvo(starEvoDir=str(grid_dir), evoModels=SOLAR_MODEL_SET)
     assert_allclose(reloaded.Lbol(1.0, SOLAR_AGE_MYR), lbol, rtol=1e-12)
-    assert_allclose(reloaded.Teff(1.0, SOLAR_AGE_MYR),
-                    compiled.Teff(1.0, SOLAR_AGE_MYR), rtol=1e-12)
+    assert_allclose(
+        reloaded.Teff(1.0, SOLAR_AGE_MYR), compiled.Teff(1.0, SOLAR_AGE_MYR), rtol=1e-12
+    )
 
 
 def test_grid_cache_write_failure_does_not_break_construction(tmp_path, monkeypatch, caplog):
@@ -181,8 +232,18 @@ def test_starevo_methods_return_physical_solar_quantities(default_star_evo):
     assert_allclose(se_obj.Value(1.0, SOLAR_AGE_MYR, 'Lbol'), vals['Lbol'], rtol=1e-12)
 
     # Strictly positive structural quantities.
-    for key in ('Rstar', 'Lbol', 'Teff', 'Itotal', 'Icore', 'Ienv',
-                'Mcore', 'Menv', 'Rcore', 'tauConv'):
+    for key in (
+        'Rstar',
+        'Lbol',
+        'Teff',
+        'Itotal',
+        'Icore',
+        'Ienv',
+        'Mcore',
+        'Menv',
+        'Rcore',
+        'tauConv',
+    ):
         assert vals[key] > 0.0, key
 
     # Envelope mass fraction is bounded; the solar core radius is inside the star.
@@ -217,10 +278,22 @@ def test_module_level_wrappers_match_default_grid():
     instance.
     """
     mors.DownloadEvolutionTracks('Spada')
-    module_vals = {name: float(getattr(mors, name)(1.0, SOLAR_AGE_MYR)) for name in QUANTITY_NAMES}
+    module_vals = {
+        name: float(getattr(mors, name)(1.0, SOLAR_AGE_MYR)) for name in QUANTITY_NAMES
+    }
 
-    for key in ('Rstar', 'Lbol', 'Teff', 'Itotal', 'Icore', 'Ienv',
-                'Mcore', 'Menv', 'Rcore', 'tauConv'):
+    for key in (
+        'Rstar',
+        'Lbol',
+        'Teff',
+        'Itotal',
+        'Icore',
+        'Ienv',
+        'Mcore',
+        'Menv',
+        'Rcore',
+        'tauConv',
+    ):
         assert module_vals[key] > 0.0, key
 
     # Same structural constraints as the class accessors.

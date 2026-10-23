@@ -7,6 +7,15 @@ behaviour of `mors.cluster` against an analytical limit.
 |---|---|---|
 | `tests/test_cluster.py::test_percentile_of_uniform_ramp_matches_closed_form` | Analytical limit: the percentile of an evenly spaced distribution | Pins the `Cluster.Percentile` output for an evenly spaced rotation-rate distribution to the closed form `A + (B - A) * q / 100`. |
 
+## Cases
+
+### Percentile of a uniform ramp
+
+- Reference: closed form `A + (B - A) * q / 100`
+- Tolerance: `rtol=1e-12` at q = 5, 50 and 95
+- Test id: `tests/test_cluster.py::test_percentile_of_uniform_ramp_matches_closed_form`
+- Command: `pytest tests/test_cluster.py::test_percentile_of_uniform_ramp_matches_closed_form`
+
 ## Re-derivation note
 
 `Cluster` holds a population of stars and reports statistics of their rotation

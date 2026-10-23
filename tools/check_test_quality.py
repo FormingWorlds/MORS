@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """AST-based test-quality linter for the MORS test suite.
 
-Enforces the rules in `.github/.claude/rules/mors-tests.md` (sections 1 + 7):
+Enforces the test rules of `tests/AGENTS.md`:
 
 - Every test file must declare a module-level ``pytestmark`` containing a tier
   marker (``unit`` / ``smoke`` / ``integration`` / ``slow``).
@@ -11,7 +11,7 @@ Enforces the rules in `.github/.claude/rules/mors-tests.md` (sections 1 + 7):
   check in the test: ``result is not None``, ``result > 0``,
   ``len(result) > 0``, ``isinstance(result, dict)``, ``result is None``.
   A weak assertion that accompanies a stronger primary assertion (the
-  three-class discrimination guard from mors-tests.md section 2 uses
+  discrimination guard of tests/AGENTS.md uses
   ``val > 0`` as a sign guard alongside ``pytest.approx(...)``, for
   example) is NOT flagged.
 - Every test function must have a docstring.
@@ -79,14 +79,13 @@ NUMPY_TESTING_HELPERS = {
 # Optional dependencies. Any test module that imports one of these MUST
 # precede the import with ``pytest.importorskip('<name>')`` at module
 # scope, otherwise CI's ``pip install --no-deps`` build fails collection.
-# Source rule: mors-tests.md section 5.
 OPTIONAL_DEPS = {
     'hypothesis',
 }
 
 # Physics source files. Each one should have a companion test file under
 # tests/ carrying at least one @pytest.mark.physics_invariant test and at
-# least one @pytest.mark.reference_pinned test (mors-tests.md section 3).
+# least one @pytest.mark.reference_pinned test (tests/AGENTS.md).
 PHYSICS_SOURCES = {
     'baraffe.py',
     'cluster.py',

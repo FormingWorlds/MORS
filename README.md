@@ -22,7 +22,7 @@ Full documentation is at **[proteus-framework.org/MORS](https://proteus-framewor
 - [Tutorial](https://proteus-framework.org/MORS/Tutorials/first_run.html): a first stellar-evolution run and how to read its output.
 - [How-to guides](https://proteus-framework.org/MORS/How-to/installation.html): install, evolve a star, read tracks and activity quantities, compute habitable-zone boundaries, run the tests.
 - [Explanations](https://proteus-framework.org/MORS/Explanations/rotation.html): rotation model, X-ray and EUV activity, stellar structure, spectral synthesis, and coupling to PROTEUS.
-- [API reference](https://proteus-framework.org/MORS/Reference/api/index.html) and [validation anchors](https://proteus-framework.org/MORS/Validation/physicalmodel.html): every public function with NumPy-style docstrings, plus the per-source reference-pinned test inventory.
+- [API reference](https://proteus-framework.org/MORS/Reference/api/index.html) and [validation cases](https://proteus-framework.org/MORS/Validation/index.html): every public function with NumPy-style docstrings, plus the per-source reference-pinned test inventory.
 
 ## Installation
 
