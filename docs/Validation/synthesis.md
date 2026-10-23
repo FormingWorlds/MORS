@@ -7,6 +7,15 @@ behaviour of `mors.synthesis` against a self-consistency identity.
 |---|---|---|---|
 | `tests/test_synthesis.py::test_GetProperties_flux_budget` | Self-consistency: the band fluxes sum to the bolometric flux | closed form | Pins the band luminosities and fluxes returned by `GetProperties` against a hand-computed budget and asserts the five sub-band fluxes sum exactly to the bolometric flux, because the UV band is defined as the bolometric remainder. |
 
+## Cases
+
+### Flux budget closure
+
+- Reference: self-consistency: the 5 sub-band fluxes sum to the bolometric flux
+- Tolerance: `rtol=1e-12` on each band flux, each band luminosity and the closure
+- Test id: `tests/test_synthesis.py::test_GetProperties_flux_budget`
+- Command: `pytest tests/test_synthesis.py::test_GetProperties_flux_budget`
+
 ## Re-derivation note
 
 `synthesis.GetProperties` builds the stellar high-energy budget from the

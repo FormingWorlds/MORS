@@ -7,6 +7,15 @@ behaviour of `mors.spectrum` against an analytical limit.
 |---|---|---|---|
 | `tests/test_spectrum.py::test_Spectrum_CalcBandFluxes_constant_integrand` | Analytical limit: integral of a unit integrand over a band equals the band width | closed form | Feeds a constant unit-flux spectrum and pins each band integral (and the bolometric integral) to the exact band width, so a wrong integration weight, a dropped bin width, or a wavelength-unit slip fails against a hand-computed value. |
 
+## Cases
+
+### Band integral of a constant spectrum
+
+- Reference: closed form: the band width
+- Tolerance: `rtol=1e-12` on each band and the bolometric integral
+- Test id: `tests/test_spectrum.py::test_Spectrum_CalcBandFluxes_constant_integrand`
+- Command: `pytest tests/test_spectrum.py::test_Spectrum_CalcBandFluxes_constant_integrand`
+
 ## Re-derivation note
 
 `Spectrum.CalcBandFluxes` integrates the loaded spectrum over each emission

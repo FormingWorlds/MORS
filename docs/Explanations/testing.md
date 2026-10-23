@@ -18,7 +18,7 @@ The suite is a regression net: a passing run confirms that recent changes have
 not perturbed locked behaviour, not that the behaviour is itself physically
 correct. Physical correctness is judged separately, against analytic limits,
 benchmark codes, and published references; each physics source records its
-anchor on a validation page (`docs/Validation/`).
+anchor on a page of the [Validation](../Validation/index.md) tab.
 
 ## Test tiers and coverage
 

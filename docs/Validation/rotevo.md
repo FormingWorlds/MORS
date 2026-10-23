@@ -7,6 +7,15 @@ behaviour of `mors.rotevo` against an analytical limit.
 |---|---|---|
 | `tests/test_rotevo.py::test_forward_euler_step_matches_analytic_update` | Analytical limit: one explicit Euler step of a prescribed constant rate | Pins a single forward-Euler rotation step against the closed form `Omega_new = Omega + dAge * rate`, for a prescribed constant envelope and core rate. |
 
+## Cases
+
+### Forward-Euler step
+
+- Reference: closed form `Omega_new = Omega + dAge * r`
+- Tolerance: `rtol=1e-12` on the envelope (9.0) and core (9.5) rates
+- Test id: `tests/test_rotevo.py::test_forward_euler_step_matches_analytic_update`
+- Command: `pytest tests/test_rotevo.py::test_forward_euler_step_matches_analytic_update`
+
 ## Re-derivation note
 
 `rotevo.py` integrates the coupled core and envelope rotation rates forward in

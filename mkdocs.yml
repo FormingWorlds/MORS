@@ -42,6 +42,21 @@ nav:
       - Coupling to PROTEUS: Explanations/proteus.md
       - Testing suite: Explanations/testing.md
 
+  - Validation:
+      - Overview: Validation/index.md
+      - Stellar structure and evolution:
+        - Stellar evolution tracks: Validation/stellarevo.md
+        - Star model: Validation/star.md
+        - Baraffe tracks: Validation/baraffe.md
+      - Rotation:
+        - Rotation evolution: Validation/rotevo.md
+      - Activity and habitable zone: Validation/physicalmodel.md
+      - Spectra:
+        - Spectrum: Validation/spectrum.md
+        - Spectral synthesis: Validation/synthesis.md
+      - Cluster statistics:
+        - Cluster percentiles: Validation/cluster.md
+
   - Reference:
       - Publications and bibliography: Reference/publications.md
       - Parameter reference: Reference/parameters.md
@@ -60,15 +75,6 @@ nav:
         - mors.constants: Reference/api/constants.md
         - mors.data: Reference/api/data.md
         - mors.cli: Reference/api/cli.md
-      - Validation anchors:
-        - Baraffe tracks: Validation/baraffe.md
-        - Stellar evolution tracks: Validation/stellarevo.md
-        - Star model: Validation/star.md
-        - Rotation evolution: Validation/rotevo.md
-        - Activity and habitable zone: Validation/physicalmodel.md
-        - Cluster percentiles: Validation/cluster.md
-        - Spectrum: Validation/spectrum.md
-        - Spectral synthesis: Validation/synthesis.md
 
   - Community:
       - Contact: Community/contact.md

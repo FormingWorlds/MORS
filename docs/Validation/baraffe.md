@@ -7,6 +7,15 @@ behaviour of `mors.baraffe` against a published source.
 |---|---|---|---|
 | `tests/test_baraffe.py::test_baraffe_track_matches_published_values` | Baraffe et al. (2015) [^cite-baraffe2015], A&A 577, A42 | [2015A&A...577A..42B](https://ui.adsabs.harvard.edu/abs/2015A%26A...577A..42B/abstract) | Pins the interpolated luminosity, stellar radius, and orbital insolation at two stellar masses (0.047 and 1.113 Msun) against the Baraffe et al. (2015) evolutionary tracks, and asserts each returned quantity is strictly positive. |
 
+## Cases
+
+### Baraffe track values
+
+- Reference: Baraffe et al. (2015) [^cite-baraffe2015] evolutionary tracks
+- Tolerance: `rtol=1e-5` on luminosity, radius and insolation at 0.047 and 1.113 Msun
+- Test id: `tests/test_baraffe.py::test_baraffe_track_matches_published_values`
+- Command: `pytest tests/test_baraffe.py::test_baraffe_track_matches_published_values` (needs `FWL_DATA` with the tracks)
+
 ## Re-derivation note
 
 `mors.BaraffeTrack` reads the Baraffe et al. (2015) evolutionary tracks
