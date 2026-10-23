@@ -5,12 +5,11 @@ repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.6.0
     hooks:
-      # The vendored SIL Open Font License text is redistributed verbatim
-      # alongside the fonts, so the two rewriting hooks leave it alone.
-      # A test asserts that every exclude in this file matches a tracked file.
+      # The vendored OFL text and the test-written validation SVGs keep their
+      # bytes. A test asserts that every exclude matches a tracked file.
       - id: trailing-whitespace
         args: [--markdown-linebreak-ext=md]
-        exclude: ^docs/stylesheets/fonts/OFL\.txt$
+        exclude: ^(docs/stylesheets/fonts/OFL\.txt|docs/assets/validation/.*\.svg)$
       - id: end-of-file-fixer
         exclude: ^docs/stylesheets/fonts/OFL\.txt$
       - id: check-case-conflict
