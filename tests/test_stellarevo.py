@@ -46,7 +46,7 @@ def default_star_evo():
 
 @pytest.mark.reference_pinned
 @pytest.mark.physics_invariant
-def test_stellarevo_solar_calibration():
+def test_stellarevo_solar_calibration(validation_plot):
     """The Spada 1 Msun track reproduces the Sun at the solar age.
 
     Reference: Spada et al. (2013) solar-calibrated tracks, with the solar
@@ -54,7 +54,8 @@ def test_stellarevo_solar_calibration():
     temperature 5772 K. At 4.57 Gyr the solar-mass track lands within
     0.15 Lsun of L = 1 Lsun, 0.05 Rsun of R = 1 Rsun, and 3% of Teff = 5772 K.
     A wrong track index, a wrong age unit, or a units slip would move any of
-    these far outside the tolerance.
+    these far outside the tolerance. The plot shows the track with the Sun and
+    the tolerance band of each quantity.
     """
     mors.DownloadEvolutionTracks('Spada')
     lbol = mors.Value(1.0, SOLAR_AGE_MYR, 'Lbol')
@@ -68,6 +69,32 @@ def test_stellarevo_solar_calibration():
     assert_allclose(lbol, 1.0, atol=0.15)
     assert_allclose(rstar, 1.0, atol=0.05)
     assert_allclose(teff, T_EFF_SUN, rtol=0.03)
+
+    def figure():
+        import matplotlib.pyplot as plt
+
+        ages = np.geomspace(100.0, 8000.0, 60)
+        rows = (
+            ('Lbol', 'L [Lsun]', lbol, 1.0, 0.15),
+            ('Rstar', 'R [Rsun]', rstar, 1.0, 0.05),
+            ('Teff', 'Teff [K]', teff, T_EFF_SUN, 0.03 * T_EFF_SUN),
+        )
+        fig, axes = plt.subplots(3, 1, sharex=True, figsize=(6.4, 6.4))
+        for ax, (key, label, value, ref, tol) in zip(axes, rows):
+            ax.plot(ages, [mors.Value(1.0, a, key) for a in ages], label='Spada 1 Msun track')
+            ax.errorbar(
+                SOLAR_AGE_MYR, ref, yerr=tol, fmt='o', ms=5, capsize=4, label='Sun and tolerance'
+            )
+            ax.plot(SOLAR_AGE_MYR, value, 'x', ms=9, mew=2, zorder=3, label='track at 4.57 Gyr')
+            ax.set_ylabel(label)
+        axes[0].legend()
+        axes[-1].set(xscale='log', xlabel='Age [Myr]')
+        for ax in axes:
+            ax.minorticks_off()
+        fig.tight_layout()
+        return fig
+
+    validation_plot(figure, 'stellarevo_solar_calibration')
 
 
 @pytest.mark.physics_invariant
