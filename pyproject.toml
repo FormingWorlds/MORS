@@ -48,6 +48,8 @@ develop = [
   "pytest",
   "pytest-cov",
   "pytest-timeout",
+  # validation_plot fixture for the Validation tab plots
+  "proteus-mpl>=1.4.0",
   "pyyaml",
   "ruff",
   "tomlkit"
