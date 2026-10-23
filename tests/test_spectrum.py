@@ -118,6 +118,7 @@ def test_planck_surface_flux_increases_with_temperature(wl, T1, T2):
 
 # Spectrum: LoadDirectly / CalcBandFluxes
 
+
 @pytest.mark.physics_invariant
 @pytest.mark.parametrize(
     'wl,fl',
@@ -172,11 +173,11 @@ def test_Spectrum_LoadDirectly_sanitizes_and_orders(wl, fl):
         (
             np.concatenate(
                 [
-                    np.linspace(0.6, 9.9, 50),        # xr (avoid 10..12.5 overlap)
-                    np.linspace(12.6, 31.9, 50),      # e1
-                    np.linspace(32.1, 91.9, 50),      # e2
-                    np.linspace(92.1, 399.9, 100),    # uv
-                    np.linspace(400.1, 900.0, 100),   # pl
+                    np.linspace(0.6, 9.9, 50),  # xr (avoid 10..12.5 overlap)
+                    np.linspace(12.6, 31.9, 50),  # e1
+                    np.linspace(32.1, 91.9, 50),  # e2
+                    np.linspace(92.1, 399.9, 100),  # uv
+                    np.linspace(400.1, 900.0, 100),  # pl
                 ]
             ),
             None,  # filled below
@@ -209,8 +210,14 @@ def test_Spectrum_CalcBandFluxes_constant_integrand(wl, fl, expected):
     integ = s.CalcBandFluxes()
 
     ret = (integ['xr'], integ['e1'], integ['e2'], integ['uv'], integ['pl'], integ['bo'])
-    exp = (expected['xr'], expected['e1'], expected['e2'], expected['uv'],
-           expected['pl'], expected['bo'])
+    exp = (
+        expected['xr'],
+        expected['e1'],
+        expected['e2'],
+        expected['uv'],
+        expected['pl'],
+        expected['bo'],
+    )
 
     # Every band integral is positive for a positive integrand.
     assert all(x > 0.0 for x in ret)
@@ -278,16 +285,15 @@ def test_Spectrum_ExtendPlanck(Teff, R_star, wl_max):
     assert s.ext_long == old_n
     assert_allclose(s.wl[s.ext_long - 1], old_max, rtol=1e-12, atol=0.0)
     assert_allclose(s.wl[-1], wl_max, rtol=1e-10, atol=0.0)
-    assert np.all(s.fl[s.ext_long:] > 0.0)
+    assert np.all(s.fl[s.ext_long :] > 0.0)
 
 
 # TSV I/O
 
+
 @pytest.mark.parametrize(
     'wl,fl',
-    (
-        (np.linspace(1.0, 100.0, 200), np.linspace(1e-10, 2e-10, 200)),
-    ),
+    ((np.linspace(1.0, 100.0, 200), np.linspace(1e-10, 2e-10, 200)),),
 )
 def test_Spectrum_tsv_roundtrip(tmp_path, wl, fl):
     """Writing a spectrum to TSV and reading it back preserves the grid and flux.
@@ -331,12 +337,12 @@ def test_Spectrum_CalcBandFluxes_skips_out_of_range_bins():
     # followed by clean, non-overlapping per-band segments at unit flux.
     wl = np.concatenate(
         [
-            np.array([0.1, 0.3]),             # below all bands, WhichBand -> None
-            np.linspace(0.6, 9.9, 40),        # xr (avoid 10..12.5 overlap)
-            np.linspace(12.6, 31.9, 40),      # e1
-            np.linspace(32.1, 91.9, 40),      # e2
-            np.linspace(92.1, 399.9, 60),     # uv
-            np.linspace(400.1, 900.0, 60),    # pl
+            np.array([0.1, 0.3]),  # below all bands, WhichBand -> None
+            np.linspace(0.6, 9.9, 40),  # xr (avoid 10..12.5 overlap)
+            np.linspace(12.6, 31.9, 40),  # e1
+            np.linspace(32.1, 91.9, 40),  # e2
+            np.linspace(92.1, 399.9, 60),  # uv
+            np.linspace(400.1, 900.0, 60),  # pl
         ]
     )
     fl = np.ones_like(wl)
