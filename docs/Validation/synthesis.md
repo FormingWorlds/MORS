@@ -30,13 +30,16 @@ F_uv = F_bo - F_xr - F_e1 - F_e2 - F_pl
 
 By construction this makes the five sub-band fluxes sum to the bolometric flux
 exactly. The test mocks the stellar-model inputs (`Value`, `Percentile`,
-`Lxuv`, `Lbol`) and the Planck surface flux with physically plausible constants,
-recomputes the expected per-band fluxes and luminosities from the same physical
+`Lxuv`, `Lbol`) with physically plausible constants and sets the Planck surface
+flux to zero, so `F_pl` is zero in this case. It recomputes the expected per-band fluxes and luminosities from the same physical
 constants the source uses (`AU`, `LbolSun`), and pins the result. The final
 assertion checks the closure `sum(sub-bands) == F_bo` directly.
 
-Scale: a regression that drops a band from the remainder, or that double-counts
-a contribution, breaks the closure by more than the `rtol=1e-12` tolerance.
+Scale: the closure holds by construction of `F_uv`, so the pins of the
+individual band fluxes and luminosities carry the check: a wrong X-ray or EUV
+flux, or a wrong luminosity conversion, moves a pinned value by more than the
+`rtol=1e-12` tolerance. With `F_pl` set to zero, this case does not check the
+photospheric term of the remainder.
 
 ## Anchor type
 

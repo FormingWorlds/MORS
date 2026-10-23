@@ -36,9 +36,9 @@ A module-level constant read from an environment variable at import time does no
 
 ## MORS specifics
 
-Structure: `src/mors/<file>.py` is tested in `tests/test_<file>.py`. A scenario that runs several sources (a coupled `Star` evolution uses `star.py`, `stellarevo.py`, `rotevo.py` and `physicalmodel.py`) is named after the primary source, and its file docstring names the others. `bash tools/validate_test_structure.sh` checks that every test carries exactly one of `unit`, `smoke`, `integration`, `slow` and `skip` (module, class or function).
+Structure: `src/mors/<file>.py` is tested in `tests/test_<file>.py`. A scenario that runs several sources (a coupled `Star` evolution uses `star.py`, `stellarevo.py`, `rotevo.py` and `physicalmodel.py`) is named after the primary source, and its file docstring names the others. `bash tools/validate_test_structure.sh` checks that every test carries at most one of `unit`, `smoke`, `integration` and `slow` (module, class or function), and `skip` when it carries none.
 
-Tiers: tests of the band, flux and synthesis code with the track lookups mocked are `unit`; tests that read the real Baraffe or Spada tracks are `integration`, need `FWL_DATA`, and run nightly. CI: pull requests run `pytest -m "(unit or smoke) and not skip"` with the fast coverage gate, the structure check and `check_test_quality.py --check`, which blocks here; the nightly runs all tiers. The [testing page](../docs/How-to/run_tests.md) gives the commands per tier.
+Tiers: tests of the band, flux and synthesis code with the track lookups mocked are `unit`; tests that read the real Baraffe or Spada tracks are `integration`, need `FWL_DATA`, and run nightly. Smoke tests aim for under 30 s each. The tests need the develop extra: proteus-mpl provides the `validation_plot` fixture. `pytest -m <tier>` runs one tier. CI: pull requests run `pytest -m "(unit or smoke) and not skip"` with the fast coverage gate, the structure check and `check_test_quality.py --check`, which blocks here; the nightly runs all tiers. The [testing page](../docs/How-to/run_tests.md) gives the commands per tier.
 
 ### Physics sources and invariants
 
@@ -51,7 +51,10 @@ The physics sources are listed in `AGENTS.md` and in `PHYSICS_SOURCES` of `tools
 
 A property (monotonicity, conservation, bound) is preferred over a point pin where both are possible. Each physics source has at least one `physics_invariant` and one `reference_pinned` test and a page in `docs/Validation/`; the [Validation overview](../docs/Validation/index.md) lists the cases. `python tools/check_test_quality.py --reference-pinned-status` and `--physics-invariant-status` list the gaps (advisory). The markers are registered in `pyproject.toml` and do not block CI on their own.
 
-### Discriminating values
+### Edge cases and discriminating values
+
+Useful edge cases here: `Omega = 0`, the youngest age of a track, the lowest and highest mass of the grid, a spectrum with a single band or an empty band.
+
 
 The plausible bugs here are a wrong exponent or factor, a wrong sign, a cgs and SI slip (erg/s against W, cm against m, nm against micron), and a wrong track, band or integrator (Baraffe or Spada, X-ray or EUV, `ForwardEuler` or `RungeKutta4`). A test that pins a value with `pytest.approx` or `assert_allclose` adds a guard for each class: a wrong-value distance, an explicit sign (`val > 0`), a scale window with the unit in the comment (`1e32 < L < 1e34` for a solar-type `Lbol` in erg/s), and a value that separates the chosen track or band from its sibling. When the primary assertion is a conservation closure, the closure covers the exponent class; the sign and scale guards stay.
 
@@ -60,7 +63,7 @@ The plausible bugs here are a wrong exponent or factor, a wrong sign, a cgs and 
 - Track interpolation: an age between grid nodes; at a node every interpolant agrees.
 - Band closure: a spectrum with non-trivial flux in each band, not one band at unit flux.
 
-The linter flags a weak assertion (`is not None`, `> 0`, `len(...) > 0`, `isinstance`, `is None`) only when it is the sole assertion, so the sign and scale guards beside a pin pass. A single assertion is accepted only for a hard-fail invariant (a band closure at `1e-12`) that no other test in the file checks. Delete a test that asserts a fixture's implicit default.
+The linter flags a weak assertion only when it is the sole assertion, so the sign and scale guards beside a pin pass. A single assertion is accepted only for a hard-fail invariant (a band closure at `1e-12`) that no other test in the file checks. Delete a test that asserts a fixture's implicit default.
 
 ### Tolerances, mocks, constants
 
@@ -68,7 +71,7 @@ The linter flags a weak assertion (`is not None`, `> 0`, `len(...) > 0`, `isinst
 - Unit tests mock the track download, file and HTTP access, `scipy.optimize.minimize`, and the real `Value` and `Percentile` lookups (`monkeypatch.setattr(synth, 'Value', fake_Value)`). When a test sets a physics term to zero to isolate another (the Planck flux, to test the XUV budget), its docstring says so and it asserts the degenerate invariant. Never mock the function under test. Smoke, integration and slow tests use the real tracks.
 - `hypothesis` is the one optional dependency the linter knows (`OPTIONAL_DEPS`); a new optional dependency is added there. The runtime dependencies (`numpy`, `scipy`, `matplotlib`, `click`, `platformdirs`) need no guard.
 - `FWL_DATA` is read into a module constant at import: patch the constant (`monkeypatch.setattr('mors.data.<CONST>', tmp_path, raising=False)`) as well as the environment variable.
-- Test parameters use the units of the source, named in a comment (Msun, Myr, `Omega_sun`, erg/s, nm, W/m^2 at 1 AU); parametrize ids name the physical scenario (low-mass star, young star, `ForwardEuler`). Write no large outputs.
+- Test parameters use the units of the source, named in a comment (Msun, Myr, `Omega_sun`, erg/s, nm, erg s-1 cm-2 at 1 AU); parametrize ids name the physical scenario (low-mass star, young star, `ForwardEuler`). Write no large outputs.
 
 ### Docstrings and names
 

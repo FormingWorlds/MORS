@@ -18,8 +18,10 @@ Coverage as the nightly measures it, and one test with its locals on failure:
 
 ```bash
 coverage run -m pytest -m "(unit or smoke or integration or slow) and not skip" && coverage report && coverage html
-pytest -x -v --showlocals tests/test_<file>.py::test_function
+pytest -x -v --showlocals tests/test_<file>.py::test_function  # add --pdb for the debugger
 ```
+
+Entry points: the Python API (`mors.Star(Mstar=1.0, Omega=1.0).Value(age_myr, 'Lbol')`) and the `mors` command (`src/mors/cli.py`).
 
 <!-- fwl-core:begin sha256=1adfa510a4f117ec -->
 ## PROTEUS ecosystem rules
@@ -70,18 +72,18 @@ Commit messages, pull-request text, code comments, docstrings, test names, test 
 
 Python 3.11, 3.12 or 3.13 and git. `pip install -e ".[develop]"` and `pre-commit install -f`; there is nothing to compile. Next to PROTEUS, install MORS editable from the PROTEUS tree (`pip install -e MORS/.`) so a change takes effect without a reinstall. `FWL_DATA` must point at a data directory: MORS fetches the Baraffe and Spada tracks there through fwl-io on first use, and `mors download all` fetches them at once. The pre-commit hook runs `ruff check --fix` on the files a commit touches; older modules carry lint debt that is cleaned when a file is edited, not in one sweep. Serve the docs with `zensical serve` after `pip install -e '.[docs]'`.
 
-Style: lines shorter than 96 characters; the existing code mixes casing (`Value`, `Percentile`), so match the file rather than rename; constants in `UPPER_CASE`; standard type hints; a docstring states the physical scenario.
+Style: lines of at most 96 characters (ruff `line-length`); the existing code mixes casing (`Value`, `Percentile`), so match the file rather than rename; constants in `UPPER_CASE`; standard type hints; a docstring states the physical scenario.
 
 ## CI
 
 - `tests.yaml` (every pull request): `pytest -m "(unit or smoke) and not skip"` with coverage against the fast gate, `validate_test_structure.sh`, `check_test_quality.py --check` (blocking), the agent-file check, and a guard that rejects a pull request that lowers `[tool.coverage.report].fail_under` or `[tool.mors.coverage_fast].fail_under` below `min(base, 90)` or raises one above 90.
-- `code-style.yaml` runs pre-commit on the changed files; `docs.yaml` builds the docs.
+- `code-style.yaml` runs pre-commit on the changed files; `docs.yaml` builds and deploys the docs on a push to `main`, so build them locally (`zensical build --clean`) when a change touches `docs/` or `mkdocs.yml`.
 - `nightly.yml`: all tiers, coverage to Codecov, the full gate enforced.
 - `publish-test-badges.yml` refreshes the test-count badges on the `badges` branch; `publish.yaml` releases to PyPI on a tag.
 
 ## Physics and coupling contract
 
-- Units mix cgs and SI, and this is where errors enter: luminosity in erg/s from `Star.Value` (about 4.1e33 for 1 Msun at 4.57 Gyr) and in Lsun from `stellarevo.Value`, radius in Rsun or cm depending on the call, `Teff` in K, `Omega` in units of the solar rotation rate, age in Myr, stellar mass in Msun, wavelength in nm, flux at 1 AU in W/m^2, surface flux scaled by `(R_star / AU)**2`. Confirm the unit at every conversion site; a value off by 1e7 (erg against W) or 1e2 (cm against m) that passes a loose test is the signature.
+- Units mix cgs and SI, and this is where errors enter: luminosity in erg/s from `Star.Value` (about 4.1e33 for 1 Msun at 4.57 Gyr) and in Lsun from `stellarevo.Value`, radius in Rsun from `Value`, `Teff` in K, `Omega` in units of the solar rotation rate, age in Myr, stellar mass in Msun, wavelength in nm. Spectra and band fluxes at 1 AU are in erg s-1 cm-2 (per nm for a spectrum); `BaraffeSolarConstant` returns W/m^2. `ScaleToSurf` and `ScaleTo1AU` take `R_star` in m and scale by `(R_star / AU_SI)**2`, while `mors.constants.AU` and `Rsun` are in cm. Confirm the unit at every conversion site; a value off by 1e7 (erg against W) or 1e2 (cm against m) that passes a loose test is the signature.
 - Constants (`AU`, `LbolSun`, `Pi`, `Rsun`, `Msun`) come from `mors.constants`; a bare literal such as `1.496e11` in a function body is a defect.
 - The band keys (`xr`, `e1`, `e2`, `uv`, `pl`, `bo`) and their limits (`spectrum.bands_limits`) are the coupling contract. A change to a key or a limit is mirrored in the PROTEUS caller and in the pinned band-flux tests.
 - PROTEUS (`src/proteus/star/wrapper.py`) builds `mors.Star(Mstar=..., Age=..., percentile=..., Prot=...)` and `mors.BaraffeTrack(Mstar)`, and reads `Star.Value(age, key)` for `Rstar`, `Teff`, `Lbol`, `Lx`, `Leuv1` and `Leuv2`; a change of a signature, a return unit or a key comes with the PROTEUS change.

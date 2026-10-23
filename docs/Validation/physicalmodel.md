@@ -5,9 +5,9 @@ behaviour of `mors.physicalmodel` against published sources.
 
 | Test id | Reference | Scope |
 |---|---|---|
-| `tests/test_physicalmodel.py::test_saturated_xray_ratio_matches_johnstone_value` | Johnstone et al. (2020) saturated X-ray ratio, calibrated on the Spada et al. (2013) [^cite-spada2013] models | Pins the saturated X-ray-to-bolometric ratio at the saturation Rossby number to `Rx_sat = 5.135e-4`, the value the rotation-activity model uses (see [High-energy emission and activity](../Explanations/activity.md)). |
-| `tests/test_physicalmodel.py::test_solar_runaway_greenhouse_limit` | Kopparapu et al. (2013) [^cite-kopparapu2013], Table 3 | Pins the runaway-greenhouse boundary for a solar analogue to `(Lbol / Seff)**0.5` with `Seff = 1.0385`, giving about 0.98 AU at one solar luminosity. |
-| `tests/test_physicalmodel.py::test_runaway_greenhouse_limit_for_a_cool_star` | Kopparapu et al. (2013) [^cite-kopparapu2013], Table 3 | Pins the runaway-greenhouse boundary at Teff = 4000 K and Lbol = 0.1 Lsun, where every temperature term of the `Seff` polynomial is non-zero, and checks that a linear cubic term misses by more than 2%. |
+| `tests/test_physicalmodel.py::TestXrayRegimes::test_saturated_xray_ratio_matches_johnstone_value` | Johnstone et al. (2020) saturated X-ray ratio, calibrated on the Spada et al. (2013) [^cite-spada2013] models | Pins the saturated X-ray-to-bolometric ratio at the saturation Rossby number to `Rx_sat = 5.135e-4`, the value the rotation-activity model uses (see [High-energy emission and activity](../Explanations/activity.md)). |
+| `tests/test_physicalmodel.py::TestHabitableZone::test_solar_runaway_greenhouse_limit` | Kopparapu et al. (2013) [^cite-kopparapu2013], Table 3 | Pins the runaway-greenhouse boundary for a solar analogue to `(Lbol / Seff)**0.5` with `Seff = 1.0385`, giving about 0.98 AU at one solar luminosity. |
+| `tests/test_physicalmodel.py::TestHabitableZone::test_runaway_greenhouse_limit_for_a_cool_star` | Kopparapu et al. (2013) [^cite-kopparapu2013], Table 3 | Pins the runaway-greenhouse boundary at Teff = 4000 K and Lbol = 0.1 Lsun, where every temperature term of the `Seff` polynomial is non-zero, and checks that a linear cubic term misses by more than 2%. |
 
 ## Cases
 
