@@ -68,7 +68,6 @@ def test_stellarevo_solar_calibration(validation_plot):
     assert lbol > 0.0
     assert rstar > 0.0
     assert teff > 0.0
-    # Solar calibration: within 0.15 Lsun, 0.05 Rsun, and 3% in Teff.
     assert_allclose(lbol, 1.0, atol=SOLAR_L_ATOL)
     assert_allclose(rstar, 1.0, atol=SOLAR_R_ATOL)
     assert_allclose(teff, T_EFF_SUN, rtol=SOLAR_TEFF_RTOL)
@@ -84,8 +83,7 @@ def test_stellarevo_solar_calibration(validation_plot):
         )
         fig, axes = plt.subplots(3, 1, sharex=True, figsize=(6.4, 6.4))
         for ax, (key, label, value, ref, tol) in zip(axes, rows):
-            track = [mors.Value(1.0, a, key) for a in ages]
-            ax.plot(ages, track, label='Spada 1 Msun track')
+            ax.plot(ages, mors.Value(1.0, ages, key), label='Spada 1 Msun track')
             ax.errorbar(
                 SOLAR_AGE_MYR,
                 ref,
@@ -138,7 +136,7 @@ def test_grid_compiled_from_raw_tracks_matches_saved_grid(tmp_path, monkeypatch)
     The pickle is written to the user cache directory, never into the track
     directory, which holds immutable fetched data. The freshly compiled 1 Msun track must still land near L = 1 Lsun and
     R = 1 Rsun at the solar age, and a second construction from the pickle it
-    just wrote must return the identical grid. A wrong column index in the raw
+    just wrote must return the same Lbol and Teff at 1 Msun and the solar age. A wrong column index in the raw
     reader, a dropped log-to-linear conversion, or a Gyr-to-Myr slip would move
     the solar luminosity far outside the tolerance.
     """

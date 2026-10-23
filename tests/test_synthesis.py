@@ -88,7 +88,7 @@ def test_GetProperties_flux_budget(monkeypatch, Mstar, pctle, age, Lxuv_dict, Lb
 
     # Self-consistency closure: the five sub-band fluxes sum to the bolometric
     # flux, because the UV band is defined as the bolometric remainder. This is
-    # the conservation anchor; a regression in any band breaks it.
+    # the conservation anchor; the band pins above carry the per-band checks.
     band_sum = out["F_xr"] + out["F_e1"] + out["F_e2"] + out["F_pl"] + out["F_uv"]
     assert_allclose(band_sum, out["F_bo"], rtol=1e-12, atol=0.0)
 

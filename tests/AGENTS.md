@@ -38,7 +38,7 @@ A module-level constant read from an environment variable at import time does no
 
 Structure: `src/mors/<file>.py` is tested in `tests/test_<file>.py`. A scenario that runs several sources (a coupled `Star` evolution uses `star.py`, `stellarevo.py`, `rotevo.py` and `physicalmodel.py`) is named after the primary source, and its file docstring names the others. `bash tools/validate_test_structure.sh` checks that every test carries at most one of `unit`, `smoke`, `integration` and `slow` (module, class or function), and `skip` when it carries none.
 
-Tiers: tests of the band, flux and synthesis code with the track lookups mocked are `unit`; tests that read the real Baraffe or Spada tracks are `integration`, need `FWL_DATA`, and run nightly. Smoke tests aim for under 30 s each. The tests need the develop extra: proteus-mpl provides the `validation_plot` fixture. `pytest -m <tier>` runs one tier. CI: pull requests run `pytest -m "(unit or smoke) and not skip"` with the fast coverage gate, the structure check and `check_test_quality.py --check`, which blocks here; the nightly runs all tiers. The [testing page](../docs/How-to/run_tests.md) gives the commands per tier.
+Tiers: tests of the band, flux and synthesis code with the track lookups mocked are `unit`; tests that read the real Baraffe or Spada tracks are `integration`, need `FWL_DATA`, and run nightly. Smoke tests aim for under 30 s each; the 60 s timeout is the cap. The tests need the develop extra: proteus-mpl provides the `validation_plot` fixture. `pytest -m <tier>` runs one tier. CI: pull requests run `pytest -m "(unit or smoke) and not skip"` with the fast coverage gate, the structure check and `check_test_quality.py --check`, which blocks here; the nightly runs all tiers. The [testing page](../docs/How-to/run_tests.md) gives the commands per tier.
 
 ### Physics sources and invariants
 
@@ -53,8 +53,7 @@ A property (monotonicity, conservation, bound) is preferred over a point pin whe
 
 ### Edge cases and discriminating values
 
-Useful edge cases here: `Omega = 0`, the youngest age of a track, the lowest and highest mass of the grid, a spectrum with a single band or an empty band.
-
+Useful edge cases here: a very slow rotator (`Omega = 0.01`; `Omega = 0` raises a bare `ZeroDivisionError` in `Star`), the youngest age of a track, the lowest and highest mass of the grid, a spectrum with a single band or an empty band.
 
 The plausible bugs here are a wrong exponent or factor, a wrong sign, a cgs and SI slip (erg/s against W, cm against m, nm against micron), and a wrong track, band or integrator (Baraffe or Spada, X-ray or EUV, `ForwardEuler` or `RungeKutta4`). A test that pins a value with `pytest.approx` or `assert_allclose` adds a guard for each class: a wrong-value distance, an explicit sign (`val > 0`), a scale window with the unit in the comment (`1e32 < L < 1e34` for a solar-type `Lbol` in erg/s), and a value that separates the chosen track or band from its sibling. When the primary assertion is a conservation closure, the closure covers the exponent class; the sign and scale guards stay.
 

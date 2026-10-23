@@ -21,8 +21,9 @@ behaviour of `mors.star` against a published source.
 The `Star` class couples the Spada et al. (2013) stellar-structure tracks with a
 rotation-and-activity model and exposes `Star.Value(age, key)`. `Lbol` is
 returned in erg/s, converted from the tracks' native solar-luminosity units by
-multiplying by the nominal solar luminosity; `Rstar` is returned in solar radii. Activity keys (`Leuv`) depend on the rotation history the chosen
-time integrator produces.
+multiplying by the nominal solar luminosity; `Rstar` is returned in solar
+radii. Activity keys (`Leuv`) depend on the rotation history the chosen time
+integrator produces.
 
 The Spada et al. (2013) models are solar-calibrated: a 1 Msun star at the solar
 age reproduces the Sun. In this implementation the solar-mass track at 4.57 Gyr

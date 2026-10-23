@@ -199,8 +199,8 @@ def test_Spectrum_CalcBandFluxes_constant_integrand(wl, fl, expected):
     band integral to a hand-computed width, and the bolometric integral to the
     full wavelength span. For a constant integrand every Riemann sum telescopes
     to the same total, so this does not separate trapezoid from rectangle
-    weighting; what it does catch is a dropped bin width, a wavelength-unit
-    slip, or a wrong band boundary, each of which fails the 1e-12 tolerance.
+    weighting; what it does catch is a dropped bin width or a wavelength-unit
+    slip, each of which fails the 1e-12 tolerance.
     """
     if fl is None:
         fl = np.ones_like(wl)
