@@ -1,6 +1,6 @@
 # Validation
 
-Each physics source of MORS has at least one `reference_pinned` test that compares the code with a published benchmark, an analytical limit or a self-consistency identity. The pages of this tab list these cases, one page per source file, grouped by the process they describe. Each case gives its reference, its tolerance, its test id and the command that runs it.
+Each physics source of MORS has at least one `reference_pinned` test that compares the code with a published benchmark, an analytical limit or a self-consistency identity, or pins the output of the code as a regression check. The pages of this tab list these cases, one page per source file, grouped by the process they describe. Each case gives its reference, its tolerance, its test id and the command that runs it.
 
 Tests in the `unit` tier run on every pull request with the track lookups mocked. Tests in the `integration` tier read the real Baraffe et al. (2015) and Spada et al. (2013) tracks from `FWL_DATA` and run in the nightly workflow. See [Testing](../How-to/run_tests.md) for the tiers and the commands.
 
@@ -11,7 +11,7 @@ Tests in the `unit` tier run on every pull request with the track lookups mocked
 | [Stellar evolution tracks](stellarevo.md) | Solar calibration | `tests/test_stellarevo.py::test_stellarevo_solar_calibration` | Spada et al. (2013) solar-calibrated tracks | integration tier; plot pair |
 | [Stellar evolution tracks](stellarevo.md) | Grid compiled from the raw tracks | `tests/test_stellarevo.py::test_grid_compiled_from_raw_tracks_matches_saved_grid` | Spada et al. (2013) raw track files | integration tier |
 | [Star model](star.md) | Solar luminosity at the solar age | `tests/test_star.py::test_star_reproduces_solar_luminosity_at_solar_age` | Spada et al. (2013); IAU 2015 nominal solar luminosity | integration tier |
-| [Baraffe tracks](baraffe.md) | Baraffe track values | `tests/test_baraffe.py::test_baraffe_track_matches_published_values` | Baraffe et al. (2015) | integration tier |
+| [Baraffe tracks](baraffe.md) | Baraffe track values | `tests/test_baraffe.py::test_baraffe_track_matches_published_values` | regression pin of the interpolation of the Baraffe et al. (2015) tracks | integration tier |
 | [Rotation evolution](rotevo.md) | Forward-Euler step | `tests/test_rotevo.py::test_forward_euler_step_matches_analytic_update` | closed form | unit tier |
 | [Activity and habitable zone](physicalmodel.md) | Saturated X-ray ratio | `tests/test_physicalmodel.py::TestXrayRegimes::test_saturated_xray_ratio_matches_johnstone_value` | Johnstone et al. (2020) | unit tier |
 | [Activity and habitable zone](physicalmodel.md) | Runaway greenhouse limit, solar analogue | `tests/test_physicalmodel.py::TestHabitableZone::test_solar_runaway_greenhouse_limit` | Kopparapu et al. (2013), Table 3 | unit tier |

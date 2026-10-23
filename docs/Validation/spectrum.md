@@ -5,13 +5,13 @@ behaviour of `mors.spectrum` against an analytical limit.
 
 | Test id | Reference | Source page | Scope |
 |---|---|---|---|
-| `tests/test_spectrum.py::test_Spectrum_CalcBandFluxes_constant_integrand` | Analytical limit: integral of a unit integrand over a band equals the band width | closed form | Feeds a constant unit-flux spectrum and pins each band integral (and the bolometric integral) to the exact band width, so a dropped bin width or a wavelength-unit slip fails against a hand-computed value. |
+| `tests/test_spectrum.py::test_Spectrum_CalcBandFluxes_constant_integrand` | Analytical limit: the integral of a unit integrand equals the length of the integration interval | closed form | Feeds a constant unit-flux spectrum and pins each band integral to the span between the first and last sample point in that band (and the bolometric integral to the full sampled span), so a dropped bin width or a wavelength-unit slip fails against a hand-computed value. |
 
 ## Cases
 
 ### Band integral of a constant spectrum
 
-- Reference: closed form: the band width
+- Reference: closed form: the span between the first and last sample point in each band
 - Tolerance: `rtol=1e-12` on each band and the bolometric integral
 - Test id: `tests/test_spectrum.py::test_Spectrum_CalcBandFluxes_constant_integrand`
 - Command: `pytest tests/test_spectrum.py::test_Spectrum_CalcBandFluxes_constant_integrand`
@@ -20,11 +20,11 @@ behaviour of `mors.spectrum` against an analytical limit.
 
 `Spectrum.CalcBandFluxes` integrates the loaded spectrum over each emission
 band (`xr`, `e1`, `e2`, `uv`, `pl`) and over the full bolometric range (`bo`).
-For an integrand that is identically 1, the integral over a band reduces to the
-band width in the integration variable:
+For an integrand that is identically 1, the integral over the samples of a band
+reduces to the span between its first and last sample point:
 
 ```
-integral_band 1 dlambda = (lambda_hi - lambda_lo)
+integral_band 1 dlambda = (lambda_last - lambda_first)
 ```
 
 The test builds a flat spectrum whose sample points are placed inside each band

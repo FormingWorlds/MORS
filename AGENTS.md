@@ -8,7 +8,7 @@ MORS evolves the rotation, luminosity, radius and high-energy (X-ray, EUV, UV) e
 
 ```bash
 pytest -m "(unit or smoke) and not skip"
-ruff check --fix src/ tests/ && ruff format src/ tests/
+ruff check --fix <changed files> && ruff format <changed files>
 bash tools/validate_test_structure.sh
 python tools/check_test_quality.py --check
 python tools/agents/check_agents_md.py
@@ -70,7 +70,7 @@ Commit messages, pull-request text, code comments, docstrings, test names, test 
 
 ## Environment
 
-Python 3.11, 3.12 or 3.13 and git. `pip install -e ".[develop]"` and `pre-commit install -f`; there is nothing to compile. Next to PROTEUS, install MORS editable from the PROTEUS tree (`pip install -e MORS/.`) so a change takes effect without a reinstall. `FWL_DATA` must point at a data directory: MORS fetches the Baraffe and Spada tracks there through fwl-io on first use, and `mors download all` fetches them at once. The pre-commit hook runs `ruff check --fix` on the files a commit touches; older modules carry lint debt that is cleaned when a file is edited, not in one sweep. Serve the docs with `zensical serve` after `pip install -e '.[docs]'`.
+Python 3.11, 3.12 or 3.13 and git. `pip install -e ".[develop]"` and `pre-commit install -f`; there is nothing to compile. Next to PROTEUS, install MORS editable from the PROTEUS tree (`pip install -e MORS/.`) so a change takes effect without a reinstall. `FWL_DATA` must point at a data directory: MORS fetches the Baraffe and Spada tracks there through fwl-io on first use, and `mors download all` fetches them at once. The pre-commit hook runs `ruff check --fix` on the files a commit touches; older modules carry lint debt that is cleaned when a file is edited, not in one sweep, so `ruff check src/ tests/` and `ruff format --check src/ tests/` exit 1 on the whole tree. Serve the docs with `zensical serve` after `pip install -e '.[docs]'`.
 
 Style: lines of at most 96 characters (ruff `line-length`); the existing code mixes casing (`Value`, `Percentile`), so match the file rather than rename; constants in `UPPER_CASE`; standard type hints; a docstring states the physical scenario.
 
@@ -86,9 +86,9 @@ Style: lines of at most 96 characters (ruff `line-length`); the existing code mi
 - Units mix cgs and SI, and this is where errors enter: luminosity in erg/s from `Star.Value` (about 4.1e33 for 1 Msun at 4.57 Gyr) and in Lsun from `stellarevo.Value`, `Rstar` in Rsun from `Value` (`Star.Value(age, 'Rcore')` returns cm although its `Units` entry says Rsun), `Teff` in K, `Omega` in units of the solar rotation rate, age in Myr, stellar mass in Msun, wavelength in nm. Spectra and band fluxes at 1 AU are in erg s-1 cm-2 (per nm for a spectrum); `BaraffeSolarConstant` returns W/m^2. `ScaleToSurf` and `ScaleTo1AU` take `R_star` in m and multiply by `(AU_SI / R_star)**2` and `(R_star / AU_SI)**2`, while `mors.constants.AU` and `Rsun` are in cm. Confirm the unit at every conversion site; a value off by 1e7 (erg against W) or 1e2 (cm against m) that passes a loose test is the signature.
 - Constants (`AU`, `LbolSun`, `Pi`, `Rsun`, `Msun`) come from `mors.constants`; a bare literal such as `1.496e11` in a function body is a defect.
 - The band keys (`xr`, `e1`, `e2`, `uv`, `pl`, `bo`) and their limits (`spectrum.bands_limits`) are the coupling contract. A change to a key or a limit is mirrored in the PROTEUS caller and in the pinned band-flux tests.
-- PROTEUS (`src/proteus/star/wrapper.py`) builds `mors.Star(Mstar=..., Age=..., percentile=..., Prot=...)` and `mors.BaraffeTrack(Mstar)`, and reads `Star.Value(age, key)` for `Rstar`, `Teff`, `Lbol`, `Lx`, `Leuv1` and `Leuv2`; a change of a signature, a return unit or a key comes with the PROTEUS change.
+- PROTEUS (`src/proteus/star/wrapper.py`) builds `mors.Star(Mstar=..., Age=..., percentile=..., Prot=...)` and `mors.BaraffeTrack(Mstar)`, and reads `Star.Value(age, key)` for `Rstar`, `Teff`, `Lbol`, `Lx`, `Leuv`, `Leuv1` and `Leuv2`; the `percentile` argument goes through `Star` to `Percentile`; that file is the list of call sites; a change of a signature, a return unit or a key comes with the PROTEUS change.
 - `ScaleTo1AU(ScaleToSurf(f, R)) == f` within tolerance; a broken round trip rescales every flux PROTEUS receives.
-- PROTEUS integrates the XUV flux over the life of the star, so `Lx` and `Leuv1`, `Leuv2` must stay continuous in age at the grid boundaries of the track interpolation.
+- PROTEUS integrates the XUV flux over the life of the star for the escape budget: a change of the track interpolation must not make `Lx`, `Leuv`, `Leuv1` or `Leuv2` non-monotone or discontinuous in age, in particular at a grid boundary.
 - `baraffe.py` and `stellarevo.py` read the tracks from `FWL_DATA`; code checks that the files exist (or fetches them) before it reads them. A pinned value names the track set it was pinned against. A change of the default track set (Baraffe or Spada) or of the default time integration (`TimeIntegrationMethod`, now `RosenbrockFixed`) changes the pinned reference values and the `docs/Validation/` pages: `git grep` the old default and update each in the same pull request.
 - The parameter dictionary from `parameters.py` and the configured attributes of a `Star` are not changed after initialisation; use local variables.
 

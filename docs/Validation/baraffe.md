@@ -1,17 +1,19 @@
 # Validation: `src/mors/baraffe.py`
 
-This page tracks the `@pytest.mark.reference_pinned` tests that anchor the
-behaviour of `mors.baraffe` against a published source.
+This page tracks the `@pytest.mark.reference_pinned` tests of `mors.baraffe`.
+The pinned values are the output of the code's own interpolation of the
+Baraffe et al. (2015) tracks, so the case is a regression pin of the
+interpolation, not a comparison with the published tables.
 
 | Test id | Reference | Source page | Scope |
 |---|---|---|---|
-| `tests/test_baraffe.py::test_baraffe_track_matches_published_values` | Baraffe et al. (2015) [^cite-baraffe2015], A&A 577, A42 | [2015A&A...577A..42B](https://ui.adsabs.harvard.edu/abs/2015A%26A...577A..42B/abstract) | Pins the interpolated luminosity, stellar radius, and orbital insolation at two stellar masses (0.047 and 1.113 Msun) against the Baraffe et al. (2015) evolutionary tracks, and asserts each returned quantity is strictly positive. |
+| `tests/test_baraffe.py::test_baraffe_track_matches_published_values` | Baraffe et al. (2015) [^cite-baraffe2015], A&A 577, A42 | [2015A&A...577A..42B](https://ui.adsabs.harvard.edu/abs/2015A%26A...577A..42B/abstract) | Pins the interpolated luminosity, stellar radius, and orbital insolation at two stellar masses (0.047 and 1.113 Msun) to values the interpolation of the Baraffe et al. (2015) tracks gave (a regression pin), and asserts each returned quantity is strictly positive. |
 
 ## Cases
 
 ### Baraffe track values
 
-- Reference: Baraffe et al. (2015) [^cite-baraffe2015] evolutionary tracks
+- Reference: the code's own interpolation of the Baraffe et al. (2015) [^cite-baraffe2015] tracks (regression pin; the values are not compared with the published tables)
 - Tolerance: `rtol=1e-5` on luminosity, radius and insolation at 0.047 and 1.113 Msun
 - Test id: `tests/test_baraffe.py::test_baraffe_track_matches_published_values`
 - Command: `pytest tests/test_baraffe.py::test_baraffe_track_matches_published_values` (needs `FWL_DATA` with the tracks)
@@ -32,7 +34,7 @@ far outside the `rtol=1e-5` tolerance.
 
 ## Anchor type
 
-Published benchmark. The Baraffe et al. (2015) tracks are the benchmark; the
+Regression pin of the interpolation of the Baraffe et al. (2015) tracks; the
 pinned test is accompanied by a positivity guard, and a companion
 `physics_invariant` test (`test_baraffe_luminosity_increases_with_mass`)
 asserts the monotone increase of luminosity with mass at fixed age as the

@@ -39,7 +39,7 @@ units are solar luminosities for `Lbol`, solar radii for `Rstar`, and Kelvin for
 
 The Spada et al. (2013) models are solar-calibrated, so a 1 Msun star at the
 solar age reproduces the Sun. In this grid the solar-mass track at 4.57 Gyr
-returns roughly 1.08 Lsun, 1.02 Rsun, and 5844 K, all within about 10% of the
+returns roughly 1.08 Lsun, 1.015 Rsun, and 5844 K, all within about 10% of the
 solar reference values (unity in the normalised luminosity and radius, 5772 K
 in effective temperature). Pinning the interpolation output at the solar point
 tests that the correct track is read, that the age unit is Myr, and that the
