@@ -6,7 +6,7 @@ behaviour of `mors.stellarevo` against a published source.
 | Test id | Reference | Source page | Scope |
 |---|---|---|---|
 | `tests/test_stellarevo.py::test_stellarevo_solar_calibration` | Spada et al. (2013) [^cite-spada2013] solar-calibrated tracks; solar effective temperature 5772 K | [2013ApJ...776...87S](https://ui.adsabs.harvard.edu/abs/2013ApJ...776...87S/abstract) | Checks that the interpolated 1 Msun track at the solar age (4.57 Gyr) returns L within 0.15 Lsun of unity, R within 0.05 Rsun of unity, and Teff within 3% of 5772 K, in the tracks' native units. |
-| `tests/test_stellarevo.py::test_grid_compiled_from_raw_tracks_matches_saved_grid` | Spada et al. (2013) [^cite-spada2013] raw track files | [2013ApJ...776...87S](https://ui.adsabs.harvard.edu/abs/2013ApJ...776...87S/abstract) | Compiles the grid from the raw track files, checks the 1 Msun track at the solar age, and checks that the grid read back from the cache file returns the same `Lbol` and `Teff` at 1 Msun and 4.57 Gyr. |
+| `tests/test_stellarevo.py::test_grid_compiled_from_raw_tracks_matches_saved_grid` | Spada et al. (2013) [^cite-spada2013] raw track files | [2013ApJ...776...87S](https://ui.adsabs.harvard.edu/abs/2013ApJ...776...87S/abstract) | Compiles the grid from the raw track files, checks the 1 Msun track at the solar age, and checks that a second construction returns the same `Lbol` and `Teff` at 1 Msun and 4.57 Gyr; it does not check that the second construction reads the cache file. |
 
 ## Cases
 
@@ -25,7 +25,7 @@ Luminosity, radius and effective temperature of the 1 Msun Spada et al. (2013) t
 ### Grid compiled from the raw tracks
 
 - Reference: Spada et al. (2013) [^cite-spada2013] raw track files
-- Tolerance: `atol=0.2` Lsun on L and `atol=0.1` Rsun on R at 4.57 Gyr; `Lbol` and `Teff` at 1 Msun and 4.57 Gyr from the grid read back from the cache agree with `rtol=1e-12`
+- Tolerance: `atol=0.2` Lsun on L and `atol=0.1` Rsun on R at 4.57 Gyr; `Lbol` and `Teff` at 1 Msun and 4.57 Gyr from a second construction agree with `rtol=1e-12` (the test does not check that this construction reads the cache file)
 - Test id: `tests/test_stellarevo.py::test_grid_compiled_from_raw_tracks_matches_saved_grid`
 - Command: `pytest tests/test_stellarevo.py::test_grid_compiled_from_raw_tracks_matches_saved_grid` (needs `FWL_DATA` with the tracks)
 

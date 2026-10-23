@@ -134,11 +134,13 @@ def test_grid_compiled_from_raw_tracks_matches_saved_grid(tmp_path, monkeypatch)
     pre-pickled grid; here the raw ``.track1`` / ``.track2`` files are read and
     the grid is compiled from scratch (the code path that produced that pickle).
     The pickle is written to the user cache directory, never into the track
-    directory, which holds immutable fetched data. The freshly compiled 1 Msun track must still land near L = 1 Lsun and
-    R = 1 Rsun at the solar age, and a second construction from the pickle it
-    just wrote must return the same Lbol and Teff at 1 Msun and the solar age. A wrong column index in the raw
-    reader, a dropped log-to-linear conversion, or a Gyr-to-Myr slip would move
-    the solar luminosity far outside the tolerance.
+    directory, which holds immutable fetched data. The freshly compiled 1 Msun
+    track must still land near L = 1 Lsun and R = 1 Rsun at the solar age, and a
+    second construction must return the same Lbol and Teff at 1 Msun and the
+    solar age; the test does not check that the second construction reads the
+    pickle. A wrong column index in the raw reader, a dropped log-to-linear
+    conversion, or a Gyr-to-Myr slip would move the solar luminosity far outside
+    the tolerance.
     """
     real_model_dir = os.path.join(se.starEvoDirDefault, SOLAR_MODEL_SET)
     # Point a private grid directory at the real raw tracks with no pickle present,
