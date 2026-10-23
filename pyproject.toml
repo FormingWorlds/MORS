@@ -42,6 +42,8 @@ homepage = "https://github.com/FormingWorlds/MORS"
 [project.optional-dependencies]
 develop = [
   "coverage[toml]",
+  # the nightly keys, fetches and checks its data with fwl-io cache
+  "fwl-io>=26.10.22",
   "pip-tools",
   "pytest",
   "pytest-cov",
