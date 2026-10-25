@@ -1,50 +1,34 @@
 # Validation: `src/mors/baraffe.py`
 
-This page tracks the `@pytest.mark.reference_pinned` tests of `mors.baraffe`.
-The pinned values are the output of the code's own interpolation of the
-Baraffe et al. (2015) tracks, so the case is a regression pin of the
-interpolation, not a comparison with the published tables.
+## What this page checks
 
-| Test id | Reference | Source page | Scope |
-|---|---|---|---|
-| `tests/test_baraffe.py::test_baraffe_track_matches_published_values` | Baraffe et al. (2015) [^cite-baraffe2015], A&A 577, A42 | [2015A&A...577A..42B](https://ui.adsabs.harvard.edu/abs/2015A%26A...577A..42B/abstract) | Pins the interpolated luminosity, stellar radius, and orbital insolation at two stellar masses (0.047 and 1.113 Msun) to values the interpolation of the Baraffe et al. (2015) tracks gave (a regression pin), and asserts each returned quantity is strictly positive. |
+This page checks how MORS reads and interpolates the stellar-evolution tracks of Baraffe et al. (2015).
+`BaraffeTrack` in `mors.baraffe` supplies the bolometric luminosity, stellar radius, and orbital insolation as functions of stellar mass and age.
+Validation means that a test runs the code on a reference case with known outputs, and checks the result within a stated tolerance.
+The pinned values are the output of the interpolation of the Baraffe et al. (2015) tracks, so this is a regression pin.
+If this part of the code is wrong, PROTEUS receives the wrong stellar luminosity and radius when the Baraffe tracks are selected.
+The atmospheric evolution and planetary climate in coupled runs are then wrong.
 
-## Cases
+## Baraffe track values
 
-### Baraffe track values
+**Why this check exists.** The interpolation can select the wrong track file, misplace the age index, or return a mass-independent value, without a warning. A broken lookup could also flip a sign or return zero without an error message.
 
-- Reference: the code's own interpolation of the Baraffe et al. (2015) [^cite-baraffe2015] tracks (regression pin; the values are not compared with the published tables)
-- Tolerance: `rtol=1e-5` on luminosity, radius and insolation at 0.047 and 1.113 Msun
-- Test id: `tests/test_baraffe.py::test_baraffe_track_matches_published_values`
-- Command: `pytest tests/test_baraffe.py::test_baraffe_track_matches_published_values` (needs `FWL_DATA` with the tracks)
+**What it tests.** `mors.BaraffeTrack` reads the Baraffe et al. (2015) evolutionary tracks from `FWL_DATA` for a given stellar mass. It interpolates bolometric luminosity $L$, stellar radius $R$, and derived orbital insolation $S$ as functions of age. The test evaluates two stellar masses, 0.047 and 1.113 Msun, spanning a factor of roughly 24 in mass. A positivity guard checks that each returned quantity is strictly positive. A companion `physics_invariant` test (`test_baraffe_luminosity_increases_with_mass`) checks the monotone increase of luminosity with mass at fixed age.
 
-## Re-derivation note
+**How we know the right answer.** The pinned values are the output of the code interpolation of the Baraffe et al. (2015) tracks. At a common age, the interpolated luminosity of the 1.113 Msun track lies more than two orders of magnitude above the 0.047 Msun track. A regression that selects the wrong track index or returns a mass-independent value, moves the result far outside the `rtol=1e-5` tolerance.
 
-`mors.BaraffeTrack` reads the Baraffe et al. (2015) evolutionary tracks
-(downloaded to `FWL_DATA`) for a given stellar mass and interpolates the
-bolometric luminosity, stellar radius, and derived orbital insolation as a
-function of age. The pinned values are the interpolation output for the two
-tabulated masses at the ages listed in the test data.
+**Why it matters.** PROTEUS consumes the Baraffe luminosity and insolation through the MORS stellar-evolution step when the Baraffe track set is selected.
 
-The two masses span a factor of roughly 24 in stellar mass. At a common age
-the interpolated luminosity of the 1.113 Msun track lies more than two orders
-of magnitude above the 0.047 Msun track, so a regression that selects the
-wrong track index, or that returns a mass-independent value, moves the result
-far outside the `rtol=1e-5` tolerance.
+??? info "Test details"
+    - Reference: the code's own interpolation of the Baraffe et al. (2015) [^cite-baraffe2015] tracks (regression pin; the values are not compared with the published tables)
+    - Tolerance: `rtol=1e-5` on luminosity, radius and insolation at 0.047 and 1.113 Msun
+    - Test id: `tests/test_baraffe.py::test_baraffe_track_matches_published_values`
+    - Command: `pytest tests/test_baraffe.py::test_baraffe_track_matches_published_values` (needs `FWL_DATA` with the tracks)
 
-## Anchor type
-
-Regression pin of the interpolation of the Baraffe et al. (2015) tracks; the
-pinned test is accompanied by a positivity guard, and a companion
-`physics_invariant` test (`test_baraffe_luminosity_increases_with_mass`)
-asserts the monotone increase of luminosity with mass at fixed age as the
-property-based second-line check.
-
-## Cross-references
+## Related code
 
 - `src/mors/baraffe.py`: loads and interpolates the Baraffe et al. (2015) tracks.
-- PROTEUS consumes the Baraffe luminosity and insolation through the MORS
-  stellar-evolution step when the Baraffe track set is selected.
+- `tests/test_baraffe.py`: `test_baraffe_track_matches_published_values` and `test_baraffe_luminosity_increases_with_mass`.
 
 ## References
 

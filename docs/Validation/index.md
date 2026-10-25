@@ -1,8 +1,13 @@
 # Validation
 
-Each physics source of MORS has at least one `reference_pinned` test that compares the code with a published benchmark, an analytical limit or a self-consistency identity, or pins the output of the code as a regression check. The pages of this tab list these cases, one page per source file, grouped by the process they describe. Each case gives its reference, its tolerance, its test id and the command that runs it.
+## What this page checks
 
-Tests in the `unit` tier run on every pull request with the track lookups mocked. Tests in the `integration` tier read the real Baraffe et al. (2015) and Spada et al. (2013) tracks from `FWL_DATA` and run in the nightly workflow. See [Testing](../How-to/run_tests.md) for the tiers and the commands.
+Each physics source file of MORS has at least one `reference_pinned` test that compares code outputs with a published benchmark, an analytical limit, or a self-consistency identity, or pins code outputs as a regression check.
+The pages of this tab list these validation cases, with one page per source file, grouped by physical process.
+Each case gives its reference, its tolerance, its test id, and the command that executes it.
+Tests in the `unit` tier run on every pull request with track lookups mocked.
+Tests in the `integration` tier read the Baraffe et al. (2015) and Spada et al. (2013) tracks from `FWL_DATA` and run in nightly workflows.
+See [Testing](../How-to/run_tests.md) for test tiers and execution commands.
 
 ## Cases by process
 
