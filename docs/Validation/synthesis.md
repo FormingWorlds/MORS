@@ -18,7 +18,7 @@ The case below says why the check exists, what it tests, how we know the right a
 
 **Why it matters.** `GetProperties` gives the band properties from which `mors.synthesis` scales a stellar spectrum through time.
 
-**Known limit.** With `F_pl` set to zero, this case does not check the subtraction of the Planck term from `F_bo`; `test_GetProperties_planck_trapezoid_constant` checks the `F_pl` integral, and no test checks its subtraction. The test shares `AU` and `LbolSun` with the source, so a wrong value of these constants does not fail it. PROTEUS does not call `GetProperties`: it computes the band properties with its own `get_spada_synthesis_properties` and then calls `CalcScaledSpectrumFromProps`, so this test does not cover the PROTEUS version.
+**Known limit.** With `F_pl` set to zero, this case does not check the subtraction of the Planck term from `F_bo`; `test_GetProperties_planck_trapezoid_constant` checks the `F_pl` integral, and no test checks its subtraction. The test shares `AU` and `LbolSun` with the source, so a wrong value of these constants does not fail it. It does not check the returned `radius` and `Teff`, nor that `Percentile` feeds `Lxuv`. PROTEUS does not call `GetProperties`: it computes the band properties with its own `get_spada_synthesis_properties` and then calls `CalcScaledSpectrumFromProps`, so this test does not cover the PROTEUS version.
 
 ??? info "Test details"
     - Reference: self-consistency: the 5 sub-band fluxes sum to the bolometric flux

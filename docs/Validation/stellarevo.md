@@ -10,7 +10,7 @@ Each case below says why the check exists, what it tests, how we know the right 
 
 ## Solar calibration
 
-**Why this check exists.** The interpolation can read the wrong track, use the wrong age unit (the code expects Myr), or rescale the native units without an error message. Because the main-sequence mass-luminosity relation is steep, a wrong track index shifts luminosity by orders of magnitude.
+**Why this check exists.** The interpolation can read the wrong track, use the wrong age unit (the code expects Myr), or rescale the native units without an error message. Near 1 Msun, a track one 0.05 Msun bin away changes the luminosity by 26 to 35 %, outside the 0.15 Lsun tolerance.
 
 **What it tests.** `stellarevo.Value(Mstar, Age, key)` reads the Spada et al. (2013) grid (24 mass bins from 0.1 to 1.25 Msun, loaded from `FWL_DATA`) and returns structural quantities by linear interpolation in age, then in mass. The native units are solar luminosities for `Lbol`, solar radii for `Rstar` and K for `Teff`. The Spada et al. (2013) models are solar-calibrated. At the solar age of 4.57 Gyr, the interpolated 1 Msun track returns roughly 1.08 Lsun, 1.015 Rsun, and 5844 K, agreeing to about 10% with solar reference values (unity in normalized luminosity and radius, 5772 K in effective temperature). The test asserts that L lands inside 0.15 Lsun of unity, R lands inside 0.05 Rsun of unity, and Teff deviates by under 3% from 5772 K. A companion test (`test_stellarevo_luminosity_increases_with_mass`) samples masses from 0.3 to 1.2 Msun and asserts strict monotonic increase, with the lightest and heaviest tracks separated by more than two orders of magnitude.
 

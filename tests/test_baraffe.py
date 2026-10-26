@@ -64,12 +64,12 @@ def test_baraffe_luminosity_increases_with_mass():
     """Luminosity rises steeply with mass at a fixed age across the Baraffe grid.
 
     Compares the 0.047 Msun (substellar, below the hydrogen-burning limit) and
-    1.113 Msun tracks at a common 3.2 Gyr age: the luminosity must rise steeply
-    with mass, so a swapped track index or a mass-independent lookup fails
+    1.113 Msun tracks at 3.2 Gyr; the 0.047 Msun track ends at 0.71 Gyr, so its
+    value is clipped there. The luminosity must rise steeply with mass, so a swapped track index or a mass-independent lookup fails
     loudly rather than passing on a plausible single-mass value.
     """
     mors.DownloadEvolutionTracks('Baraffe')
-    age = 3.2e9  # yr, an age both tracks cover
+    age = 3.2e9  # yr; the 0.047 Msun track is clipped to its end at 0.71 Gyr
     low = mors.BaraffeTrack(0.047).BaraffeLuminosity(age)
     high = mors.BaraffeTrack(1.113).BaraffeLuminosity(age)
     assert low > 0.0
