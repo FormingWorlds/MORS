@@ -193,7 +193,7 @@ class TestXrayRegimes:
                 [pm._Xray(dict(state, Ro=r), params=params)[2] for r in ros],
                 label='code, Rx',
             )
-            ax.axhspan(1.0e-4, 1.0e-3, color='0.9', label='scale window')
+            ax.axhspan(1.0e-4, 1.0e-3, color='0.5', alpha=0.2, label='range 1e-4 to 1e-3')
             ax.plot(params['RoSatXray'], 5.135e-4, 's', mfc='none', ms=10, label='5.135e-4')
             ax.plot(params['RoSatXray'], Rx, 'o', label='code at RoSatXray')
             ax.set(xscale='log', yscale='log', xlabel='Rossby number', ylabel='Rx = Lx / Lbol')
@@ -1052,7 +1052,7 @@ class TestHabitableZone:
             ax.plot(teffs, curve, label='code, runaway greenhouse at 0.1 Lsun')
             ax.plot(4000.0, expected, 's', mfc='none', ms=10, label='Kopparapu et al. (2013)')
             ax.plot(4000.0, hz['RunawayGreenhouse'], 'o', label='code at 4000.0 K')
-            ax.plot(4000.0, wrong, 'x', label='linear cubic term')
+            ax.plot(4000.0, wrong, 'x', label='cubic term entered as linear')
             ax.set(xlabel='Teff [K]', ylabel='distance [AU]')
             ax.legend(fontsize='small')
             fig.tight_layout()

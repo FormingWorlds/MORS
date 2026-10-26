@@ -101,12 +101,12 @@ def test_stellarevo_solar_calibration(validation_plot):
                 SOLAR_AGE_MYR,
                 ref,
                 yerr=tol,
-                fmt='o',
-                ms=5,
+                fmt='s',
+                mfc='none',
                 capsize=4,
                 label='Sun and tolerance',
             )
-            ax.plot(SOLAR_AGE_MYR, value, 'x', ms=9, mew=2, zorder=3, label='track at 4.57 Gyr')
+            ax.plot(SOLAR_AGE_MYR, value, 'o', zorder=3, label='track at 4.57 Gyr')
             ax.set_ylabel(label)
         axes[0].legend()
         axes[-1].set(xscale='log', xlabel='Age [Myr]')
@@ -185,7 +185,7 @@ def test_grid_compiled_from_raw_tracks_matches_saved_grid(
     # correct 1 Msun track is unambiguously selected.
     assert lbol > 0.5
 
-    # Re-constructing now loads the saved pickle; the grids must agree at 1 Msun.
+    # Construct a second time; the grids must agree at 1 Msun.
     reloaded = mors.StarEvo(starEvoDir=str(grid_dir), evoModels=SOLAR_MODEL_SET)
     reloaded_lbol = reloaded.Lbol(1.0, SOLAR_AGE_MYR)
     assert_allclose(reloaded_lbol, lbol, rtol=1e-12)

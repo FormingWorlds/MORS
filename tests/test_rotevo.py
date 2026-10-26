@@ -397,7 +397,7 @@ def test_forward_euler_step_matches_analytic_update(monkeypatch, validation_plot
         ax.plot([100.5, 100.5], [9.0, 9.5], 's', mfc='none', ms=10, label='9.0 and 9.5')
         ax.plot([100.5, 100.5], [env, core], 'o', label='code, envelope and core')
         ax.plot([100.5], [11.0], 'x', label='wrong-sign envelope')
-        ax.set(xlabel='Age [Myr]', ylabel='Omega [Omega_sun]')
+        ax.set(xlabel='Age [Myr]', ylabel='rotation rate [solar rotation rates]')
         ax.legend(fontsize='small')
         fig.tight_layout()
         return fig
