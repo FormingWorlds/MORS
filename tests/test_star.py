@@ -65,11 +65,12 @@ def test_star_reproduces_solar_luminosity_at_solar_age(validation_plot):
     lbol = sun.Value(SOLAR_AGE_MYR, 'Lbol')
     assert lbol > 0.0
     # rtol=0.15: the Spada solar-mass track reproduces L_sun to within 15%.
-    assert_allclose(lbol, L_SUN_CGS, rtol=0.15)
+    rtol, faint_ratio = 0.15, 0.1
+    assert_allclose(lbol, L_SUN_CGS, rtol=rtol)
     # Discrimination: a 0.3 Msun main-sequence star is more than 10x fainter.
     dwarf = mors.Star(Mstar=0.3, Omega=1.0)
     faint = dwarf.Value(SOLAR_AGE_MYR, 'Lbol')
-    assert faint < 0.1 * lbol
+    assert faint < faint_ratio * lbol
 
     def figure():
         import matplotlib.pyplot as plt
@@ -81,7 +82,7 @@ def test_star_reproduces_solar_luminosity_at_solar_age(validation_plot):
         ax.errorbar(
             SOLAR_AGE_MYR,
             L_SUN_CGS,
-            yerr=0.15 * L_SUN_CGS,
+            yerr=rtol * L_SUN_CGS,
             fmt='s',
             mfc='none',
             capsize=4,
@@ -89,7 +90,14 @@ def test_star_reproduces_solar_luminosity_at_solar_age(validation_plot):
         )
         ax.plot(SOLAR_AGE_MYR, lbol, 'o', label='code, 1 Msun at 4.57 Gyr')
         ax.plot(SOLAR_AGE_MYR, faint, 'o', label='code, 0.3 Msun at 4.57 Gyr')
-        ax.plot(SOLAR_AGE_MYR, 0.1 * lbol, '_', ms=20, mew=2, label='0.1 of the 1 Msun value')
+        ax.plot(
+            SOLAR_AGE_MYR,
+            faint_ratio * lbol,
+            '_',
+            ms=20,
+            mew=2,
+            label='0.1 of the 1 Msun value',
+        )
         ax.set(xscale='log', yscale='log', xlabel='Age [Myr]', ylabel='Lbol [erg/s]')
         ax.legend(fontsize='small', loc='upper left', bbox_to_anchor=(1.02, 1.0))
         fig.tight_layout()

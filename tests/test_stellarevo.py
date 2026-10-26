@@ -179,8 +179,9 @@ def test_grid_compiled_from_raw_tracks_matches_saved_grid(
     # Positivity and solar calibration of the freshly compiled track.
     assert lbol > 0.0
     assert rstar > 0.0
-    assert_allclose(lbol, 1.0, atol=0.2)
-    assert_allclose(rstar, 1.0, atol=0.1)
+    l_tol, r_tol = 0.2, 0.1
+    assert_allclose(lbol, 1.0, atol=l_tol)
+    assert_allclose(rstar, 1.0, atol=r_tol)
     # Discrimination: a 0.5 Msun track would give Lbol well below 0.5 Lsun, so the
     # correct 1 Msun track is unambiguously selected.
     assert lbol > 0.5
@@ -200,7 +201,7 @@ def test_grid_compiled_from_raw_tracks_matches_saved_grid(
         fig, (top, bottom) = plt.subplots(2, 1, sharex=True, figsize=(6.4, 5.2))
         top.plot(ages, [compiled.Lbol(1.0, a) for a in ages], label='compiled 1 Msun track')
         top.errorbar(
-            SOLAR_AGE_MYR, 1.0, yerr=0.2, fmt='s', mfc='none', capsize=4, label='1 +- 0.2'
+            SOLAR_AGE_MYR, 1.0, yerr=l_tol, fmt='s', mfc='none', capsize=4, label=r'1 $\pm$ 0.2'
         )
         top.plot(SOLAR_AGE_MYR, lbol, 'o', label='compiled at 4.57 Gyr')
         top.plot(
@@ -209,7 +210,7 @@ def test_grid_compiled_from_raw_tracks_matches_saved_grid(
         top.set_ylabel('L [Lsun]')
         top.legend(fontsize='small')
         bottom.plot(ages, [compiled.Rstar(1.0, a) for a in ages])
-        bottom.errorbar(SOLAR_AGE_MYR, 1.0, yerr=0.1, fmt='s', mfc='none', capsize=4)
+        bottom.errorbar(SOLAR_AGE_MYR, 1.0, yerr=r_tol, fmt='s', mfc='none', capsize=4)
         bottom.plot(SOLAR_AGE_MYR, rstar, 'o')
         bottom.set(xscale='log', xlabel='Age [Myr]', ylabel='R [Rsun]')
         fig.tight_layout()

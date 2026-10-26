@@ -174,11 +174,12 @@ class TestXrayRegimes:
         state['Ro'] = params['RoSatXray']  # exactly at the saturation threshold
         Lx, Fx, Rx = pm._Xray(state, params=params)
         # Pinned saturated activity ratio.
-        assert_allclose(Rx, 5.135e-4, rtol=1e-6)
+        rx_sat, window = 5.135e-4, (1.0e-4, 1.0e-3)
+        assert_allclose(Rx, rx_sat, rtol=1e-6)
         # Sign guard: an activity ratio is strictly positive.
         assert Rx > 0.0
         # Scale guard: a cgs-vs-SI or exponent slip would leave this window.
-        assert 1.0e-4 < Rx < 1.0e-3
+        assert window[0] < Rx < window[1]
         # Flux is the luminosity spread over the stellar surface.
         expected_Fx = Lx / (4.0 * const.Pi * (state['Rstar'] * const.Rsun) ** 2.0)
         assert_allclose(Fx, expected_Fx, rtol=1e-12)
@@ -193,8 +194,8 @@ class TestXrayRegimes:
                 [pm._Xray(dict(state, Ro=r), params=params)[2] for r in ros],
                 label='code, Rx',
             )
-            ax.axhspan(1.0e-4, 1.0e-3, color='0.5', alpha=0.2, label='range 1e-4 to 1e-3')
-            ax.plot(params['RoSatXray'], 5.135e-4, 's', mfc='none', ms=10, label='5.135e-4')
+            ax.axhspan(*window, color='0.5', alpha=0.2, label='range 1e-4 to 1e-3')
+            ax.plot(params['RoSatXray'], rx_sat, 's', mfc='none', ms=10, label='5.135e-4')
             ax.plot(params['RoSatXray'], Rx, 'o', label='code at RoSatXray')
             ax.set(xscale='log', yscale='log', xlabel='Rossby number', ylabel='Rx = Lx / Lbol')
             ax.legend(fontsize='small')
@@ -973,7 +974,8 @@ class TestHabitableZone:
         AU, the classic inner edge of the conservative habitable zone.
         """
         monkeypatch.setattr('mors.stellarevo.Lbol', lambda M, A: 1.0)
-        monkeypatch.setattr('mors.stellarevo.Teff', lambda M, A: 5780.0)
+        teff = 5780.0
+        monkeypatch.setattr('mors.stellarevo.Teff', lambda M, A: teff)
         hz = pm.aOrbHZ(Mstar=1.0, Age=4570.0)
         expected = (1.0 / 1.0385) ** 0.5
         assert_allclose(hz['RunawayGreenhouse'], expected, rtol=1e-6)
@@ -990,8 +992,8 @@ class TestHabitableZone:
                 curve.append(pm.aOrbHZ(Mstar=1.0, Age=4570.0)['RunawayGreenhouse'])
             fig, ax = plt.subplots()
             ax.plot(teffs, curve, label='code, runaway greenhouse at 1 Lsun')
-            ax.plot(5780.0, expected, 's', mfc='none', ms=10, label='Kopparapu et al. (2013)')
-            ax.plot(5780.0, hz['RunawayGreenhouse'], 'o', label='code at 5780.0 K')
+            ax.plot(teff, expected, 's', mfc='none', ms=10, label='Kopparapu et al. (2013)')
+            ax.plot(teff, hz['RunawayGreenhouse'], 'o', label='code at 5780.0 K')
             ax.set(xlabel='Teff [K]', ylabel='distance [AU]')
             ax.legend(fontsize='small')
             fig.tight_layout()
@@ -1011,10 +1013,11 @@ class TestHabitableZone:
         is (Lbol / Seff)**0.5 with Seff from the published coefficients.
         """
         monkeypatch.setattr('mors.stellarevo.Lbol', lambda M, A: 0.1)
-        monkeypatch.setattr('mors.stellarevo.Teff', lambda M, A: 4000.0)
+        teff = 4000.0
+        monkeypatch.setattr('mors.stellarevo.Teff', lambda M, A: teff)
         hz = pm.aOrbHZ(Mstar=0.5, Age=1000.0)
         # Kopparapu runaway-greenhouse coefficients at Tstar = -1780 K.
-        tstar = 4000.0 - 5780.0
+        tstar = teff - 5780.0
         seff = (
             1.0385
             + 1.2456e-4 * tstar
@@ -1050,9 +1053,9 @@ class TestHabitableZone:
                 curve.append(pm.aOrbHZ(Mstar=0.5, Age=1000.0)['RunawayGreenhouse'])
             fig, ax = plt.subplots()
             ax.plot(teffs, curve, label='code, runaway greenhouse at 0.1 Lsun')
-            ax.plot(4000.0, expected, 's', mfc='none', ms=10, label='Kopparapu et al. (2013)')
-            ax.plot(4000.0, hz['RunawayGreenhouse'], 'o', label='code at 4000.0 K')
-            ax.plot(4000.0, wrong, 'x', label='cubic term entered as linear')
+            ax.plot(teff, expected, 's', mfc='none', ms=10, label='Kopparapu et al. (2013)')
+            ax.plot(teff, hz['RunawayGreenhouse'], 'o', label='code at 4000.0 K')
+            ax.plot(teff, wrong, 'x', label='cubic term entered as linear')
             ax.set(xlabel='Teff [K]', ylabel='distance [AU]')
             ax.legend(fontsize='small')
             fig.tight_layout()

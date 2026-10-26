@@ -367,36 +367,42 @@ def test_forward_euler_step_matches_analytic_update(monkeypatch, validation_plot
     step gives ``Omega_new = Omega + dAge * r`` exactly. With r = -2 (envelope)
     and r = -1 (core), dAge = 0.5, Omega = 10, the updates are 9.0 and 9.5.
     """
-    monkeypatch.setattr(rotevo.phys, 'dOmegadt', const_rate(-2.0, -1.0))
+    r_env, r_core, age, omega0, step = -2.0, -1.0, 100.0, 10.0, 0.5
+    wrong_env = omega0 - r_env * step
+    monkeypatch.setattr(rotevo.phys, 'dOmegadt', const_rate(r_env, r_core))
     p = make_params()
     p['TimeIntegrationMethod'] = 'ForwardEuler'
     dAge, dAgeNew, env, core = rotevo.EvolveRotationStep(
         Mstar=1.0,
-        Age=100.0,
-        OmegaEnv=10.0,
-        OmegaCore=10.0,
-        dAge=0.5,
+        Age=age,
+        OmegaEnv=omega0,
+        OmegaCore=omega0,
+        dAge=step,
         params=p,
         StarEvo=FakeStarEvo(),
     )
-    assert_allclose(env, 9.0, rtol=1e-12)
-    assert_allclose(core, 9.5, rtol=1e-12)
+    env_ref, core_ref = 9.0, 9.5
+    assert_allclose(env, env_ref, rtol=1e-12)
+    assert_allclose(core, core_ref, rtol=1e-12)
     # Sign guard: a wrong-sign torque would spin the star up past 10, not down.
-    assert env < 10.0
+    assert env < omega0
     # Wrong-sign envelope result (11.0) differs from the correct 9.0 by 2 >> tol.
-    assert abs(env - 11.0) > 1.0
+    assert abs(env - wrong_env) > 1.0
     # Forward Euler reports back the fixed step it was handed.
-    assert_allclose(dAgeNew, 0.5, rtol=1e-12)
+    assert_allclose(dAgeNew, step, rtol=1e-12)
 
     def figure():
         import matplotlib.pyplot as plt
 
         fig, ax = plt.subplots()
-        ax.plot([100.0, 100.5], [10.0, 10.0 - 2.0 * 0.5], label='patched envelope rate -2')
-        ax.plot([100.0, 100.5], [10.0, 10.0 - 1.0 * 0.5], ls='--', label='patched core rate -1')
-        ax.plot([100.5, 100.5], [9.0, 9.5], 's', mfc='none', ms=10, label='9.0 and 9.5')
-        ax.plot([100.5, 100.5], [env, core], 'o', label='code, envelope and core')
-        ax.plot([100.5], [11.0], 'x', label='wrong-sign envelope')
+        t1 = age + step
+        ax.plot([age, t1], [omega0, omega0 + r_env * step], label='patched envelope rate -2')
+        ax.plot(
+            [age, t1], [omega0, omega0 + r_core * step], ls='--', label='patched core rate -1'
+        )
+        ax.plot([t1, t1], [env_ref, core_ref], 's', mfc='none', ms=10, label='9.0 and 9.5')
+        ax.plot([t1, t1], [env, core], 'o', label='code, envelope and core')
+        ax.plot([t1], [wrong_env], 'x', label='wrong-sign envelope')
         ax.set(xlabel='Age [Myr]', ylabel='rotation rate [solar rotation rates]')
         ax.legend(fontsize='small')
         fig.tight_layout()
