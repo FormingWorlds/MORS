@@ -14,11 +14,11 @@ The case below says why the check exists, what it tests, how we know the right a
 
 **What it tests.** `Omega` is the angular rotation rate and `dAge` the time step. For a prescribed constant rate of change `r`, one explicit forward-Euler step gives `Omega_new = Omega + dAge * r`. The test replaces the rate function with fixed rates (`r = -2` for the envelope, `r = -1` for the core) and takes one step with `dAge = 0.5` from `Omega = 10`. The rotation rate of the envelope must become 9.0 and that of the core 9.5. Fixing the rates separates the integrator arithmetic from the physics of the rate law.
 
-**How we know the right answer.** The single-step Euler update is a closed-form identity. A swapped update, a wrong sign or a missing time step misses it by far more than the `rtol=1e-12` tolerance. Other tests of the module check that a braking track spins down monotonically (a faster rotator brakes harder and stays positive), that the adaptive-step integrators reach the requested final age, and that 2 tracks started at different rates keep their order.
+**How we know the right answer.** The single-step Euler update is a closed-form identity. A swapped update, a wrong sign or a missing time step misses it by far more than the `rtol=1e-12` tolerance. Other tests of the module check that a braking track spins down monotonically (a faster rotator brakes harder and stays positive), that a forward-Euler track reaches the requested final age, and that 2 tracks started at different rates keep their order.
 
 **Why it matters.** `mors.star.Star` calls `rotevo.EvolveRotation` to compute the rotation history of the star. That rotation history sets stellar magnetic activity and high-energy emission.
 
-**Known limit.** The test covers the forward-Euler step only. The default method of `EvolveRotation` and the other step methods are checked by tests that are not reference-pinned, such as `test_runge_kutta4_constant_rate_linear_update`.
+**Known limit.** The test covers the forward-Euler step only. The default method is `RosenbrockFixed`, which PROTEUS uses through `mors.Star`, so this test does not protect the PROTEUS path. The other step methods are checked by tests that are not reference-pinned, such as `test_runge_kutta4_constant_rate_linear_update`.
 
 ??? info "Test details"
     - Reference: closed form `Omega_new = Omega + dAge * r`
