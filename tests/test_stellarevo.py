@@ -203,7 +203,9 @@ def test_grid_compiled_from_raw_tracks_matches_saved_grid(
             SOLAR_AGE_MYR, 1.0, yerr=0.2, fmt='s', mfc='none', capsize=4, label='1 +- 0.2'
         )
         top.plot(SOLAR_AGE_MYR, lbol, 'o', label='compiled at 4.57 Gyr')
-        top.plot(SOLAR_AGE_MYR, reloaded_lbol, '+', ms=10, label='reloaded at 4.57 Gyr')
+        top.plot(
+            SOLAR_AGE_MYR, reloaded_lbol, '+', ms=10, label='second construction at 4.57 Gyr'
+        )
         top.set_ylabel('L [Lsun]')
         top.legend(fontsize='small')
         bottom.plot(ages, [compiled.Rstar(1.0, a) for a in ages])
