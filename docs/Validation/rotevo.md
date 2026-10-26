@@ -18,6 +18,11 @@ The case below says why the check exists, what it tests, how we know the right a
 
 **Why it matters.** `mors.star.Star` calls `rotevo.EvolveRotation` to compute the rotation history of the star. That rotation history sets stellar magnetic activity and high-energy emission.
 
+![Envelope and core rotation over one forward-Euler step, with the analytic values and the wrong-sign value](../assets/validation/mors_rotevo_forward_euler.svg#only-light){ width="80%" }
+![Envelope and core rotation over one forward-Euler step, with the analytic values and the wrong-sign value](../assets/validation/mors_rotevo_forward_euler_dark.svg#only-dark){ width="80%" }
+
+**How to read the plot.** The 2 lines start at 10 Omega_sun at 100 Myr and have the slopes -2 and -1 that the test patches into the code. They are inputs of the test, not code output. The test asserts the code values after the step of 0.5 Myr (circles) against 9.0 and 9.5 (squares) to a relative 1e-12. The cross at 11.0 is the envelope value of a wrong sign of the rate. A pass means that each circle sits in its square and the envelope circle at 9.0 lies more than 1 below the cross.
+
 **Known limit.** The test covers the forward-Euler step only. The default method is `RosenbrockFixed`, which PROTEUS uses through `mors.Star`, so this test does not protect the PROTEUS path. The other step methods are checked by tests that are not reference-pinned, such as `test_runge_kutta4_constant_rate_linear_update`.
 
 ??? info "Test details"

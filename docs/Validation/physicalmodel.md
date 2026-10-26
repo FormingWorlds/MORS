@@ -18,6 +18,11 @@ Each case below says why the check exists, what it tests, how we know the right 
 
 **Why it matters.** `_Xray` gives the X-ray luminosity along every rotation track (`ExtendedQuantities`, which `rotevo` calls). With the Spada tracks, PROTEUS reads `Lx` and `Leuv` through `Star.Value` to compute the XUV flux at the planet, `F_xuv`.
 
+![X-ray to bolometric luminosity ratio against Rossby number, with the value at the saturation threshold](../assets/validation/mors_physicalmodel_xray_saturated.svg#only-light){ width="80%" }
+![X-ray to bolometric luminosity ratio against Rossby number, with the value at the saturation threshold](../assets/validation/mors_physicalmodel_xray_saturated_dark.svg#only-dark){ width="80%" }
+
+**How to read the plot.** Both axes are logarithmic. The line is the `Rx` that `_Xray` returns for Rossby numbers from 1/30 to 30 times the threshold 0.0605; it gives context. The bend of the line is the threshold. The test asserts the code value at the threshold (circle) against 5.135e-4 (square) to a relative 1e-6, too small to see. The grey band is the scale window 1e-4 to 1e-3. A pass means that the circle sits in the square inside the band. The test also asserts the X-ray flux, which the plot does not draw.
+
 **Known limit.** The code derives `C1` and `C2` from `Rx_sat` and `Ro_sat`, and the test evaluates at `Ro_sat` itself, so a wrong threshold `Ro_sat`, or an exponent error that keeps the fast-to-slow ratio above 5, does not fail this test or its companion; only `Rx_sat` is checked directly.
 
 ??? info "Test details"
@@ -36,6 +41,11 @@ Each case below says why the check exists, what it tests, how we know the right 
 
 **Why it matters.** `aOrbHZ` gives the habitable-zone distances that `Star` and `Cluster` store, and `mors` exports it for direct use. PROTEUS does not read it.
 
+![Runaway greenhouse distance against effective temperature at 1 Lsun, with the value at 5780 K](../assets/validation/mors_physicalmodel_hz_solar.svg#only-light){ width="80%" }
+![Runaway greenhouse distance against effective temperature at 1 Lsun, with the value at 5780 K](../assets/validation/mors_physicalmodel_hz_solar_dark.svg#only-dark){ width="80%" }
+
+**How to read the plot.** The line is the runaway greenhouse distance of `aOrbHZ` at 1 Lsun for effective temperatures from 2600 to 7200 K and gives context. The test asserts the code value at 5780 K (circle) against $(1/1.0385)^{0.5}$ = 0.981 AU (square) to a relative 1e-6, too small to see. A pass means that the circle sits in the square.
+
 ??? info "Test details"
     - Reference: Kopparapu et al. (2013) [^cite-kopparapu2013], Table 3, `Seff = 1.0385`
     - Tolerance: `rtol=1e-6`
@@ -51,6 +61,11 @@ Each case below says why the check exists, what it tests, how we know the right 
 **How we know the right answer.** Kopparapu et al. (2013), Table 3, gives all coefficients of the polynomial.
 
 **Why it matters.** `aOrbHZ` gives the runaway-greenhouse distance of every star that is not a solar analogue through these terms.
+
+![Runaway greenhouse distance against effective temperature at 0.1 Lsun, with the value at 4000 K and the wrong-term value](../assets/validation/mors_physicalmodel_hz_cool.svg#only-light){ width="80%" }
+![Runaway greenhouse distance against effective temperature at 0.1 Lsun, with the value at 4000 K and the wrong-term value](../assets/validation/mors_physicalmodel_hz_cool_dark.svg#only-dark){ width="80%" }
+
+**How to read the plot.** The line is the runaway greenhouse distance of `aOrbHZ` at 0.1 Lsun and gives context. The test asserts the code value at 4000 K (circle) against the value from the published coefficients, 0.3355 AU (square), to a relative 1e-9. The cross is the value with a linear cubic term, 0.3439 AU. A pass means that the circle sits in the square and the cross lies more than 2 % away; it lies 2.5 % away.
 
 **Known limit.** Only the runaway-greenhouse polynomial is compared with Kopparapu et al. (2013). The coefficients of the Recent Venus, Moist, Maximum and Early Mars limits, and so the `HZ` distance (the mean of the Moist and Maximum limits) that `physicalmodel.py` uses for the XUV flux in the habitable zone, are checked only by the ordering test. Both tests replace `stellarevo.Lbol` and `Teff` with fixed values.
 

@@ -140,7 +140,9 @@ def test_stellarevo_luminosity_increases_with_mass():
 
 @pytest.mark.reference_pinned
 @pytest.mark.physics_invariant
-def test_grid_compiled_from_raw_tracks_matches_saved_grid(tmp_path, monkeypatch):
+def test_grid_compiled_from_raw_tracks_matches_saved_grid(
+    tmp_path, monkeypatch, validation_plot
+):
     """Compiling the grid from the raw Spada track files reproduces the solar calibration.
 
     Reference: Spada et al. (2013), ApJ 776, 87. The default install ships a
@@ -185,10 +187,33 @@ def test_grid_compiled_from_raw_tracks_matches_saved_grid(tmp_path, monkeypatch)
 
     # Re-constructing now loads the saved pickle; the grids must agree at 1 Msun.
     reloaded = mors.StarEvo(starEvoDir=str(grid_dir), evoModels=SOLAR_MODEL_SET)
-    assert_allclose(reloaded.Lbol(1.0, SOLAR_AGE_MYR), lbol, rtol=1e-12)
+    reloaded_lbol = reloaded.Lbol(1.0, SOLAR_AGE_MYR)
+    assert_allclose(reloaded_lbol, lbol, rtol=1e-12)
     assert_allclose(
         reloaded.Teff(1.0, SOLAR_AGE_MYR), compiled.Teff(1.0, SOLAR_AGE_MYR), rtol=1e-12
     )
+
+    def figure():
+        import matplotlib.pyplot as plt
+
+        ages = np.geomspace(100.0, 8000.0, 60)
+        fig, (top, bottom) = plt.subplots(2, 1, sharex=True, figsize=(6.4, 5.2))
+        top.plot(ages, [compiled.Lbol(1.0, a) for a in ages], label='compiled 1 Msun track')
+        top.errorbar(
+            SOLAR_AGE_MYR, 1.0, yerr=0.2, fmt='s', mfc='none', capsize=4, label='1 +- 0.2'
+        )
+        top.plot(SOLAR_AGE_MYR, lbol, 'o', label='compiled at 4.57 Gyr')
+        top.plot(SOLAR_AGE_MYR, reloaded_lbol, '+', ms=10, label='reloaded at 4.57 Gyr')
+        top.set_ylabel('L [Lsun]')
+        top.legend(fontsize='small')
+        bottom.plot(ages, [compiled.Rstar(1.0, a) for a in ages])
+        bottom.errorbar(SOLAR_AGE_MYR, 1.0, yerr=0.1, fmt='s', mfc='none', capsize=4)
+        bottom.plot(SOLAR_AGE_MYR, rstar, 'o')
+        bottom.set(xscale='log', xlabel='Age [Myr]', ylabel='R [Rsun]')
+        fig.tight_layout()
+        return fig
+
+    validation_plot(figure, 'mors_stellarevo_grid_compiled')
 
 
 def test_grid_cache_write_failure_does_not_break_construction(tmp_path, monkeypatch, caplog):

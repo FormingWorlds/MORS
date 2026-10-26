@@ -18,6 +18,11 @@ The case below says why the check exists, what it tests, how we know the right a
 
 **Why it matters.** With the Spada tracks, PROTEUS calls `CalcBandFluxes` on the modern spectrum of the star. In MORS, `FitModernProperties` in `mors.synthesis` calls it too.
 
+![Band integrals of a unit spectrum against the band widths](../assets/validation/mors_spectrum_constant_integrand.svg#only-light){ width="80%" }
+![Band integrals of a unit spectrum against the band widths](../assets/validation/mors_spectrum_constant_integrand_dark.svg#only-dark){ width="80%" }
+
+**How to read the plot.** Each grey column is the integral of the unit spectrum over one band, from `CalcBandFluxes`. Each mark is the width of that band, the closed form. The test asserts each column against its mark to a relative 1e-12. A pass means that every mark sits at the top of its column.
+
 **Known limit.** For a constant integrand every way of summing the samples (rectangles or trapezoids) gives the same total, so this case does not test the summation weights. The sample points stay away from the band edges, so a band limit that moves without crossing a sample point also passes.
 
 ??? info "Test details"

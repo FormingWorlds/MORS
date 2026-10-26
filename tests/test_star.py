@@ -50,7 +50,7 @@ SPADA_FORWARD_EULER = (
 
 @pytest.mark.reference_pinned
 @pytest.mark.physics_invariant
-def test_star_reproduces_solar_luminosity_at_solar_age():
+def test_star_reproduces_solar_luminosity_at_solar_age(validation_plot):
     """A 1 Msun star at the solar age reproduces the nominal solar luminosity.
 
     Reference: Spada et al. (2013) solar-calibrated tracks with the IAU 2015 B3
@@ -61,13 +61,41 @@ def test_star_reproduces_solar_luminosity_at_solar_age():
     factor of ten fainter, rules out a wrong-mass track slipping through.
     """
     mors.DownloadEvolutionTracks('Spada')
-    lbol = mors.Star(Mstar=1.0, Omega=1.0).Value(SOLAR_AGE_MYR, 'Lbol')
+    sun = mors.Star(Mstar=1.0, Omega=1.0)
+    lbol = sun.Value(SOLAR_AGE_MYR, 'Lbol')
     assert lbol > 0.0
     # rtol=0.15: the Spada solar-mass track reproduces L_sun to within 15%.
     assert_allclose(lbol, L_SUN_CGS, rtol=0.15)
     # Discrimination: a 0.3 Msun main-sequence star is more than 10x fainter.
-    faint = mors.Star(Mstar=0.3, Omega=1.0).Value(SOLAR_AGE_MYR, 'Lbol')
+    dwarf = mors.Star(Mstar=0.3, Omega=1.0)
+    faint = dwarf.Value(SOLAR_AGE_MYR, 'Lbol')
     assert faint < 0.1 * lbol
+
+    def figure():
+        import matplotlib.pyplot as plt
+
+        ages = np.geomspace(sun.Tracks['Age'][0], sun.Tracks['Age'][-1], 30)
+        fig, ax = plt.subplots()
+        ax.plot(ages, [sun.Value(a, 'Lbol') for a in ages], label='code, 1 Msun')
+        ax.plot(ages, [dwarf.Value(a, 'Lbol') for a in ages], ls='--', label='code, 0.3 Msun')
+        ax.errorbar(
+            SOLAR_AGE_MYR,
+            L_SUN_CGS,
+            yerr=0.15 * L_SUN_CGS,
+            fmt='s',
+            mfc='none',
+            capsize=4,
+            label='L_sun +- 15 %',
+        )
+        ax.plot(SOLAR_AGE_MYR, lbol, 'o', label='code, 1 Msun at 4.57 Gyr')
+        ax.plot(SOLAR_AGE_MYR, faint, 'o', label='code, 0.3 Msun at 4.57 Gyr')
+        ax.plot(SOLAR_AGE_MYR, 0.1 * lbol, '_', ms=20, mew=2, label='0.1 of the 1 Msun value')
+        ax.set(xscale='log', yscale='log', xlabel='Age [Myr]', ylabel='Lbol [erg/s]')
+        ax.legend(fontsize='small')
+        fig.tight_layout()
+        return fig
+
+    validation_plot(figure, 'mors_star_solar_luminosity')
 
 
 def test_star_construction_leaves_shared_default_params_intact():

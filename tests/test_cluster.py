@@ -227,7 +227,7 @@ def test_percentile_string_labels_and_error_contract(cluster_mod):
 
 @pytest.mark.reference_pinned
 @pytest.mark.physics_invariant
-def test_percentile_of_uniform_ramp_matches_closed_form(cluster_mod):
+def test_percentile_of_uniform_ramp_matches_closed_form(cluster_mod, validation_plot):
     """Percentile of a uniform rotation ramp equals its closed-form value.
 
     Analytical anchor: for an evenly spaced distribution running from A to B, the
@@ -246,8 +246,10 @@ def test_percentile_of_uniform_ramp_matches_closed_form(cluster_mod):
     # shared age, so the uniform 1..40 Omega_sun ramp stays uniform.
     factor = 1.0 / (1.0 + age / 1000.0)
     lo_edge, hi_edge = 1.0 * factor, 40.0 * factor
+    checked = {}
     for q in (5.0, 50.0, 95.0):
         got = cluster.Percentile(Mstar=1.0, Age=age, percentile=q)
+        checked[q] = got
         analytic = lo_edge + (hi_edge - lo_edge) * q / 100.0
         assert_allclose(got, analytic, rtol=1e-12)
     # Discrimination guard: a wrong branch returning the distribution midpoint
@@ -258,6 +260,33 @@ def test_percentile_of_uniform_ramp_matches_closed_form(cluster_mod):
     p95 = cluster.Percentile(Mstar=1.0, Age=age, percentile=95.0)
     assert abs(p05 - midpoint) > 1.0
     assert abs(p95 - midpoint) > 1.0
+
+    def figure():
+        import matplotlib.pyplot as plt
+
+        qs = np.linspace(0.0, 100.0, 41)
+        fig, ax = plt.subplots()
+        ax.plot(
+            qs,
+            [cluster.Percentile(Mstar=1.0, Age=age, percentile=q) for q in qs],
+            label='code, Percentile',
+        )
+        ax.axhline(midpoint, ls=':', color='0.5', label='midpoint of the ramp')
+        ax.plot(
+            list(checked),
+            [lo_edge + (hi_edge - lo_edge) * q / 100.0 for q in checked],
+            's',
+            mfc='none',
+            ms=10,
+            label='closed form',
+        )
+        ax.plot(list(checked), list(checked.values()), 'o', label='code at 5, 50, 95')
+        ax.set(xlabel='percentile', ylabel='Omega [Omega_sun]')
+        ax.legend(fontsize='small')
+        fig.tight_layout()
+        return fig
+
+    validation_plot(figure, 'mors_cluster_percentile_ramp')
 
 
 def test_activity_lifetime_requires_string_quantity(cluster_mod):

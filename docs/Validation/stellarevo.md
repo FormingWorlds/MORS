@@ -41,6 +41,11 @@ Luminosity, radius and effective temperature of the 1 Msun Spada et al. (2013) t
 
 **Why it matters.** MORS compiles the grid from the raw files when no compiled grid exists, so every later run reads what this step wrote.
 
+![Luminosity and radius of the compiled 1 Msun track against age, with the values at the solar age](../assets/validation/mors_stellarevo_grid_compiled.svg#only-light){ width="80%" }
+![Luminosity and radius of the compiled 1 Msun track against age, with the values at the solar age](../assets/validation/mors_stellarevo_grid_compiled_dark.svg#only-dark){ width="80%" }
+
+**How to read the plot.** The x-axis is the age on a log scale. The lines are `Lbol` and `Rstar` of the freshly compiled grid for 1 Msun and give context. The test asserts the compiled values at 4.57 Gyr (circles) against 1 Lsun with an error bar of 0.2 and 1 Rsun with an error bar of 0.1 (squares). The plus (+) is the luminosity of the reloaded grid, which must equal the compiled value to a relative 1e-12, too small to see. A pass means that each circle lies inside its error bar and the plus sits on the upper circle.
+
 **Known limit.** The test compares `Lbol` and `Rstar` with the solar reference, but checks `Teff` only against a second construction from the same code, so a `Teff` left in log units does not fail it. It also does not check that the second construction reads the cache file.
 
 ??? info "Test details"

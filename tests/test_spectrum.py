@@ -192,7 +192,7 @@ def test_Spectrum_LoadDirectly_sanitizes_and_orders(wl, fl):
         ),
     ),
 )
-def test_Spectrum_CalcBandFluxes_constant_integrand(wl, fl, expected):
+def test_Spectrum_CalcBandFluxes_constant_integrand(wl, fl, expected, validation_plot):
     """A unit-flux spectrum integrates to the band width in every band.
 
     Analytical limit: the integral of a constant integrand of value 1 over a
@@ -222,6 +222,20 @@ def test_Spectrum_CalcBandFluxes_constant_integrand(wl, fl, expected):
     # Every band integral is positive for a positive integrand.
     assert all(x > 0.0 for x in ret)
     assert_allclose(ret, exp, rtol=1e-12, atol=0.0)
+
+    def figure():
+        import matplotlib.pyplot as plt
+
+        bands = ['xr', 'e1', 'e2', 'uv', 'pl', 'bo']
+        fig, ax = plt.subplots()
+        ax.bar(bands, ret, color='0.75', label='code, band integral')
+        ax.plot(bands, exp, 'o', label='band width')
+        ax.set(ylabel='integral of a unit spectrum [nm]')
+        ax.legend(fontsize='small')
+        fig.tight_layout()
+        return fig
+
+    validation_plot(figure, 'mors_spectrum_constant_integrand')
 
 
 # Spectrum: extensions

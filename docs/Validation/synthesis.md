@@ -18,6 +18,11 @@ The case below says why the check exists, what it tests, how we know the right a
 
 **Why it matters.** `GetProperties` gives the band properties from which `mors.synthesis` scales a stellar spectrum through time.
 
+![Band fluxes at 1 AU from GetProperties against the expected values, with the sum of the bands](../assets/validation/mors_synthesis_flux_budget.svg#only-light){ width="80%" }
+![Band fluxes at 1 AU from GetProperties against the expected values, with the sum of the bands](../assets/validation/mors_synthesis_flux_budget_dark.svg#only-dark){ width="80%" }
+
+**How to read the plot.** The y-axis is logarithmic. Each grey column is a flux of `GetProperties` at 1 AU and each mark is the expected value of the test. The test asserts every column against its mark to a relative 1e-12. The short line on F_bo is the sum of the band fluxes, which must equal F_bo to a relative 1e-12. F_pl is 0, because the test patches the Planck part out, so the plot does not draw it. The test also asserts the luminosities, which the plot does not draw. A pass means that every mark sits at the top of its column and the short line sits on F_bo.
+
 **Known limit.** With `F_pl` set to zero, this case does not check the subtraction of the Planck term from `F_bo`; `test_GetProperties_planck_trapezoid_constant` checks the `F_pl` integral, and no test checks its subtraction. The test shares `AU` and `LbolSun` with the source, so a wrong value of these constants does not fail it. It does not check the returned `radius` and `Teff`, nor that `Percentile` feeds `Lxuv`. PROTEUS does not call `GetProperties`: it computes the band properties with its own `get_spada_synthesis_properties` and then calls `CalcScaledSpectrumFromProps`, so this test does not cover the PROTEUS version.
 
 ??? info "Test details"

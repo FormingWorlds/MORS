@@ -36,7 +36,7 @@ TEST_DATA = (
 @pytest.mark.reference_pinned
 @pytest.mark.physics_invariant
 @pytest.mark.parametrize('inp,expected', TEST_DATA)
-def test_baraffe_track_matches_published_values(inp, expected):
+def test_baraffe_track_matches_published_values(inp, expected, validation_plot):
     """Pin Baraffe luminosity, radius, and insolation against the tracks.
 
     Reference: the Baraffe et al. (2015), A&A 577, A42 evolutionary tracks. The
@@ -57,6 +57,29 @@ def test_baraffe_track_matches_published_values(inp, expected):
     assert all(x > 0.0 for x in ret)
     # rtol=1e-5 tracks the precision of the pinned reference values.
     assert_allclose(ret, expected, rtol=1e-5, atol=0)
+
+    def figure():
+        import matplotlib.pyplot as plt
+
+        ages = np.geomspace(baraffe.tmin, baraffe.tmax, 40)
+        fig, (top, bottom) = plt.subplots(2, 1, sharex=True, figsize=(6.4, 5.2))
+        top.plot(
+            ages,
+            [baraffe.BaraffeLuminosity(a) for a in ages],
+            label=f'code, {inp[0]} Msun track',
+        )
+        top.plot(inp[1], expected[0], 's', mfc='none', ms=10, label='pinned value')
+        top.plot(inp[1], ret[0], 'o', label='code')
+        top.set(yscale='log', ylabel='L [Lsun]')
+        top.legend(fontsize='small')
+        bottom.plot(ages, [baraffe.BaraffeStellarRadius(a) for a in ages])
+        bottom.plot(inp[1], expected[1], 's', mfc='none', ms=10)
+        bottom.plot(inp[1], ret[1], 'o')
+        bottom.set(xscale='log', xlabel='Age [yr]', ylabel='R [Rsun]')
+        fig.tight_layout()
+        return fig
+
+    validation_plot(figure, f'mors_baraffe_{inp[0]:g}'.replace('.', 'p'))
 
 
 @pytest.mark.physics_invariant

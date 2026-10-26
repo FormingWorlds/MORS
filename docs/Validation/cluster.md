@@ -18,6 +18,11 @@ The case below says why the check exists, what it tests, how we know the right a
 
 **Why it matters.** `Cluster.Percentile` is the percentile query of a star population in MORS.
 
+![Surface rotation of a cluster percentile against the percentile, with the closed form at 5, 50 and 95](../assets/validation/mors_cluster_percentile_ramp.svg#only-light){ width="80%" }
+![Surface rotation of a cluster percentile against the percentile, with the closed form at 5, 50 and 95](../assets/validation/mors_cluster_percentile_ramp_dark.svg#only-dark){ width="80%" }
+
+**How to read the plot.** The line is `Cluster.Percentile` for percentiles 0 to 100 at 200 Myr and gives context. The dotted line is the midpoint of the ramp. The test asserts the code values at the percentiles 5, 50 and 95 (circles) against the closed form (squares) to a relative 1e-12. A pass means that each circle sits in its square and the circles at 5 and 95 lie more than 1 Omega_sun from the dotted line.
+
 **Known limit.** The test replaces both the star model (`Star`) and the percentile routine (`star.Percentile`) with simple stand-ins (test functions that return fixed, simple values; the percentile stand-in calls `np.percentile`). So it checks how `Cluster.Percentile` collects and passes the rates, not the spin-down or the percentile code of MORS. `Star` and PROTEUS take the initial rotation of a single star from `star.Percentile` directly, which this test does not cover.
 
 ??? info "Test details"

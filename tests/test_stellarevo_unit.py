@@ -125,7 +125,9 @@ def test_concurrent_compiles_of_same_grid_produce_one_loadable_grid(tmp_path, mo
     log_paths = [str(tmp_path / f'writer{i}.log') for i in range(n_writers)]
     ctx = multiprocessing.get_context('spawn')
     procs = [
-        ctx.Process(target=_concurrent_compile_worker, args=(track_dir, cache_root, 'evoA', log_path))
+        ctx.Process(
+            target=_concurrent_compile_worker, args=(track_dir, cache_root, 'evoA', log_path)
+        )
         for log_path in log_paths
     ]
     for p in procs:
@@ -140,7 +142,9 @@ def test_concurrent_compiles_of_same_grid_produce_one_loadable_grid(tmp_path, mo
         if os.path.exists(log_path):
             with open(log_path) as f:
                 warnings.extend(line for line in f if line.strip())
-    assert warnings == [], f'a writer logged a warning while compiling the shared grid: {warnings}'
+    assert warnings == [], (
+        f'a writer logged a warning while compiling the shared grid: {warnings}'
+    )
 
     monkeypatch.setattr(se.platformdirs, 'user_cache_dir', lambda *_a, **_k: cache_root)
     monkeypatch.setattr(se, '_ReadEvolutionTrack', _fake_track_large)
