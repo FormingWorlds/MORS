@@ -10,7 +10,7 @@ The case below says why the check exists, what it tests, how we know the right a
 
 ## Flux budget closure
 
-**Why this check exists.** The UV band flux is the bolometric remainder: $F_\mathrm{uv} = F_\mathrm{bo} - F_\mathrm{xr} - F_\mathrm{e1} - F_\mathrm{e2} - F_\mathrm{pl}$, with $F$ the flux of each band (bolometric, X-ray, 2 extreme-ultraviolet bands, photospheric). A dropped band in this budget, or a wrong conversion of a band flux or luminosity, gives wrong band values without an error message.
+**Why this check exists.** The UV band flux is the bolometric remainder: $F_\mathrm{uv} = F_\mathrm{bo} - F_\mathrm{xr} - F_\mathrm{e1} - F_\mathrm{e2} - F_\mathrm{pl}$, with $F$ the flux of each band (bolometric, X-ray, 2 extreme-ultraviolet bands, photospheric). A dropped X-ray or extreme-ultraviolet term in this budget, or a wrong conversion of a band flux or luminosity, gives wrong band values without an error message.
 
 **What it tests.** The test replaces the stellar model inputs (`Value`, `Percentile`, `Lxuv`, `Lbol`) with fixed, physically plausible values. It sets the Planck surface flux to zero and `ScaleTo1AU` to the identity, so `F_pl` is zero in this case. It recomputes the expected per-band fluxes and luminosities from physical constants (`AU`, `LbolSun`), pins each returned value, and checks that the 5 sub-band fluxes sum to the bolometric flux. Companion tests check the Planck band integral of a constant (`test_GetProperties_planck_trapezoid_constant`), positive band-scale factors (`test_CalcBandScales`), and that the wavelength grid stays the same (`test_CalcScaledSpectrumFromProps_scales_by_first_band`).
 

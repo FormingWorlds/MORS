@@ -10,13 +10,15 @@ Each case below says why the check exists, what it tests, how we know the right 
 
 ## Saturated X-ray ratio
 
-**Why this check exists.** The X-ray activity relation is a broken power law in the Rossby number $Ro$ (the rotation period over the convective turnover time), with a saturated branch for fast rotators. A change of the saturation constant shifts the X-ray luminosity of every fast rotator without an error message.
+**Why this check exists.** The X-ray activity relation is a broken power law in the Rossby number $Ro$ (the rotation period over the convective turnover time), with a saturated branch for fast rotators. A wrong constant of the unsaturated branch, or a wrong saturation threshold, shifts the X-ray luminosity without an error message.
 
-**What it tests.** The saturated branch is `Rx = C1 * Ro**beta1` for `Ro <= Ro_sat`, with `Rx` the ratio of the X-ray to the bolometric luminosity. At the saturation Rossby number `Ro_sat` the 2 branches meet. The test evaluates the relation there and checks `Rx_sat = 5.135e-4`. It also checks that `Rx` is positive and between 1e-4 and 1e-3, and that the X-ray surface flux equals the X-ray luminosity over the stellar surface area. A companion test walks a point on each side of the threshold to check which branch the code takes. Other tests of the module check that the emission quantities are positive, that `Lxuv = Lx + Leuv`, the antisymmetry of the torques, and the monotonicity of the saturation.
+**What it tests.** `Rx` is the ratio of the X-ray to the bolometric luminosity. The code uses the saturated branch `Rx = C1 * Ro**beta1` for `Ro < Ro_sat` and the unsaturated branch `C2 * Ro**beta2` otherwise; at the saturation Rossby number `Ro_sat` the 2 branches meet. The test evaluates the relation at `Ro = Ro_sat`, where the code takes the unsaturated branch, and checks `Rx_sat = 5.135e-4`. It also checks that `Rx` is positive and between 1e-4 and 1e-3, and that the X-ray surface flux equals the X-ray luminosity over the stellar surface area. A companion test, `test_fast_rotator_emits_more_xrays_than_slow_rotator`, checks that a star at 0.5 `Ro_sat` has more than 5 times the `Rx` of a star at 10 `Ro_sat`. Other tests of the module check that the emission quantities are positive, that `Lxuv = Lx + Leuv`, the antisymmetry of the torques, and the monotonicity of the saturation.
 
 **How we know the right answer.** `Rx_sat = 5.135e-4` is the saturated ratio of Johnstone et al. (2020), calibrated on the Spada et al. (2013) models; it is the value the rotation-activity model uses (see [High-energy emission and activity](../Explanations/activity.md)).
 
-**Why it matters.** `_Xray` gives the X-ray luminosity along every rotation track (`ExtendedQuantities`, which `rotevo` calls). PROTEUS reads `Lx` and `Leuv` through `Star.Value` to compute the XUV flux at the planet, `F_xuv`.
+**Why it matters.** `_Xray` gives the X-ray luminosity along every rotation track (`ExtendedQuantities`, which `rotevo` calls). With the Spada tracks, PROTEUS reads `Lx` and `Leuv` through `Star.Value` to compute the XUV flux at the planet, `F_xuv`.
+
+**Known limit.** At `Ro = Ro_sat` the code runs the unsaturated branch, so a wrong `C1` or `beta1` of the saturated branch does not fail this test.
 
 ??? info "Test details"
     - Reference: Johnstone et al. (2020) saturated `Rx_sat = 5.135e-4`, calibrated on the Spada et al. (2013) [^cite-spada2013] models
@@ -32,7 +34,7 @@ Each case below says why the check exists, what it tests, how we know the right 
 
 **How we know the right answer.** Kopparapu et al. (2013), Table 3, gives `Seff = 1.0385` for the solar runaway-greenhouse limit.
 
-**Why it matters.** `aOrbHZ` gives the habitable-zone distances that `Cluster` stores for each star, and `mors` exports it for direct use.
+**Why it matters.** `aOrbHZ` gives the habitable-zone distances that `Star` and `Cluster` store, and `mors` exports it for direct use. PROTEUS does not use it.
 
 ??? info "Test details"
     - Reference: Kopparapu et al. (2013) [^cite-kopparapu2013], Table 3, `Seff = 1.0385`

@@ -12,7 +12,7 @@ Each case below says why the check exists, what it tests, how we know the right 
 
 **Why this check exists.** The interpolation can read the wrong track, use the wrong age unit (the code expects Myr), or rescale the native units without an error message. Because the main-sequence mass-luminosity relation is steep, a wrong track index shifts luminosity by orders of magnitude.
 
-**What it tests.** `stellarevo.Value(Mstar, Age, key)` reads the Spada et al. (2013) grid (24 mass bins from 0.1 to 1.25 Msun, loaded from `FWL_DATA`) and returns structural quantities by bilinear interpolation in mass and log-age. The Spada et al. (2013) models are solar-calibrated. At the solar age of 4.57 Gyr, the interpolated 1 Msun track returns roughly 1.08 Lsun, 1.015 Rsun, and 5844 K, agreeing to about 10% with solar reference values (unity in normalized luminosity and radius, 5772 K in effective temperature). The test asserts that L lands inside 0.15 Lsun of unity, R lands inside 0.05 Rsun of unity, and Teff deviates by under 3% from 5772 K. A companion test (`test_stellarevo_luminosity_increases_with_mass`) samples masses from 0.3 to 1.2 Msun and asserts strict monotonic increase, with the lightest and heaviest tracks separated by more than two orders of magnitude.
+**What it tests.** `stellarevo.Value(Mstar, Age, key)` reads the Spada et al. (2013) grid (24 mass bins from 0.1 to 1.25 Msun, loaded from `FWL_DATA`) and returns structural quantities by linear interpolation in age, then in mass. The native units are solar luminosities for `Lbol`, solar radii for `Rstar` and K for `Teff`. The Spada et al. (2013) models are solar-calibrated. At the solar age of 4.57 Gyr, the interpolated 1 Msun track returns roughly 1.08 Lsun, 1.015 Rsun, and 5844 K, agreeing to about 10% with solar reference values (unity in normalized luminosity and radius, 5772 K in effective temperature). The test asserts that L lands inside 0.15 Lsun of unity, R lands inside 0.05 Rsun of unity, and Teff deviates by under 3% from 5772 K. A companion test (`test_stellarevo_luminosity_increases_with_mass`) samples masses from 0.3 to 1.2 Msun and asserts strict monotonic increase, with the lightest and heaviest tracks separated by more than two orders of magnitude.
 
 **How we know the right answer.** The Spada et al. (2013) tracks are solar-calibrated, so a 1 Msun star at the solar age must reproduce the Sun: unity in luminosity and radius in solar units, and the standard solar effective temperature of 5772 K. The companion test adds an independent check on the mass ordering of the tracks.
 
@@ -41,7 +41,7 @@ Luminosity, radius and effective temperature of the 1 Msun Spada et al. (2013) t
 
 **Why it matters.** MORS compiles the grid from the raw files when no compiled grid exists, so every later run reads what this step wrote.
 
-**Known limit.** The test checks that a second construction matches the first, but does not check that it reads the cache file.
+**Known limit.** The test compares `Lbol` and `Rstar` with the solar reference, but checks `Teff` only against a second construction from the same code, so a `Teff` left in log units does not fail it. It also does not check that the second construction reads the cache file.
 
 ??? info "Test details"
     - Reference: Spada et al. (2013) [^cite-spada2013] raw track files
@@ -52,7 +52,7 @@ Luminosity, radius and effective temperature of the 1 Msun Spada et al. (2013) t
 ## Related code
 
 - `src/mors/stellarevo.py`: `StarEvo`, `Value`, `Lbol`, `Rstar`, `Teff`, and moment-of-inertia wrappers.
-- `src/mors/star.py`: converts native track output to cgs units for PROTEUS; see [star.md](star.md).
+- `src/mors/physicalmodel.py`: converts the native `Lbol` to erg/s for the rotation tracks that `Star` holds; see [star.md](star.md).
 - `tests/test_stellarevo.py`: `test_stellarevo_solar_calibration` and `test_grid_compiled_from_raw_tracks_matches_saved_grid`.
 
 ## References

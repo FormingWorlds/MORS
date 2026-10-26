@@ -3,9 +3,9 @@
 ## What this page checks
 
 Validation means that a test runs the code on a case with a known right answer and checks the result within a stated tolerance.
-Each physics source file of MORS has at least one such `reference_pinned` test: it compares the output with a published benchmark, an analytical limit or a self-consistency identity, or pins the output as a regression check.
+Each physics source file of MORS has at least one such `reference_pinned` test. It compares the output with a published benchmark, an analytical limit or a self-consistency identity, or with a stored earlier output (a regression pin).
 The pages of this tab list these cases, one page per source file, grouped by physical process.
-Each case says why the check exists, what it tests, how we know the right answer and why it matters, and a box "Test details" gives its reference, its tolerance, its test id and the command that runs it.
+Each case says why the check exists, what it tests, how we know the right answer and why it matters. A box "Test details" gives its reference, its tolerance, its test id and the command that runs it.
 Tests in the `unit` tier run on every pull request with track lookups mocked.
 Tests in the `integration` tier read the Baraffe et al. (2015) and Spada et al. (2013) tracks from `FWL_DATA` and run in nightly workflows.
 See [Testing](../How-to/run_tests.md) for test tiers and execution commands.

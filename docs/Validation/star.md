@@ -4,7 +4,7 @@
 
 This page checks the high-level `Star` model class in `mors.star`.
 The class links the Spada et al. (2013) stellar tracks with rotational spin-down and magnetic activity models.
-`Star.Value(age, key)` returns stellar quantities: `Lbol` in erg/s, converted from the solar-luminosity units of the tracks with the nominal solar luminosity, and `Rstar` in solar radii.
+`Star.Value(age, key)` returns stellar quantities from the stored tracks: `Lbol` in erg/s and `Rstar` in solar radii. The conversion of `Lbol` from solar luminosities to erg/s happens in `physicalmodel.py`, when the tracks are built.
 Activity keys such as `Leuv` depend on the rotation history that the chosen time integrator produces.
 Validation means that a test runs the code on a case with a known right answer and checks the result within a stated tolerance.
 If this part of the code is wrong, PROTEUS receives wrong stellar luminosities and high-energy fluxes.
@@ -12,7 +12,7 @@ The case below says why the check exists, what it tests, how we know the right a
 
 ## Solar luminosity at the solar age
 
-**Why this check exists.** `Star.Value` converts the bolometric luminosity from the units of the tracks ($L_\odot$, solar luminosities) to erg/s with the nominal solar luminosity. A wrong mass track, a dropped conversion factor (about 4e33) or a wrong exponent gives a large luminosity error without an error message.
+**Why this check exists.** The bolometric luminosity of a `Star` goes from the solar-luminosity units of the stellar tracks (the tabulated evolution of a star of given mass) to erg/s. A wrong mass track or a dropped conversion factor (about 4e33) gives a large luminosity error without an error message.
 
 **What it tests.** The test evaluates a 1 Msun star at the solar age of 4.57 Gyr and asserts that the bolometric luminosity matches the IAU nominal solar luminosity within 15%. It also applies a guard asserting that the luminosity of a 0.3 Msun star is below 0.1 of the 1 Msun value. Companion tests compare `Star.Value` with the model output for both time integrators (`test_star_value_default_integrator`, `test_star_value_forward_euler_integrator`) and check that the radius, the bolometric luminosity and the EUV luminosity are positive.
 
@@ -28,7 +28,8 @@ The case below says why the check exists, what it tests, how we know the right a
 
 ## Related code
 
-- `src/mors/star.py`: the `Star` class, `Star.Value`, and the cgs unit scaling applied to track outputs.
+- `src/mors/star.py`: the `Star` class and `Star.Value`.
+- `src/mors/physicalmodel.py`: the conversion of `Lbol` to erg/s (`StarEvo.Lbol(...) * const.LbolSun`).
 - `src/mors/stellarevo.py`: supplies the underlying stellar tracks; see [stellarevo.md](stellarevo.md).
 - `tests/test_star.py`: `test_star_reproduces_solar_luminosity_at_solar_age` and companion tests.
 
