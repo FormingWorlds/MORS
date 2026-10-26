@@ -23,13 +23,13 @@ Each case below says why the check exists, what it tests, how we know the right 
 
 Luminosity, radius and effective temperature of the 1 Msun Spada et al. (2013) track between 100 Myr and 8 Gyr (line). The circle is the track value at 4.57 Gyr that the test asserts; the square with the error bar is the Sun with the tolerance of each assertion.
 
-**How to read the plot.** The x-axis is the age in Myr on a log scale. The 3 panels show the luminosity in $L_\odot$, the radius in $R_\odot$ and the effective temperature in K. The line is the 1 Msun Spada et al. (2013) track and gives context. The test asserts the track values at 4.57 Gyr (circles) against the Sun (squares). The error bars are the tolerances: 0.15 $L_\odot$, 0.05 $R_\odot$ and 3 % of 5772 K. A pass means that each circle lies inside its error bar.
+**How to read the plot.** The x-axis is the age in Myr on a log scale. The 3 panels show $L$ in $L_\odot$, $R$ in $R_\odot$ and $T_\mathrm{eff}$ in K. The line is the 1 Msun Spada et al. (2013) track and gives context. The test asserts the track values at 4.57 Gyr (circles) against the Sun (squares). The error bars are the tolerances: 0.15 $L_\odot$, 0.05 $R_\odot$ and 3 % of 5772 K. A pass means that each circle lies inside its error bar.
 
 ??? info "Test details"
     - Reference: Spada et al. (2013) [^cite-spada2013] solar-calibrated tracks; solar effective temperature 5772 K
     - Tolerance: `atol=0.15` Lsun on L, `atol=0.05` Rsun on R, `rtol=0.03` on Teff at 4.57 Gyr
     - Test id: `tests/test_stellarevo.py::test_stellarevo_solar_calibration`
-    - Command: `pytest tests/test_stellarevo.py::test_stellarevo_solar_calibration --validation-plots` (needs `FWL_DATA` with the tracks; without `--validation-plots` the test writes no plot)
+    - Command: `pytest tests/test_stellarevo.py::test_stellarevo_solar_calibration --validation-plots` (needs `FWL_DATA` with the tracks; without `--validation-plots` the test compares its plot data with the committed pair)
 
 ## Grid compiled from the raw tracks
 
@@ -44,7 +44,7 @@ Luminosity, radius and effective temperature of the 1 Msun Spada et al. (2013) t
 ![Luminosity and radius of the compiled 1 Msun track against age, with the values at the solar age](../assets/validation/mors_stellarevo_grid_compiled.svg#only-light){ width="80%" }
 ![Luminosity and radius of the compiled 1 Msun track against age, with the values at the solar age](../assets/validation/mors_stellarevo_grid_compiled_dark.svg#only-dark){ width="80%" }
 
-**How to read the plot.** The x-axis is the age on a log scale. The lines are `Lbol` and `Rstar` of the freshly compiled grid for 1 Msun and give context. In the top panel the test asserts the compiled luminosity at 4.57 Gyr (circle) against 1 Lsun with an error bar of 0.2 Lsun (square). In the bottom panel it asserts the compiled radius (circle) against 1 Rsun with an error bar of 0.1 Rsun (square). The plus (+) in the top panel is the luminosity of a second construction of the grid. It must equal the compiled value to a relative 1e-12, too small to see. A pass means that each circle lies inside its error bar and the plus sits on the circle of the top panel. The test also asserts where the cache file is written and that the luminosity is above 0.5 Lsun. It also asserts that the effective temperatures of the 2 constructions agree to a relative 1e-12. The plot does not draw these.
+**How to read the plot.** The x-axis is the age on a log scale; the lines are `Lbol` and `Rstar` of the freshly compiled 1 Msun grid and give context. The test asserts the compiled values at 4.57 Gyr (circles) against 1 Lsun and 1 Rsun (squares, error bars 0.2 Lsun and 0.1 Rsun). The plus (+) is the luminosity of a second construction, asserted equal to a relative 1e-12, too small to see. A pass means that each circle lies inside its error bar and the plus sits on the top circle. The cache file location, the 0.5 Lsun guard and the equal effective temperatures are asserted but not drawn.
 
 **Known limit.** The test compares `Lbol` and `Rstar` with the solar reference, but checks `Teff` only against a second construction from the same code, so a `Teff` left in log units does not fail it. It also does not check that the second construction reads the cache file.
 

@@ -394,11 +394,24 @@ def test_forward_euler_step_matches_analytic_update(monkeypatch, validation_plot
     def figure():
         import matplotlib.pyplot as plt
 
+        steps = np.linspace(0.05, step, 10)
+        runs = [
+            rotevo.EvolveRotationStep(
+                Mstar=1.0,
+                Age=age,
+                OmegaEnv=omega0,
+                OmegaCore=omega0,
+                dAge=dt,
+                params=p,
+                StarEvo=FakeStarEvo(),
+            )
+            for dt in steps
+        ]
         fig, ax = plt.subplots()
-        t1 = age + step
-        ax.plot([age, t1], [omega0, omega0 + r_env * step], label='patched envelope rate -2')
+        t1 = age + dAge
+        ax.plot(age + steps, [r[2] for r in runs], label='code, envelope after a step dAge')
         ax.plot(
-            [age, t1], [omega0, omega0 + r_core * step], ls='--', label='patched core rate -1'
+            age + steps, [r[3] for r in runs], ls='--', label='code, core after a step dAge'
         )
         ax.plot([t1, t1], [env_ref, core_ref], 's', mfc='none', ms=10, label='9.0 and 9.5')
         ax.plot([t1, t1], [env, core], 'o', label='code, envelope and core')

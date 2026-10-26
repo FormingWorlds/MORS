@@ -25,7 +25,7 @@ The case below says why the check exists, what it tests, how we know the right a
 ![Luminosity and radius of the 1.113 Msun Baraffe track against age, with the pinned values](../assets/validation/mors_baraffe_1p113.svg#only-light){ width="80%" }
 ![Luminosity and radius of the 1.113 Msun Baraffe track against age, with the pinned values](../assets/validation/mors_baraffe_1p113_dark.svg#only-dark){ width="80%" }
 
-**How to read the plot.** There is one plot for each of the 2 cases of the test: 0.047 Msun at 8.5e7 yr (85 Myr) and 1.113 Msun at 3.2e9 yr (3.2 Gyr). The x-axis is the age in years on a log scale. The lines are `BaraffeLuminosity` and `BaraffeStellarRadius` of the track over its ages and give context. The test asserts the code values (circles) against the pinned values (squares) to a relative 1e-5, too small to see. It also asserts the orbital insolation of each case, which the plot does not draw. A pass means that each circle sits in its square.
+**How to read the plot.** There is one plot for each of the 2 cases: 0.047 Msun at 8.5e7 yr and 1.113 Msun at 3.2e9 yr. The x-axis is the age in years on a log scale. The lines are `BaraffeLuminosity` and `BaraffeStellarRadius` of the track over its ages and give context. The test asserts the code values (circles) against the pinned values (squares) to a relative 1e-5, too small to see. It also asserts the orbital insolation, which the plot does not draw. A pass means that each circle sits in its square.
 
 **Known limit.** The stored values are not compared with the published tables of Baraffe et al. (2015), despite the word `published_values` in the test id. The effective temperature (`BaraffeStellarTeff`) has no stored value.
 

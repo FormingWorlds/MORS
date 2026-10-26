@@ -246,20 +246,17 @@ def test_percentile_of_uniform_ramp_matches_closed_form(cluster_mod, validation_
     # shared age, so the uniform 1..40 Omega_sun ramp stays uniform.
     factor = 1.0 / (1.0 + age / 1000.0)
     lo_edge, hi_edge = 1.0 * factor, 40.0 * factor
-    checked = {}
+    checked, analytic = {}, {}
     for q in (5.0, 50.0, 95.0):
-        got = cluster.Percentile(Mstar=1.0, Age=age, percentile=q)
-        checked[q] = got
-        analytic = lo_edge + (hi_edge - lo_edge) * q / 100.0
-        assert_allclose(got, analytic, rtol=1e-12)
+        checked[q] = cluster.Percentile(Mstar=1.0, Age=age, percentile=q)
+        analytic[q] = lo_edge + (hi_edge - lo_edge) * q / 100.0
+        assert_allclose(checked[q], analytic[q], rtol=1e-12)
     # Discrimination guard: a wrong branch returning the distribution midpoint
     # for every request would sit at (lo+hi)/2, differing from the analytic p05
     # and p95 by far more than the tolerance.
     midpoint = 0.5 * (lo_edge + hi_edge)
-    p05 = cluster.Percentile(Mstar=1.0, Age=age, percentile=5.0)
-    p95 = cluster.Percentile(Mstar=1.0, Age=age, percentile=95.0)
-    assert abs(p05 - midpoint) > 1.0
-    assert abs(p95 - midpoint) > 1.0
+    assert abs(checked[5.0] - midpoint) > 1.0
+    assert abs(checked[95.0] - midpoint) > 1.0
 
     def figure():
         import matplotlib.pyplot as plt
@@ -273,8 +270,8 @@ def test_percentile_of_uniform_ramp_matches_closed_form(cluster_mod, validation_
         )
         ax.axhline(midpoint, ls=':', color='0.5', label='midpoint of the ramp')
         ax.plot(
-            list(checked),
-            [lo_edge + (hi_edge - lo_edge) * q / 100.0 for q in checked],
+            list(analytic),
+            list(analytic.values()),
             's',
             mfc='none',
             ms=10,

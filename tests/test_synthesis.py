@@ -98,7 +98,8 @@ def test_GetProperties_flux_budget(
     )
     expected_L_uv = expected_F_uv * area
 
-    ret = (out['F_bo'], out['F_xr'], out['F_e1'], out['F_e2'], out['F_pl'], out['F_uv'])
+    keys = ('F_bo', 'F_xr', 'F_e1', 'F_e2', 'F_pl', 'F_uv')
+    ret = tuple(out[k] for k in keys)
     exp = (
         expected_F_bo,
         expected_F_xr,
@@ -129,9 +130,10 @@ def test_GetProperties_flux_budget(
         import matplotlib.pyplot as plt
 
         bands = ['F_xr', 'F_e1', 'F_e2', 'F_uv', 'F_bo']
-        expect = dict(zip(['F_bo', 'F_xr', 'F_e1', 'F_e2', 'F_pl', 'F_uv'], exp))
+        expect = dict(zip(keys, exp))
+        got = dict(zip(keys, ret))
         fig, ax = plt.subplots()
-        ax.bar(bands, [out[b] for b in bands], color='0.75', label='code')
+        ax.bar(bands, [got[b] for b in bands], color='0.75', label='code')
         ax.plot(bands, [expect[b] for b in bands], 'o', label='expected')
         ax.plot(['F_bo'], [band_sum], '_', ms=30, mew=2, label='sum of the bands')
         ax.set(yscale='log', ylabel='flux at 1 AU [erg s$^{-1}$ cm$^{-2}$]')

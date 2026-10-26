@@ -30,6 +30,8 @@ T_EFF_SUN = 5772.0
 # Solar calibration tolerances, shared by the assertions and the validation plot.
 SOLAR_L_ATOL = 0.15  # Lsun
 SOLAR_R_ATOL = 0.05  # Rsun
+SOLAR_L_REF = 1.0  # Lsun
+SOLAR_R_REF = 1.0  # Rsun
 SOLAR_TEFF_RTOL = 0.03
 # Default Spada model set, closest to solar composition.
 SOLAR_MODEL_SET = 'X0p70952_Z0p01631_A1p875'
@@ -81,8 +83,8 @@ def test_stellarevo_solar_calibration(validation_plot):
     assert lbol > 0.0
     assert rstar > 0.0
     assert teff > 0.0
-    assert_allclose(lbol, 1.0, atol=SOLAR_L_ATOL)
-    assert_allclose(rstar, 1.0, atol=SOLAR_R_ATOL)
+    assert_allclose(lbol, SOLAR_L_REF, atol=SOLAR_L_ATOL)
+    assert_allclose(rstar, SOLAR_R_REF, atol=SOLAR_R_ATOL)
     assert_allclose(teff, T_EFF_SUN, rtol=SOLAR_TEFF_RTOL)
 
     def figure():
@@ -90,8 +92,8 @@ def test_stellarevo_solar_calibration(validation_plot):
 
         ages = np.geomspace(100.0, 8000.0, 60)
         rows = (
-            ('Lbol', 'L [Lsun]', lbol, 1.0, SOLAR_L_ATOL),
-            ('Rstar', 'R [Rsun]', rstar, 1.0, SOLAR_R_ATOL),
+            ('Lbol', 'L [Lsun]', lbol, SOLAR_L_REF, SOLAR_L_ATOL),
+            ('Rstar', 'R [Rsun]', rstar, SOLAR_R_REF, SOLAR_R_ATOL),
             ('Teff', 'Teff [K]', teff, T_EFF_SUN, SOLAR_TEFF_RTOL * T_EFF_SUN),
         )
         fig, axes = plt.subplots(3, 1, sharex=True, figsize=(6.4, 6.4))
@@ -180,8 +182,8 @@ def test_grid_compiled_from_raw_tracks_matches_saved_grid(
     assert lbol > 0.0
     assert rstar > 0.0
     l_tol, r_tol = 0.2, 0.1
-    assert_allclose(lbol, 1.0, atol=l_tol)
-    assert_allclose(rstar, 1.0, atol=r_tol)
+    assert_allclose(lbol, SOLAR_L_REF, atol=l_tol)
+    assert_allclose(rstar, SOLAR_R_REF, atol=r_tol)
     # Discrimination: a 0.5 Msun track would give Lbol well below 0.5 Lsun, so the
     # correct 1 Msun track is unambiguously selected.
     assert lbol > 0.5
@@ -201,7 +203,13 @@ def test_grid_compiled_from_raw_tracks_matches_saved_grid(
         fig, (top, bottom) = plt.subplots(2, 1, sharex=True, figsize=(6.4, 5.2))
         top.plot(ages, [compiled.Lbol(1.0, a) for a in ages], label='compiled 1 Msun track')
         top.errorbar(
-            SOLAR_AGE_MYR, 1.0, yerr=l_tol, fmt='s', mfc='none', capsize=4, label=r'1 $\pm$ 0.2'
+            SOLAR_AGE_MYR,
+            SOLAR_L_REF,
+            yerr=l_tol,
+            fmt='s',
+            mfc='none',
+            capsize=4,
+            label=r'1 $\pm$ 0.2',
         )
         top.plot(SOLAR_AGE_MYR, lbol, 'o', label='compiled at 4.57 Gyr')
         top.plot(
@@ -210,7 +218,7 @@ def test_grid_compiled_from_raw_tracks_matches_saved_grid(
         top.set_ylabel('L [Lsun]')
         top.legend(fontsize='small')
         bottom.plot(ages, [compiled.Rstar(1.0, a) for a in ages])
-        bottom.errorbar(SOLAR_AGE_MYR, 1.0, yerr=r_tol, fmt='s', mfc='none', capsize=4)
+        bottom.errorbar(SOLAR_AGE_MYR, SOLAR_R_REF, yerr=r_tol, fmt='s', mfc='none', capsize=4)
         bottom.plot(SOLAR_AGE_MYR, rstar, 'o')
         bottom.set(xscale='log', xlabel='Age [Myr]', ylabel='R [Rsun]')
         fig.tight_layout()
