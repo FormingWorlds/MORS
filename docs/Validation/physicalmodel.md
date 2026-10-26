@@ -1,77 +1,65 @@
 # Validation: `src/mors/physicalmodel.py`
 
-This page tracks the `@pytest.mark.reference_pinned` tests that anchor the
-behaviour of `mors.physicalmodel` against published sources.
+## What this page checks
 
-| Test id | Reference | Scope |
-|---|---|---|
-| `tests/test_physicalmodel.py::TestXrayRegimes::test_saturated_xray_ratio_matches_johnstone_value` | Johnstone et al. (2020) saturated X-ray ratio, calibrated on the Spada et al. (2013) [^cite-spada2013] models | Pins the saturated X-ray-to-bolometric ratio at the saturation Rossby number to `Rx_sat = 5.135e-4`, the value the rotation-activity model uses (see [High-energy emission and activity](../Explanations/activity.md)). |
-| `tests/test_physicalmodel.py::TestHabitableZone::test_solar_runaway_greenhouse_limit` | Kopparapu et al. (2013) [^cite-kopparapu2013], Table 3 | Pins the runaway-greenhouse boundary for a solar analogue to `(Lbol / Seff)**0.5` with `Seff = 1.0385`, giving about 0.98 AU at one solar luminosity. |
-| `tests/test_physicalmodel.py::TestHabitableZone::test_runaway_greenhouse_limit_for_a_cool_star` | Kopparapu et al. (2013) [^cite-kopparapu2013], Table 3 | Pins the runaway-greenhouse boundary at Teff = 4000 K and Lbol = 0.1 Lsun, where every temperature term of the `Seff` polynomial is non-zero, and checks that a linear cubic term misses by more than 2%. |
+This page checks 2 relations of `mors.physicalmodel`: the X-ray activity of a star and the habitable-zone distance.
+The module holds the rotation, activity and high-energy emission relations of the stellar model.
+Validation means that a test runs the code on a case with a known right answer and checks the result within a stated tolerance.
+If this part of the code is wrong, the X-ray luminosity of the star or the habitable-zone distance is wrong.
+Each case below says why the check exists, what it tests, how we know the right answer and why it matters; a box "Test details" ends each case.
 
-## Cases
+## Saturated X-ray ratio
 
-### Saturated X-ray ratio
+**Why this check exists.** The X-ray activity relation is a broken power law in the Rossby number $Ro$ (the rotation period over the convective turnover time), with a saturated branch for fast rotators. A change of the saturation constant shifts the X-ray luminosity of every fast rotator without an error message.
 
-- Reference: Johnstone et al. (2020) saturated `Rx_sat = 5.135e-4`, calibrated on the Spada et al. (2013) [^cite-spada2013] models
-- Tolerance: `rtol=1e-6`
-- Test id: `tests/test_physicalmodel.py::TestXrayRegimes::test_saturated_xray_ratio_matches_johnstone_value`
-- Command: `pytest tests/test_physicalmodel.py::TestXrayRegimes::test_saturated_xray_ratio_matches_johnstone_value`
+**What it tests.** The saturated branch is `Rx = C1 * Ro**beta1` for `Ro <= Ro_sat`, with `Rx` the ratio of the X-ray to the bolometric luminosity. At the saturation Rossby number `Ro_sat` the 2 branches meet. The test evaluates the relation there and checks `Rx_sat = 5.135e-4`. It also checks that `Rx` is positive and between 1e-4 and 1e-3, and that the X-ray surface flux equals the X-ray luminosity over the stellar surface area. A companion test walks a point on each side of the threshold to check which branch the code takes. Other tests of the module check that the emission quantities are positive, that `Lxuv = Lx + Leuv`, the antisymmetry of the torques, and the monotonicity of the saturation.
 
-### Runaway greenhouse limit, solar analogue
+**How we know the right answer.** `Rx_sat = 5.135e-4` is the saturated ratio of Johnstone et al. (2020), calibrated on the Spada et al. (2013) models; it is the value the rotation-activity model uses (see [High-energy emission and activity](../Explanations/activity.md)).
 
-- Reference: Kopparapu et al. (2013) [^cite-kopparapu2013], Table 3, `Seff = 1.0385`
-- Tolerance: `rtol=1e-6`
-- Test id: `tests/test_physicalmodel.py::TestHabitableZone::test_solar_runaway_greenhouse_limit`
-- Command: `pytest tests/test_physicalmodel.py::TestHabitableZone::test_solar_runaway_greenhouse_limit`
+**Why it matters.** `_Xray` gives the X-ray luminosity along every rotation track (`ExtendedQuantities`, which `rotevo` calls). PROTEUS reads `Lx` and `Leuv` through `Star.Value` to compute the XUV flux at the planet, `F_xuv`.
 
-### Runaway greenhouse limit, cool star
+??? info "Test details"
+    - Reference: Johnstone et al. (2020) saturated `Rx_sat = 5.135e-4`, calibrated on the Spada et al. (2013) [^cite-spada2013] models
+    - Tolerance: `rtol=1e-6`
+    - Test id: `tests/test_physicalmodel.py::TestXrayRegimes::test_saturated_xray_ratio_matches_johnstone_value`
+    - Command: `pytest tests/test_physicalmodel.py::TestXrayRegimes::test_saturated_xray_ratio_matches_johnstone_value`
 
-- Reference: Kopparapu et al. (2013) [^cite-kopparapu2013], Table 3 polynomial at Teff = 4000 K
-- Tolerance: `rtol=1e-9`; a linear cubic term must miss by more than 2%
-- Test id: `tests/test_physicalmodel.py::TestHabitableZone::test_runaway_greenhouse_limit_for_a_cool_star`
-- Command: `pytest tests/test_physicalmodel.py::TestHabitableZone::test_runaway_greenhouse_limit_for_a_cool_star`
+## Runaway greenhouse limit, solar analogue
 
-## Re-derivation note
+**Why this check exists.** The habitable-zone distance comes from a polynomial in the stellar temperature. A wrong solar coefficient or a wrong form of the distance law moves the boundary without an error message.
 
-`physicalmodel.py` holds the rotation, activity, and high-energy emission
-relations of the stellar model. Two relations are pinned:
+**What it tests.** The runaway-greenhouse boundary distance is `aOrb = (Lbol / Seff)**0.5`. Effective stellar flux follows `Seff = Seff_sun + a*T + b*T**2 + c*T**3 + d*T**4` with `T = Teff - 5780`. For a solar analogue with `T = 0`, `Seff = Seff_sun = 1.0385`. Here `Seff` is the effective stellar flux in units of the solar flux at the Earth, `Teff` the effective temperature in K and `Lbol` the bolometric luminosity in solar units. At one solar luminosity this places the boundary at `(1 / 1.0385)**0.5`, about 0.98 AU. A companion test checks the ordering of the 5 boundaries from Recent Venus (innermost) to Early Mars (outermost).
 
-The X-ray activity relation is a broken power law in Rossby number with a
-saturated branch `Rx = C1 * Ro**beta1` for `Ro <= Ro_sat`. At the saturation
-Rossby number the two branches meet at `Rx_sat = 5.135e-4`. The reference-pinned
-test evaluates the relation at the saturation point and pins that value, so a
-regression in the saturation constant or the branch selection is caught. A
-companion test walks a point on each side of the threshold to check the
-branch dispatch.
+**How we know the right answer.** Kopparapu et al. (2013), Table 3, gives `Seff = 1.0385` for the solar runaway-greenhouse limit.
 
-The habitable-zone boundaries follow the Kopparapu et al. (2013) effective
-stellar flux `Seff = Seff_sun + a*T + b*T**2 + c*T**3 + d*T**4` with
-`T = Teff - 5780`, and the boundary distance is `aOrb = (Lbol / Seff)**0.5`.
-For a solar analogue `T = 0`, so `Seff = Seff_sun`; the runaway-greenhouse
-coefficient `Seff_sun = 1.0385` places the boundary at `(1 / 1.0385)**0.5`,
-about 0.98 AU for one solar luminosity. The test pins that solar-limit
-boundary, and a companion test asserts the full ordering of the five
-boundaries from Recent Venus (innermost) to Early Mars (outermost).
-A second pinned test sets `Teff = 4000 K`, where every temperature term of
-the polynomial is non-zero, so an error in a coefficient or an exponent
-that the solar case cannot see moves the boundary outside the tolerance.
+**Why it matters.** `aOrbHZ` gives the habitable-zone distances that `Cluster` stores for each star, and `mors` exports it for direct use.
 
-## Anchor type
+??? info "Test details"
+    - Reference: Kopparapu et al. (2013) [^cite-kopparapu2013], Table 3, `Seff = 1.0385`
+    - Tolerance: `rtol=1e-6`
+    - Test id: `tests/test_physicalmodel.py::TestHabitableZone::test_solar_runaway_greenhouse_limit`
+    - Command: `pytest tests/test_physicalmodel.py::TestHabitableZone::test_solar_runaway_greenhouse_limit`
 
-Published benchmark. The saturated X-ray ratio is the calibrated model value;
-the habitable-zone boundary is the Kopparapu et al. (2013) solar limit.
-Companion `physics_invariant` tests cover the positivity of the emission
-quantities, the band conservation `Lxuv = Lx + Leuv`, the torque antisymmetry,
-the saturation monotonicity, and the ordering of the habitable-zone boundaries.
+## Runaway greenhouse limit, cool star
 
-## Cross-references
+**Why this check exists.** The solar case evaluates the polynomial at `T = 0`, where every temperature term vanishes. An error in a temperature coefficient or an exponent cannot show there, but it moves the boundary for any other star.
 
-- `src/mors/physicalmodel.py`: `Lxuv`, `Lx`, `Leuv`, the Rossby and torque
-  helpers, and `aOrbHZ`.
-- [High-energy emission and activity](../Explanations/activity.md) and
-  [Habitable zone boundaries](../Explanations/habitablezone.md) describe the
-  full relations and carry the complete reference list.
+**What it tests.** At `Teff = 4000` K and `Lbol = 0.1` Lsun (solar luminosities), every temperature term of the `Seff` polynomial is non-zero. The test compares the boundary distance with the polynomial evaluated by hand. It also checks that a cubic term entered as a linear term misses by more than 2 %.
+
+**How we know the right answer.** Kopparapu et al. (2013), Table 3, gives all coefficients of the polynomial.
+
+**Why it matters.** `aOrbHZ` gives the habitable-zone distance of every star that is not a solar analogue through these terms.
+
+??? info "Test details"
+    - Reference: Kopparapu et al. (2013) [^cite-kopparapu2013], Table 3 polynomial at Teff = 4000 K
+    - Tolerance: `rtol=1e-9`; a linear cubic term must miss by more than 2%
+    - Test id: `tests/test_physicalmodel.py::TestHabitableZone::test_runaway_greenhouse_limit_for_a_cool_star`
+    - Command: `pytest tests/test_physicalmodel.py::TestHabitableZone::test_runaway_greenhouse_limit_for_a_cool_star`
+
+## Related code
+
+- `src/mors/physicalmodel.py`: `Lxuv`, `Lx`, `Leuv`, the Rossby and torque helpers, and `aOrbHZ`.
+- [High-energy emission and activity](../Explanations/activity.md) and [Habitable zone boundaries](../Explanations/habitablezone.md) describe the full relations and give the complete reference list.
 
 ## References
 

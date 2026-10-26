@@ -1,49 +1,30 @@
 # Validation: `src/mors/rotevo.py`
 
-This page tracks the `@pytest.mark.reference_pinned` tests that anchor the
-behaviour of `mors.rotevo` against an analytical limit.
+## What this page checks
 
-| Test id | Reference | Scope |
-|---|---|---|
-| `tests/test_rotevo.py::test_forward_euler_step_matches_analytic_update` | Analytical limit: one explicit Euler step of a prescribed constant rate | Pins a single forward-Euler rotation step against the closed form `Omega_new = Omega + dAge * rate`, for a prescribed constant envelope and core rate. |
+This page checks the time-stepping integrators in `mors.rotevo`.
+The module integrates the coupled rotation of the stellar core and envelope forward in time under wind-braking torques.
+Validation means that a test runs the code on a case with a known right answer and checks the result within a stated tolerance.
+If this part of the code is wrong, the rotation history of the star is wrong, and so are the activity and the high-energy emission that MORS derives from it.
+The case below says why the check exists, what it tests, how we know the right answer and why it matters; a box "Test details" ends the case.
 
-## Cases
+## Forward-Euler step
 
-### Forward-Euler step
+**Why this check exists.** The integrator arithmetic can drop the time-step factor, reverse the sign of a step, or swap the core and envelope updates without an error message. The star would then spin up instead of braking, or evolve at the wrong rate.
 
-- Reference: closed form `Omega_new = Omega + dAge * r`
-- Tolerance: `rtol=1e-12` on the envelope (9.0) and core (9.5) rates
-- Test id: `tests/test_rotevo.py::test_forward_euler_step_matches_analytic_update`
-- Command: `pytest tests/test_rotevo.py::test_forward_euler_step_matches_analytic_update`
+**What it tests.** `Omega` is the angular rotation rate and `dAge` the time step. For a prescribed constant rate of change `r`, one explicit forward-Euler step gives `Omega_new = Omega + dAge * r`. The test replaces the rate function with fixed rates (`r = -2` for the envelope, `r = -1` for the core) and takes one step with `dAge = 0.5` from `Omega = 10`. The envelope rate must become 9.0 and the core rate 9.5. Fixing the rates separates the integrator arithmetic from the physics of the rate law.
 
-## Re-derivation note
+**How we know the right answer.** The single-step Euler update is a closed-form identity. A swapped update, a wrong sign or a missing time step misses it by far more than the `rtol=1e-12` tolerance. Other tests of the module check that a braking track spins down monotonically (a faster rotator brakes harder and stays positive), that the adaptive-step integrators reach the requested final age, and that 2 tracks started at different rates keep their order.
 
-`rotevo.py` integrates the coupled core and envelope rotation rates forward in
-time under the spin-down torques. For a prescribed constant rate `r`, one
-explicit forward-Euler step is exactly
+**Why it matters.** `mors.star.Star` calls `rotevo.EvolveRotation` to compute the rotation history of the star. That rotation history sets stellar magnetic activity and high-energy emission.
 
-```
-Omega_new = Omega + dAge * r
-```
+??? info "Test details"
+    - Reference: closed form `Omega_new = Omega + dAge * r`
+    - Tolerance: `rtol=1e-12` on the envelope (9.0) and core (9.5) rates
+    - Test id: `tests/test_rotevo.py::test_forward_euler_step_matches_analytic_update`
+    - Command: `pytest tests/test_rotevo.py::test_forward_euler_step_matches_analytic_update`
 
-The reference-pinned test mocks the rate function to return fixed rates
-(`r = -2` for the envelope, `r = -1` for the core), takes one step with
-`dAge = 0.5` from `Omega = 10`, and pins the result to `9.0` and `9.5`. This
-isolates the integrator arithmetic from the physics of the rate law, so a wrong
-step sign, a dropped timestep factor, or a swapped core and envelope update
-fails against the closed form.
+## Related code
 
-## Anchor type
-
-Analytical limit. The single-step Euler update is a closed-form identity.
-Companion `physics_invariant` tests cover the monotone spin-down of a braking
-track (a faster rotator brakes harder and stays positive), the adaptive-step
-integrators reaching the requested final age, and the ordering of two tracks
-started at different rates.
-
-## Cross-references
-
-- `src/mors/rotevo.py`: `EvolveRotation` and the per-method step functions
-  (forward Euler, Runge-Kutta, Runge-Kutta-Fehlberg, Rosenbrock).
-- [Rotational evolution model](../Explanations/rotation.md) describes the
-  torques and the integration scheme.
+- `src/mors/rotevo.py`: `EvolveRotation` and the per-method step functions (forward Euler, Runge-Kutta, Runge-Kutta-Fehlberg, Rosenbrock).
+- [Rotational evolution model](../Explanations/rotation.md) describes the torques and the integration scheme.
