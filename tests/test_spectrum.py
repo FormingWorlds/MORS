@@ -6,7 +6,7 @@ round-trip of ``mors.spectrum``. The physics invariants asserted here are the
 symmetry of the flux-scaling pair, the monotonicity of the Planck surface flux
 with temperature, the strictly ascending sanitised wavelength grid with its
 positive flux floor, and the analytical-limit band integral of a constant
-spectrum (integral of a unit integrand equals the band width).
+spectrum (integral of a unit integrand equals the span of the band samples).
 
 Anchor: docs/Validation/spectrum.md.
 """
@@ -193,11 +193,11 @@ def test_Spectrum_LoadDirectly_sanitizes_and_orders(wl, fl):
     ),
 )
 def test_Spectrum_CalcBandFluxes_constant_integrand(wl, fl, expected, validation_plot):
-    """A unit-flux spectrum integrates to the band width in every band.
+    """A unit-flux spectrum integrates to the span of its samples in every band.
 
     Analytical limit: the integral of a constant integrand of value 1 over a
-    band is exactly the band width. Feeding a flat spectrum therefore pins each
-    band integral to a hand-computed width, and the bolometric integral to the
+    band is exactly the span from the first to the last sample in that band. Feeding a
+    flat spectrum therefore pins each band integral to a hand-computed span, and the bolometric integral to the
     full wavelength span. For a constant integrand every Riemann sum telescopes
     to the same total, so this does not separate trapezoid from rectangle
     weighting; what it does catch is a dropped bin width or a wavelength-unit

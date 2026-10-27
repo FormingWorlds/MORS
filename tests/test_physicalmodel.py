@@ -1027,10 +1027,9 @@ class TestHabitableZone:
         )
         expected = (0.1 / seff) ** 0.5
         assert_allclose(hz['RunawayGreenhouse'], expected, rtol=1e-9)
-        # Discrimination guard: the cubic term replaced by 3*c*Tstar (instead of
-        # c*Tstar**3) shifts the boundary by more than two percent at this
-        # temperature, so an exponent slip fails here even though it is invisible
-        # at the solar anchor where Tstar is zero.
+        # Discrimination guard: 3*c*Tstar in place of c*Tstar**3 shifts the boundary by
+        # more than 2 % at this temperature; at the solar anchor Tstar is zero and the
+        # slip is invisible.
         seff_linear = (
             1.0385
             + 1.2456e-4 * tstar
@@ -1055,7 +1054,7 @@ class TestHabitableZone:
             ax.plot(teffs, curve, label='code, runaway greenhouse at 0.1 Lsun')
             ax.plot(teff, expected, 's', mfc='none', ms=10, label='Kopparapu et al. (2013)')
             ax.plot(teff, hz['RunawayGreenhouse'], 'o', label='code at 4000.0 K')
-            ax.plot(teff, wrong, 'x', label='cubic term entered as linear')
+            ax.plot(teff, wrong, 'x', label='cubic term replaced by 3cT')
             ax.set(xlabel='Teff [K]', ylabel='distance [AU]')
             ax.legend(fontsize='small')
             fig.tight_layout()
