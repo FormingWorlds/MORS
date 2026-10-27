@@ -2,10 +2,13 @@
 """Module for holding default parameters and related functions."""
 
 # Imports for standard stuff needed here
+from __future__ import annotations
+
 import copy
+import logging
+
 import numpy as np
 
-import logging
 log = logging.getLogger("fwl."+__name__)
 
 
@@ -67,7 +70,7 @@ def SetDefaultParameters(paramsDefault):
     paramsDefault['ExtendedTracks'] = False                   # should the code return evolutionary tracks for all quantities
 
     # XUV emission parameters
-    paramsDefault['RoSatXray'] = 0.0605                       # saturation Rossby number for X-ray emission from Johnstone et al. (2020) using models of Spada et al. (2013)
+    paramsDefault['RoSatXray'] = 0.0605                       # saturation Rossby number for X-ray emission from Johnstone et al. (2021) using models of Spada et al. (2013)
     paramsDefault['RxSatXray'] = 5.135e-4                     # saturation Rx
     paramsDefault['beta1Xray'] = -0.135                       # beta from Rx = C * Ro^beta for the saturated regime
     paramsDefault['beta2Xray'] = -1.889                       # beta from Rx = C * Ro^beta for the unsaturated regime

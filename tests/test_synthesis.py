@@ -20,7 +20,9 @@ pytestmark = [pytest.mark.unit, pytest.mark.timeout(30)]
     'Mstar,pctle,age,Lxuv_dict,Lbol_val',
     ((1.0, 50.0, 1000.0, {'Lx': 1.0e28, 'Leuv1': 2.0e28, 'Leuv2': 3.0e28}, 1.0),),
 )
-def test_GetProperties_flux_budget(monkeypatch, Mstar, pctle, age, Lxuv_dict, Lbol_val):
+def test_GetProperties_flux_budget(
+    monkeypatch, Mstar, pctle, age, Lxuv_dict, Lbol_val, validation_plot
+):
     """
     Relates to synthesis.GetProperties():
 
@@ -96,7 +98,8 @@ def test_GetProperties_flux_budget(monkeypatch, Mstar, pctle, age, Lxuv_dict, Lb
     )
     expected_L_uv = expected_F_uv * area
 
-    ret = (out['F_bo'], out['F_xr'], out['F_e1'], out['F_e2'], out['F_pl'], out['F_uv'])
+    keys = ('F_bo', 'F_xr', 'F_e1', 'F_e2', 'F_pl', 'F_uv')
+    ret = tuple(out[k] for k in keys)
     exp = (
         expected_F_bo,
         expected_F_xr,
@@ -122,6 +125,23 @@ def test_GetProperties_flux_budget(monkeypatch, Mstar, pctle, age, Lxuv_dict, Lb
     # pins above carry the per-band checks.
     band_sum = out['F_xr'] + out['F_e1'] + out['F_e2'] + out['F_pl'] + out['F_uv']
     assert_allclose(band_sum, out['F_bo'], rtol=1e-12, atol=0.0)
+
+    def figure():
+        import matplotlib.pyplot as plt
+
+        bands = ['F_xr', 'F_e1', 'F_e2', 'F_uv', 'F_bo']
+        expect = dict(zip(keys, exp))
+        got = dict(zip(keys, ret))
+        fig, ax = plt.subplots()
+        ax.bar(bands, [got[b] for b in bands], color='0.75', label='code')
+        ax.plot(bands, [expect[b] for b in bands], 'o', label='expected')
+        ax.plot(['F_bo'], [band_sum], '_', ms=30, mew=2, label='sum of the bands')
+        ax.set(yscale='log', ylabel='flux at 1 AU [erg s$^{-1}$ cm$^{-2}$]')
+        ax.legend(fontsize='small')
+        fig.tight_layout()
+        return fig
+
+    validation_plot(figure, 'mors_synthesis_flux_budget')
 
 
 @pytest.mark.physics_invariant

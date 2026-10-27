@@ -13,6 +13,11 @@ import pytest
 from mors import parameters
 
 
+def pytest_sessionstart(session):
+    """Build the matplotlib font cache before the first plotting test and its time limit."""
+    from matplotlib import font_manager  # noqa: F401
+
+
 @pytest.fixture(autouse=True)
 def _restore_params_default():
     """Snapshot and restore the shared default-parameter dictionary around each test.

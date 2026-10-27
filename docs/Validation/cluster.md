@@ -1,46 +1,38 @@
 # Validation: `src/mors/cluster.py`
 
-This page tracks the `@pytest.mark.reference_pinned` tests that anchor the
-behaviour of `mors.cluster` against an analytical limit.
+## What this page checks
 
-| Test id | Reference | Scope |
-|---|---|---|
-| `tests/test_cluster.py::test_percentile_of_uniform_ramp_matches_closed_form` | Analytical limit: the percentile of an evenly spaced distribution | Pins the `Cluster.Percentile` output for an evenly spaced rotation-rate distribution to the closed form `A + (B - A) * q / 100`. |
+This page checks how the `Cluster` class of MORS reports percentiles of stellar rotation.
+`Cluster` in `mors.cluster` holds a population of stars and reports statistics of their rotation rates.
+Validation means that a test runs the code on a case with a known right answer and checks the result within a stated tolerance.
+If this part of the code is wrong, a user of `Cluster` gets a wrong rotation rate for a requested percentile.
+The case below says why the check exists, what it tests, how we know the right answer and why it matters; a box "Test details" ends the case.
 
-## Cases
+## Percentile of a uniform ramp
 
-### Percentile of a uniform ramp
+**Why this check exists.** `Cluster.Percentile` collects the surface rotation rates of the member stars at an age and hands them to the percentile routine. A wrong collection or a wrong dispatch, for example one that returns the middle of the distribution for every request, gives a wrong rotation rate without an error message.
 
-- Reference: closed form `A + (B - A) * q / 100`
-- Tolerance: `rtol=1e-12` at q = 5, 50 and 95
-- Test id: `tests/test_cluster.py::test_percentile_of_uniform_ramp_matches_closed_form`
-- Command: `pytest tests/test_cluster.py::test_percentile_of_uniform_ramp_matches_closed_form`
+**What it tests.** The test builds a cluster of 8 stars whose initial rotation rates are evenly spaced from 1 to 40 times the solar rotation rate. Its stand-in star spins every member down by the same factor, 1 / (1 + age / 1000 Myr), so at 200 Myr the rates are evenly spaced from $A$ = 1/1.2 to $B$ = 40/1.2 solar rotation rates. For an evenly spaced distribution from $A$ to $B$, the `q`-th percentile under linear interpolation is exactly `A + (B - A) * q / 100`, whatever the number of stars. The test asks for `q` = 5, 50 and 95 and compares each with this value. It also checks that the 5th and 95th percentiles are more than 1 solar rotation rate away from the middle of the distribution. A companion test, `test_percentile_maps_percentile_to_rotation_monotonically`, checks that the percentile rises with `q` and stays positive.
 
-## Re-derivation note
+**How we know the right answer.** The percentile of an evenly spaced distribution is a closed-form result.
 
-`Cluster` holds a population of stars and reports statistics of their rotation
-distribution. For an evenly spaced distribution running from `A` to `B`, the
-`q`-th percentile under linear interpolation is exactly
+**Why it matters.** `Cluster.Percentile` is the percentile query of a star population in MORS.
 
-```
-percentile(q) = A + (B - A) * q / 100
-```
+![Surface rotation of a cluster percentile against the percentile, with the closed form at 5, 50 and 95](../assets/validation/mors_cluster_percentile_ramp.svg#only-light){ width="80%" }
+![Surface rotation of a cluster percentile against the percentile, with the closed form at 5, 50 and 95](../assets/validation/mors_cluster_percentile_ramp_dark.svg#only-dark){ width="80%" }
 
-independent of the number of samples. The reference-pinned test builds a
-cluster whose initial rotation rates form an evenly spaced ramp, queries the
-percentile at a chosen `q`, and pins the result to that closed form. A
-midpoint-collapse or an off-by-one in the percentile index moves the result
-away from the analytic value.
+**How to read the plot.** The line is `Cluster.Percentile` for percentiles 0 to 100 at 200 Myr and gives context. The dotted line is the midpoint of the ramp. The test asserts the code values at the percentiles 5, 50 and 95 (circles) against the closed form (squares). The tolerance, a relative 1e-12, is too small to see. A pass means that each circle sits in its square. The circles at 5 and 95 must also lie more than 1 solar rotation rate from the dotted line.
 
-## Anchor type
+**Known limit.** The test replaces both the star model (`Star`) and the percentile routine (`star.Percentile`) with simple stand-ins (test functions that return fixed, simple values; the percentile stand-in calls `np.percentile`). So it checks how `Cluster.Percentile` collects and passes the rates, not the spin-down or the percentile code of MORS. `Star` and PROTEUS take the initial rotation of a single star from `star.Percentile` directly, which this test does not cover.
 
-Analytical limit. The percentile of a uniform ramp is a closed-form identity.
-A companion `physics_invariant` test checks that the percentile mapping is
-monotone in `q` and bounded within the distribution range.
+??? info "Test details"
+    - Reference: closed form `A + (B - A) * q / 100`
+    - Tolerance: `rtol=1e-12` at q = 5, 50 and 95
+    - Test id: `tests/test_cluster.py::test_percentile_of_uniform_ramp_matches_closed_form`
+    - Command: `pytest tests/test_cluster.py::test_percentile_of_uniform_ramp_matches_closed_form`
 
-## Cross-references
+## Related code
 
-- `src/mors/cluster.py`: the `Cluster` class, `Cluster.Percentile`, and the
-  per-quantity accessors that delegate to the member stars.
-- [Using model percentiles for initial rotation](../How-to/distribution_percentile.md)
-  describes the rotation distribution and the percentile interface.
+- `src/mors/cluster.py`: the `Cluster` class, `Cluster.Percentile`, and the per-quantity accessors that delegate to the member stars.
+- `src/mors/star.py`: `Percentile`, the separate percentile path of a single star.
+- [Using model percentiles for initial rotation](../How-to/distribution_percentile.md) describes the rotation distribution and the percentile interface.
