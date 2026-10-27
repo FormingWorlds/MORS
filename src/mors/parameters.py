@@ -2,10 +2,13 @@
 """Module for holding default parameters and related functions."""
 
 # Imports for standard stuff needed here
+from __future__ import annotations
+
 import copy
+import logging
+
 import numpy as np
 
-import logging
 log = logging.getLogger("fwl."+__name__)
 
 
