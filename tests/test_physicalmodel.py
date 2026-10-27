@@ -1027,7 +1027,7 @@ class TestHabitableZone:
         )
         expected = (0.1 / seff) ** 0.5
         assert_allclose(hz['RunawayGreenhouse'], expected, rtol=1e-9)
-        # Discrimination guard: a linear cubic term (c*Tstar instead of
+        # Discrimination guard: the cubic term replaced by 3*c*Tstar (instead of
         # c*Tstar**3) shifts the boundary by more than two percent at this
         # temperature, so an exponent slip fails here even though it is invisible
         # at the solar anchor where Tstar is zero.

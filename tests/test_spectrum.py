@@ -229,7 +229,7 @@ def test_Spectrum_CalcBandFluxes_constant_integrand(wl, fl, expected, validation
         bands = ['xr', 'e1', 'e2', 'uv', 'pl', 'bo']
         fig, ax = plt.subplots()
         ax.bar(bands, ret, color='0.75', label='code, band integral')
-        ax.plot(bands, exp, 'o', label='band width')
+        ax.plot(bands, exp, 'o', label='span of the band samples')
         ax.set(ylabel='integral of a unit spectrum [nm]')
         ax.legend(fontsize='small')
         fig.tight_layout()

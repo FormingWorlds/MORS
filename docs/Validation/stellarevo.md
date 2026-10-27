@@ -10,9 +10,9 @@ Each case below says why the check exists, what it tests, how we know the right 
 
 ## Solar calibration
 
-**Why this check exists.** The interpolation can read the wrong track, use the wrong age unit (the code expects Myr), or rescale the native units without an error message. Near 1 Msun, a track one 0.05 Msun bin away changes the luminosity by 26 to 35 %, outside the 0.15 Lsun tolerance.
+**Why this check exists.** The interpolation can read the wrong track, use the wrong age unit (the code expects Myr), or rescale the native units without an error message. Near 1 Msun, a track one 0.05 Msun bin away changes the luminosity by 26 to 35 %, outside the 0.15 Lsun (15 %) tolerance.
 
-**What it tests.** `stellarevo.Value(Mstar, Age, key)` reads the Spada et al. (2013) grid (24 mass bins from 0.1 to 1.25 Msun, loaded from `FWL_DATA`) and returns structural quantities by linear interpolation in age, then in mass. The native units are solar luminosities for `Lbol`, solar radii for `Rstar` and K for `Teff`. The Spada et al. (2013) models are solar-calibrated. At the solar age of 4.57 Gyr, the interpolated 1 Msun track returns roughly 1.08 Lsun, 1.015 Rsun, and 5844 K, agreeing to about 10% with solar reference values (unity in normalized luminosity and radius, 5772 K in effective temperature). The test asserts that L lands inside 0.15 Lsun of unity, R lands inside 0.05 Rsun of unity, and Teff deviates by under 3% from 5772 K. A companion test (`test_stellarevo_luminosity_increases_with_mass`) samples masses from 0.3 to 1.2 Msun and asserts strict monotonic increase, with the lightest and heaviest tracks separated by more than two orders of magnitude.
+**What it tests.** `stellarevo.Value(Mstar, Age, key)` reads the Spada et al. (2013) grid (24 mass bins from 0.1 to 1.25 Msun, loaded from `FWL_DATA`) and returns structural quantities by linear interpolation in age, then in mass. The native units are solar luminosities for `Lbol`, solar radii for `Rstar` and K for `Teff`. The Spada et al. (2013) models are solar-calibrated. At the solar age of 4.57 Gyr, the interpolated 1 Msun track returns 1.080 Lsun, 1.015 Rsun and 5844 K. These lie 8.0 %, 1.5 % and 1.2 % above the solar values (1 Lsun, 1 Rsun and 5772 K). The test asserts that L lands inside 0.15 Lsun of unity, R lands inside 0.05 Rsun of unity, and Teff deviates by under 3% from 5772 K. A companion test (`test_stellarevo_luminosity_increases_with_mass`) samples masses from 0.3 to 1.2 Msun and asserts strict monotonic increase, with the lightest and heaviest tracks separated by more than two orders of magnitude.
 
 **How we know the right answer.** The Spada et al. (2013) tracks are solar-calibrated, so a 1 Msun star at the solar age must reproduce the Sun: unity in luminosity and radius in solar units, and the standard solar effective temperature of 5772 K. The companion test adds an independent check on the mass ordering of the tracks.
 
@@ -21,15 +21,13 @@ Each case below says why the check exists, what it tests, how we know the right 
 ![1 Msun Spada track of L, R and Teff against age, with the Sun and the tolerance at the solar age](../assets/validation/stellarevo_solar_calibration.svg#only-light){ width="80%" }
 ![1 Msun Spada track of L, R and Teff against age, with the Sun and the tolerance at the solar age](../assets/validation/stellarevo_solar_calibration_dark.svg#only-dark){ width="80%" }
 
-Luminosity, radius and effective temperature of the 1 Msun Spada et al. (2013) track between 100 Myr and 8 Gyr (line). The circle is the track value at 4.57 Gyr that the test asserts; the square with the error bar is the Sun with the tolerance of each assertion.
-
-**How to read the plot.** The x-axis is the age in Myr on a log scale. The 3 panels show $L$ in $L_\odot$, $R$ in $R_\odot$ and $T_\mathrm{eff}$ in K. The line is the 1 Msun Spada et al. (2013) track and gives context. The test asserts the track values at 4.57 Gyr (circles) against the Sun (squares). The error bars are the tolerances: 0.15 $L_\odot$, 0.05 $R_\odot$ and 3 % of 5772 K. A pass means that each circle lies inside its error bar.
+**How to read the plot.** The x-axis is the age in Myr on a log scale. The 3 panels show $L$ in $L_\odot$, $R$ in $R_\odot$ and $T_\mathrm{eff}$ in K. The line is the 1 Msun Spada et al. (2013) track and gives context. The test asserts the track values at 4.57 Gyr (circles) against the Sun (squares). The error bars are the tolerances: 0.15 $L_\odot$ (15 %), 0.05 $R_\odot$ (5 %) and 3 % of 5772 K. A pass means that each circle lies inside its error bar.
 
 ??? info "Test details"
     - Reference: Spada et al. (2013) [^cite-spada2013] solar-calibrated tracks; solar effective temperature 5772 K
     - Tolerance: `atol=0.15` Lsun on L, `atol=0.05` Rsun on R, `rtol=0.03` on Teff at 4.57 Gyr
     - Test id: `tests/test_stellarevo.py::test_stellarevo_solar_calibration`
-    - Command: `pytest tests/test_stellarevo.py::test_stellarevo_solar_calibration --validation-plots` (needs `FWL_DATA` with the tracks; without `--validation-plots` the test compares its plot data with the committed pair)
+    - Command: `pytest tests/test_stellarevo.py::test_stellarevo_solar_calibration` (needs `FWL_DATA` with the tracks)
 
 ## Grid compiled from the raw tracks
 
@@ -39,7 +37,7 @@ Luminosity, radius and effective temperature of the 1 Msun Spada et al. (2013) t
 
 **How we know the right answer.** The solar calibration of the Spada et al. (2013) tracks, as in the case above, with wider tolerances. A wrong column or unit moves the solar point outside them. The second construction must give the same values to `rtol=1e-12`.
 
-**Why it matters.** MORS compiles the grid from the raw files when no compiled grid exists, so every later run reads what this step wrote.
+**Why it matters.** MORS compiles the grid from the raw files when no compiled grid exists and writes it as a cache that later runs read. If the write fails, MORS logs a warning and compiles the grid again in the next run.
 
 ![Luminosity and radius of the compiled 1 Msun track against age, with the values at the solar age](../assets/validation/mors_stellarevo_grid_compiled.svg#only-light){ width="80%" }
 ![Luminosity and radius of the compiled 1 Msun track against age, with the values at the solar age](../assets/validation/mors_stellarevo_grid_compiled_dark.svg#only-dark){ width="80%" }

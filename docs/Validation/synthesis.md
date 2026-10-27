@@ -4,7 +4,7 @@
 
 This page checks the stellar high-energy budget calculations in `mors.synthesis`.
 `synthesis.GetProperties` builds band luminosities and fluxes for X-ray, EUV, UV, Planck, and bolometric ranges.
-Validation means that a test runs the code on a case with a known right answer and checks the result within a stated tolerance; here the right answer is a self-consistency identity of the band budget.
+Validation means that a test runs the code on a case with a known right answer and checks the result within a stated tolerance; here the closure of the band budget is a bookkeeping check, and the band values computed again from the constants are the real reference.
 If this part of the code is wrong, the band scalings of the synthetic stellar spectra of MORS are wrong.
 The case below says why the check exists, what it tests, how we know the right answer and why it matters; a box "Test details" ends the case.
 
@@ -26,7 +26,7 @@ The case below says why the check exists, what it tests, how we know the right a
 **Known limit.** With `F_pl` set to zero, this case does not check the subtraction of the Planck term from `F_bo`; `test_GetProperties_planck_trapezoid_constant` checks the `F_pl` integral, and no test checks its subtraction. The test shares `AU` and `LbolSun` with the source, so a wrong value of these constants does not fail it. It does not check the returned `radius` and `Teff`, nor that `Percentile` feeds `Lxuv`. PROTEUS does not call `GetProperties`: it computes the band properties with its own `get_spada_synthesis_properties` and then calls `CalcScaledSpectrumFromProps`, so this test does not cover the PROTEUS version.
 
 ??? info "Test details"
-    - Reference: self-consistency: the 5 sub-band fluxes sum to the bolometric flux
+    - Reference: each band flux and luminosity computed again from `AU` and `LbolSun`; the closure of the 5 sub-band fluxes to the bolometric flux is a bookkeeping check
     - Tolerance: `rtol=1e-12` on each band flux, each band luminosity and the closure
     - Test id: `tests/test_synthesis.py::test_GetProperties_flux_budget`
     - Command: `pytest tests/test_synthesis.py::test_GetProperties_flux_budget`
