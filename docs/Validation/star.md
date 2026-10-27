@@ -1,61 +1,42 @@
 # Validation: `src/mors/star.py`
 
-This page tracks the `@pytest.mark.reference_pinned` tests that anchor the
-behaviour of `mors.star` against a published source.
+## What this page checks
 
-| Test id | Reference | Source page | Scope |
-|---|---|---|---|
-| `tests/test_star.py::test_star_reproduces_solar_luminosity_at_solar_age` | Spada et al. (2013) [^cite-spada2013] solar-calibrated tracks; IAU 2015 Resolution B3 nominal solar luminosity | [2013ApJ...776...87S](https://ui.adsabs.harvard.edu/abs/2013ApJ...776...87S/abstract) | Checks that a 1 Msun star at the solar age (4.57 Gyr) reproduces the nominal solar luminosity in erg/s to within 15%, validating both the track calibration and the internal Lsun-to-erg/s conversion, with a 0.3 Msun discrimination guard. |
+This page checks the high-level `Star` model class in `mors.star`.
+The class links the Spada et al. (2013) stellar tracks with rotational spin-down and magnetic activity models.
+`Star.Value(age, key)` returns stellar quantities from the stored tracks: `Lbol` in erg/s and `Rstar` in solar radii. The conversion of `Lbol` from solar luminosities to erg/s happens in `physicalmodel.py`, when the tracks are built.
+Activity keys such as `Leuv` depend on the rotation history that the chosen time integrator produces.
+Validation means that a test runs the code on a case with a known right answer and checks the result within a stated tolerance.
+If this part of the code is wrong, PROTEUS receives wrong stellar luminosities and high-energy fluxes.
+The case below says why the check exists, what it tests, how we know the right answer and why it matters; a box "Test details" ends the case.
 
-## Cases
+## Solar luminosity at the solar age
 
-### Solar luminosity at the solar age
+**Why this check exists.** The bolometric luminosity of a `Star` goes from the solar-luminosity units of the stellar tracks (the tabulated evolution of a star of given mass) to erg/s. A wrong mass track or a dropped conversion factor (about 4e33) gives a large luminosity error without an error message.
 
-- Reference: Spada et al. (2013) [^cite-spada2013] tracks; IAU 2015 Resolution B3 nominal solar luminosity 3.828e33 erg/s
-- Tolerance: `rtol=0.15` on Lbol in erg/s; the Lbol of a 0.3 Msun star must be below 0.1 of the 1 Msun value
-- Test id: `tests/test_star.py::test_star_reproduces_solar_luminosity_at_solar_age`
-- Command: `pytest tests/test_star.py::test_star_reproduces_solar_luminosity_at_solar_age` (needs `FWL_DATA` with the tracks)
+**What it tests.** The test evaluates a 1 Msun star at the solar age of 4.57 Gyr and asserts that the bolometric luminosity matches the IAU nominal solar luminosity within 15%. It also applies a guard asserting that the luminosity of a 0.3 Msun star is below 0.1 of the 1 Msun value. Companion tests compare `Star.Value` with stored earlier outputs for both time integrators (`test_star_value_default_integrator`, `test_star_value_forward_euler_integrator`) and check that the radius, the bolometric luminosity and the EUV luminosity are positive.
 
-## Re-derivation note
+**How we know the right answer.** The Spada et al. (2013) models are solar-calibrated, and the IAU 2015 Resolution B3 defines the nominal solar luminosity as 3.828e33 erg/s. The solar-mass track at 4.57 Gyr reproduces this benchmark to roughly 10%, inside the `rtol=0.15` band. A 0.3 Msun star is more than 10 times fainter than the Sun, so a test that read the wrong mass track, or dropped the conversion to erg/s, would fail clearly.
 
-The `Star` class couples the Spada et al. (2013) stellar-structure tracks with a
-rotation-and-activity model and exposes `Star.Value(age, key)`. `Lbol` is
-returned in erg/s, converted from the tracks' native solar-luminosity units by
-multiplying by the nominal solar luminosity; `Rstar` is returned in solar
-radii. Activity keys (`Leuv`) depend on the rotation history the chosen time
-integrator produces.
+**Why it matters.** PROTEUS calls `Star.Value` in its stellar step for the bolometric luminosity, the radius and the X-ray and EUV luminosities. From them it computes the instellation and the XUV flux at the planet.
 
-The Spada et al. (2013) models are solar-calibrated: a 1 Msun star at the solar
-age reproduces the Sun. In this implementation the solar-mass track at 4.57 Gyr
-returns a bolometric luminosity within roughly 10% of the IAU nominal
-`L_sun = 3.828e33 erg/s`. Pinning against that nominal value tests two things
-at once: that the track calibration is correct, and that the solar-luminosity
-to erg/s unit conversion inside `Star.Value` is applied with the right constant
-and exponent.
+![Bolometric luminosity of a 1 Msun and a 0.3 Msun star against age, with the values at the solar age](../assets/validation/mors_star_solar_luminosity.svg#only-light){ width="80%" }
+![Bolometric luminosity of a 1 Msun and a 0.3 Msun star against age, with the values at the solar age](../assets/validation/mors_star_solar_luminosity_dark.svg#only-dark){ width="80%" }
 
-Scale: a 0.3 Msun main-sequence star is more than a factor of ten fainter than
-the Sun, far outside the 15% tolerance, so a regression that read the wrong
-mass track or dropped the cgs conversion (a factor of `~4e33`) would fail
-loudly. The discrimination guard asserts the 0.3 Msun luminosity is below one
-tenth of the solar-mass value.
+**How to read the plot.** Both axes are logarithmic. The lines are `Star.Value(age, "Lbol")` at 30 ages for 1 Msun (solid) and 0.3 Msun (dashed) and give context. The test asserts the 1 Msun value at 4.57 Gyr (upper circle) against the solar luminosity 3.828e33 erg/s (square, error bar 15 %). The lower circle is the 0.3 Msun value, which must lie below 0.1 of the 1 Msun value (short line). A pass means that the upper circle lies inside the error bar and the lower circle below the short line.
 
-## Anchor type
+??? info "Test details"
+    - Reference: Spada et al. (2013) [^cite-spada2013] tracks; IAU 2015 Resolution B3 nominal solar luminosity 3.828e33 erg/s
+    - Tolerance: `rtol=0.15` on Lbol in erg/s; the Lbol of a 0.3 Msun star must be below 0.1 of the 1 Msun value
+    - Test id: `tests/test_star.py::test_star_reproduces_solar_luminosity_at_solar_age`
+    - Command: `pytest tests/test_star.py::test_star_reproduces_solar_luminosity_at_solar_age` (needs `FWL_DATA` with the tracks)
 
-Published benchmark. The Spada et al. (2013) solar-calibrated tracks and the
-IAU nominal solar luminosity are the benchmark. Companion `physics_invariant`
-tests pin `Star.Value` against the model output for both time-integration
-methods (`test_star_value_default_integrator`,
-`test_star_value_forward_euler_integrator`) and assert positivity of the
-radius, bolometric luminosity, and EUV luminosity.
+## Related code
 
-## Cross-references
-
-- `src/mors/star.py`: the `Star` class, `Star.Value`, and the cgs unit
-  conversions applied to the track output.
-- `src/mors/stellarevo.py`: supplies the underlying structural interpolation;
-  see `docs/Validation/stellarevo.md`.
-- PROTEUS reads `Star.Value` for the stellar luminosity and EUV history during
-  the stellar-evolution step.
+- `src/mors/star.py`: the `Star` class and `Star.Value`.
+- `src/mors/physicalmodel.py`: the conversion of `Lbol` to erg/s (`StarEvo.Lbol(...) * const.LbolSun`).
+- `src/mors/stellarevo.py`: supplies the underlying stellar tracks; see [stellarevo.md](stellarevo.md).
+- `tests/test_star.py`: `test_star_reproduces_solar_luminosity_at_solar_age` and companion tests.
 
 ## References
 

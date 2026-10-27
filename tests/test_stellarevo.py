@@ -30,6 +30,8 @@ T_EFF_SUN = 5772.0
 # Solar calibration tolerances, shared by the assertions and the validation plot.
 SOLAR_L_ATOL = 0.15  # Lsun
 SOLAR_R_ATOL = 0.05  # Rsun
+SOLAR_L_REF = 1.0  # Lsun
+SOLAR_R_REF = 1.0  # Rsun
 SOLAR_TEFF_RTOL = 0.03
 # Default Spada model set, closest to solar composition.
 SOLAR_MODEL_SET = 'X0p70952_Z0p01631_A1p875'
@@ -81,8 +83,8 @@ def test_stellarevo_solar_calibration(validation_plot):
     assert lbol > 0.0
     assert rstar > 0.0
     assert teff > 0.0
-    assert_allclose(lbol, 1.0, atol=SOLAR_L_ATOL)
-    assert_allclose(rstar, 1.0, atol=SOLAR_R_ATOL)
+    assert_allclose(lbol, SOLAR_L_REF, atol=SOLAR_L_ATOL)
+    assert_allclose(rstar, SOLAR_R_REF, atol=SOLAR_R_ATOL)
     assert_allclose(teff, T_EFF_SUN, rtol=SOLAR_TEFF_RTOL)
 
     def figure():
@@ -90,8 +92,8 @@ def test_stellarevo_solar_calibration(validation_plot):
 
         ages = np.geomspace(100.0, 8000.0, 60)
         rows = (
-            ('Lbol', 'L [Lsun]', lbol, 1.0, SOLAR_L_ATOL),
-            ('Rstar', 'R [Rsun]', rstar, 1.0, SOLAR_R_ATOL),
+            ('Lbol', 'L [Lsun]', lbol, SOLAR_L_REF, SOLAR_L_ATOL),
+            ('Rstar', 'R [Rsun]', rstar, SOLAR_R_REF, SOLAR_R_ATOL),
             ('Teff', 'Teff [K]', teff, T_EFF_SUN, SOLAR_TEFF_RTOL * T_EFF_SUN),
         )
         fig, axes = plt.subplots(3, 1, sharex=True, figsize=(6.4, 6.4))
@@ -101,12 +103,12 @@ def test_stellarevo_solar_calibration(validation_plot):
                 SOLAR_AGE_MYR,
                 ref,
                 yerr=tol,
-                fmt='o',
-                ms=5,
+                fmt='s',
+                mfc='none',
                 capsize=4,
                 label='Sun and tolerance',
             )
-            ax.plot(SOLAR_AGE_MYR, value, 'x', ms=9, mew=2, zorder=3, label='track at 4.57 Gyr')
+            ax.plot(SOLAR_AGE_MYR, value, 'o', zorder=3, label='track at 4.57 Gyr')
             ax.set_ylabel(label)
         axes[0].legend()
         axes[-1].set(xscale='log', xlabel='Age [Myr]')
@@ -140,7 +142,9 @@ def test_stellarevo_luminosity_increases_with_mass():
 
 @pytest.mark.reference_pinned
 @pytest.mark.physics_invariant
-def test_grid_compiled_from_raw_tracks_matches_saved_grid(tmp_path, monkeypatch):
+def test_grid_compiled_from_raw_tracks_matches_saved_grid(
+    tmp_path, monkeypatch, validation_plot
+):
     """Compiling the grid from the raw Spada track files reproduces the solar calibration.
 
     Reference: Spada et al. (2013), ApJ 776, 87. The default install ships a
@@ -177,18 +181,50 @@ def test_grid_compiled_from_raw_tracks_matches_saved_grid(tmp_path, monkeypatch)
     # Positivity and solar calibration of the freshly compiled track.
     assert lbol > 0.0
     assert rstar > 0.0
-    assert_allclose(lbol, 1.0, atol=0.2)
-    assert_allclose(rstar, 1.0, atol=0.1)
+    l_tol, r_tol = 0.2, 0.1
+    assert_allclose(lbol, SOLAR_L_REF, atol=l_tol)
+    assert_allclose(rstar, SOLAR_R_REF, atol=r_tol)
     # Discrimination: a 0.5 Msun track would give Lbol well below 0.5 Lsun, so the
     # correct 1 Msun track is unambiguously selected.
     assert lbol > 0.5
 
-    # Re-constructing now loads the saved pickle; the grids must agree at 1 Msun.
+    # Construct a second time; the grids must agree at 1 Msun.
     reloaded = mors.StarEvo(starEvoDir=str(grid_dir), evoModels=SOLAR_MODEL_SET)
-    assert_allclose(reloaded.Lbol(1.0, SOLAR_AGE_MYR), lbol, rtol=1e-12)
+    reloaded_lbol = reloaded.Lbol(1.0, SOLAR_AGE_MYR)
+    assert_allclose(reloaded_lbol, lbol, rtol=1e-12)
     assert_allclose(
         reloaded.Teff(1.0, SOLAR_AGE_MYR), compiled.Teff(1.0, SOLAR_AGE_MYR), rtol=1e-12
     )
+
+    def figure():
+        import matplotlib.pyplot as plt
+
+        ages = np.geomspace(100.0, 8000.0, 60)
+        fig, (top, bottom) = plt.subplots(2, 1, sharex=True, figsize=(6.4, 5.2))
+        top.plot(ages, [compiled.Lbol(1.0, a) for a in ages], label='compiled 1 Msun track')
+        top.errorbar(
+            SOLAR_AGE_MYR,
+            SOLAR_L_REF,
+            yerr=l_tol,
+            fmt='s',
+            mfc='none',
+            capsize=4,
+            label=r'1 $\pm$ 0.2',
+        )
+        top.plot(SOLAR_AGE_MYR, lbol, 'o', label='compiled at 4.57 Gyr')
+        top.plot(
+            SOLAR_AGE_MYR, reloaded_lbol, '+', ms=10, label='second construction at 4.57 Gyr'
+        )
+        top.set_ylabel('L [Lsun]')
+        top.legend(fontsize='small')
+        bottom.plot(ages, [compiled.Rstar(1.0, a) for a in ages])
+        bottom.errorbar(SOLAR_AGE_MYR, SOLAR_R_REF, yerr=r_tol, fmt='s', mfc='none', capsize=4)
+        bottom.plot(SOLAR_AGE_MYR, rstar, 'o')
+        bottom.set(xscale='log', xlabel='Age [Myr]', ylabel='R [Rsun]')
+        fig.tight_layout()
+        return fig
+
+    validation_plot(figure, 'mors_stellarevo_grid_compiled')
 
 
 def test_grid_cache_write_failure_does_not_break_construction(tmp_path, monkeypatch, caplog):
