@@ -2,7 +2,7 @@
 
 ## What this page checks
 
-This page checks how MORS reads and interpolates the stellar-evolution tracks of Baraffe et al. (2015).
+This page checks how MORS reads and interpolates the stellar-evolution tracks of Baraffe et al. (2015)[^cite-baraffe2015].
 `BaraffeTrack` in `mors.baraffe` gives the bolometric luminosity, the stellar radius and the orbital insolation as functions of stellar mass and age.
 Validation means that a test runs the code on a case with a known right answer and checks the result within a stated tolerance.
 Here the right answer is a stored output of the same interpolation (a regression pin): the test catches any change of the output, not an error that was there from the start.

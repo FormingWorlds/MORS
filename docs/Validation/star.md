@@ -3,7 +3,7 @@
 ## What this page checks
 
 This page checks the high-level `Star` model class in `mors.star`.
-The class links the Spada et al. (2013) stellar tracks with rotational spin-down and magnetic activity models.
+The class links the Spada et al. (2013)[^cite-spada2013] stellar tracks with rotational spin-down and magnetic activity models.
 `Star.Value(age, key)` returns stellar quantities from the stored tracks: `Lbol` in erg/s and `Rstar` in solar radii. The conversion of `Lbol` from solar luminosities to erg/s happens in `physicalmodel.py`, when the tracks are built.
 Activity keys such as `Leuv` depend on the rotation history that the chosen time integrator produces.
 Validation means that a test runs the code on a case with a known right answer and checks the result within a stated tolerance.

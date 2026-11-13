@@ -2,7 +2,7 @@
 
 ## What this page checks
 
-This page checks how MORS interpolates and manages the stellar-structure tracks of Spada et al. (2013).
+This page checks how MORS interpolates and manages the stellar-structure tracks of Spada et al. (2013)[^cite-spada2013].
 `StarEvo` in `mors.stellarevo` reads stellar evolutionary models and interpolates bolometric luminosity, stellar radius, and effective temperature as functions of stellar mass and age.
 Validation means that a test runs the code on a case with a known right answer and checks the result within a stated tolerance.
 If this part of the code is wrong, every stellar luminosity, radius and temperature of MORS is wrong, and so are the values that PROTEUS reads.

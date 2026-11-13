@@ -1,6 +1,6 @@
 # Habitable zone boundaries
 
-Habitable zone boundaries are computed following Kopparapu et al. (2013)[^cite-kopparapu2013] using stellar luminosities and effective temperatures from the Spada models (Spada et al. 2013)[^cite-spada2013] (`physicalmodel.aOrbHZ`). Six boundaries are returned:
+Habitable zone boundaries are computed following Kopparapu et al. (2013)[^cite-kopparapu2013] using stellar luminosities and effective temperatures from the Spada et al. (2013)[^cite-spada2013] models (`physicalmodel.aOrbHZ`). Six boundaries are returned:
 
 | Boundary | Key |
 |---|---|
