@@ -121,10 +121,10 @@ nightly.
 
 ### Integration tier
 
-- `test_baraffe.py`: the Baraffe et al. (2015) track interpolation. Pins
+- `test_baraffe.py`: the Baraffe et al. (2015)[^cite-baraffe2015] track interpolation. Pins
   luminosity, radius, and insolation at two masses and asserts luminosity rises
   with mass. Baraffe tracks use time in **years**, not Myr.
-- `test_stellarevo.py`: the Spada et al. (2013) structure-track interpolation.
+- `test_stellarevo.py`: the Spada et al. (2013)[^cite-spada2013] structure-track interpolation.
   Pins the solar calibration and asserts the main-sequence mass-luminosity
   monotonicity.
 - `test_star.py`: the coupled `Star` model. Pins the solar luminosity in cgs for
@@ -156,3 +156,7 @@ Coverage gates move one way: a pull-request check blocks any change that lowers
 them, and the thresholds are raised toward the 90% ecosystem target as coverage
 improves. The pull-request tier covers the mocked unit surface; the nightly tier
 adds the real-track coverage.
+
+[^cite-baraffe2015]: I. Baraffe, D. Homeier, F. Allard, G. Chabrier, *[New evolutionary models for pre-main sequence and main sequence low-mass stars down to the hydrogen-burning limit](https://doi.org/10.1051/0004-6361/201425481)*, Astronomy & Astrophysics, 577, A42, 2015. [SciX](https://scixplorer.org/abs/2015A%26A...577A..42B/abstract).
+
+[^cite-spada2013]: F. Spada, P. Demarque, Y.-C. Kim, A. Sills, *[The Radius Discrepancy in Low-mass Stars: Single versus Binaries](https://doi.org/10.1088/0004-637X/776/2/87)*, The Astrophysical Journal, 776, 87, 2013. [SciX](https://scixplorer.org/abs/2013ApJ...776...87S/abstract).

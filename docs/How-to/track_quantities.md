@@ -1,6 +1,6 @@
 # Find stellar quantities from evolution tracks
 
-Find basic stellar evolution properties (radius, luminosity, convective turnover time, moments of inertia, etc.) as a function of stellar mass and age, using the Spada et al. (2013) [^spada] tracks bundled with MORS. Baraffe et al. (2015) [^baraffe] tracks are also available.
+Find basic stellar evolution properties (radius, luminosity, convective turnover time, moments of inertia, etc.) as a function of stellar mass and age, using the Spada et al. (2013)[^cite-spada2013] tracks bundled with MORS. Baraffe et al. (2015)[^cite-baraffe2015] tracks are also available.
 
 ## Prerequisites
 
@@ -137,7 +137,7 @@ mors.LoadTrack(1.02)  # does nothing if already loaded
 
 ## Baraffe tracks
 
-MORS also provides access to Baraffe et al. (2015) [^baraffe] tracks.
+MORS also provides access to Baraffe et al. (2015)[^cite-baraffe2015] tracks.
 
 !!! info "Units"
     `Mstar` in **M☉**, but time in **years (yr)** — not Myr.
@@ -175,6 +175,6 @@ Flux  = baraffe.BaraffeSolarConstant(time_yr, 1.0)  # W m⁻² at 1 AU
 
 ---
 
-[^spada]: Spada, F., Demarque, P., Kim, Y.-C., & Sills, A. (2013). The radius discrepancy in low-mass stars: single versus binaries. *The Astrophysical Journal, 776*(2), 87. https://doi.org/10.1088/0004-637X/776/2/87
+[^cite-spada2013]: F. Spada, P. Demarque, Y.-C. Kim, A. Sills, *[The Radius Discrepancy in Low-mass Stars: Single versus Binaries](https://doi.org/10.1088/0004-637X/776/2/87)*, The Astrophysical Journal, 776, 87, 2013. [SciX](https://scixplorer.org/abs/2013ApJ...776...87S/abstract).
 
-[^baraffe]: Baraffe, I., Homeier, D., Allard, F., & Chabrier, G. (2015). New evolutionary models for pre-main sequence and main sequence stars down to the hydrogen-burning limit. *Astronomy & Astrophysics, 577*, A42. https://doi.org/10.1051/0004-6361/201425481
+[^cite-baraffe2015]: I. Baraffe, D. Homeier, F. Allard, G. Chabrier, *[New evolutionary models for pre-main sequence and main sequence low-mass stars down to the hydrogen-burning limit](https://doi.org/10.1051/0004-6361/201425481)*, Astronomy & Astrophysics, 577, A42, 2015. [SciX](https://scixplorer.org/abs/2015A%26A...577A..42B/abstract).
