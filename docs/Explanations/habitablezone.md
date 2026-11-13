@@ -1,6 +1,6 @@
 # Habitable zone boundaries
 
-Habitable zone boundaries are computed following Kopparapu et al. (2013)[^cite-kopparapu2013] using stellar luminosities and effective temperatures from the Spada models [^cite-spada2013] (`physicalmodel.aOrbHZ`). Six boundaries are returned:
+Habitable zone boundaries are computed following Kopparapu et al. (2013)[^cite-kopparapu2013] using stellar luminosities and effective temperatures from the Spada models (Spada et al. 2013)[^cite-spada2013] (`physicalmodel.aOrbHZ`). Six boundaries are returned:
 
 | Boundary | Key |
 |---|---|
@@ -17,7 +17,7 @@ The `HZ` boundary is defined as the midpoint between the moist and maximum green
 
 $$a_\mathrm{HZ} = \frac{1}{2}\left(a_\mathrm{MoistGreenhouse} + a_\mathrm{MaximumGreenhouse}\right)$$
 
-Each boundary distance is computed from the stellar flux factor $S_\mathrm{eff}$ following Kopparapu et al. (2013), eq. 3 [^cite-kopparapu2013]:
+Each boundary distance is computed from the stellar flux factor $S_\mathrm{eff}$ following Kopparapu et al. (2013)[^cite-kopparapu2013], eq. 3:
 
 $$a = \left(\frac{L_\mathrm{bol}}{L_\odot \cdot S_\mathrm{eff}}\right)^{1/2} \quad (\mathrm{AU})$$
 

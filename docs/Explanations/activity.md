@@ -37,7 +37,7 @@ Implementation: `physicalmodel._Xray`.
 
 ### X-ray variability
 
-Real stellar X-ray emission varies around the average relation. The observed scatter in the $Ro$–$R_X$ distribution can be described as a log-normal centred on zero with standard deviation $\sigma = 0.359$ dex (`params['sigmaXray']`), meaning stars spend approximately 90% of their time within one standard deviation of the average [^cite-johnstone2021]. This scatter can be sampled with `physicalmodel.XrayScatter` or `physicalmodel.XUVScatter`, which apply correlated random offsets consistently across all XUV bands.
+Real stellar X-ray emission varies around the average relation. The observed scatter in the $Ro$–$R_X$ distribution can be described as a log-normal centred on zero with standard deviation $\sigma = 0.359$ dex (`params['sigmaXray']`), meaning stars spend approximately 90% of their time within one standard deviation of the average (Johnstone et al. 2021)[^cite-johnstone2021]. This scatter can be sampled with `physicalmodel.XrayScatter` or `physicalmodel.XUVScatter`, which apply correlated random offsets consistently across all XUV bands.
 
 ---
 
@@ -53,7 +53,7 @@ This relation is mass-independent when expressed in surface fluxes. Since corona
 
 ## 3. EUV emission
 
-EUV emission is empirically related to $F_X$ rather than to $L_X$ or $R_X$, since $F_X$ best captures the physical state of the emitting plasma [^cite-johnstone2015]. The relations are derived from EUVE observations of nearby F, G, K, and M stars [^cite-craig1997] and solar spectra.
+EUV emission is empirically related to $F_X$ rather than to $L_X$ or $R_X$, since $F_X$ best captures the physical state of the emitting plasma (Johnstone & Güdel 2015)[^cite-johnstone2015]. The relations are derived from EUVE observations of nearby F, G, K, and M stars (Craig et al. 1997)[^cite-craig1997] and solar spectra.
 
 ### EUV band 1 (10–36 nm)
 
