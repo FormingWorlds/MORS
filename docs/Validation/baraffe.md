@@ -30,7 +30,7 @@ The case below says why the check exists, what it tests, how we know the right a
 **Known limit.** The stored values are not compared with the published tables of Baraffe et al. (2015), despite the word `published_values` in the test id. The effective temperature (`BaraffeStellarTeff`) has no stored value. Both masses lie between grid nodes, so the test checks the interpolation between 2 tracks, not a tabulated track itself.
 
 ??? info "Test details"
-    - Reference: the code's own interpolation of the Baraffe et al. (2015) [^cite-baraffe2015] tracks (regression pin; the values are not compared with the published tables)
+    - Reference: the code's own interpolation of the Baraffe et al. (2015)[^cite-baraffe2015] tracks (regression pin; the values are not compared with the published tables)
     - Tolerance: `rtol=1e-5` on luminosity, radius and insolation at 0.047 and 1.113 Msun
     - Test id: `tests/test_baraffe.py::test_baraffe_track_matches_published_values`
     - Command: `pytest tests/test_baraffe.py::test_baraffe_track_matches_published_values` (needs `FWL_DATA` with the tracks)
@@ -42,4 +42,4 @@ The case below says why the check exists, what it tests, how we know the right a
 
 ## References
 
-[^cite-baraffe2015]: I. Baraffe, D. Homeier, F. Allard, G. Chabrier, *[New evolutionary models for pre-main sequence and main sequence low-mass stars down to the hydrogen-burning limit](https://doi.org/10.1051/0004-6361/201425481)*, Astronomy & Astrophysics, 577, A42, 2015. [ADS](https://ui.adsabs.harvard.edu/abs/2015A%26A...577A..42B/abstract).
+[^cite-baraffe2015]: I. Baraffe, D. Homeier, F. Allard, G. Chabrier, *[New evolutionary models for pre-main sequence and main sequence low-mass stars down to the hydrogen-burning limit](https://doi.org/10.1051/0004-6361/201425481)*, Astronomy & Astrophysics, 577, A42, 2015. [SciX](https://scixplorer.org/abs/2015A%26A...577A..42B/abstract).

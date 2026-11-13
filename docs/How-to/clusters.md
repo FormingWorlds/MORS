@@ -136,7 +136,7 @@ cluster = mors.Cluster(Mstar=Mstar, Omega=Omega)
 ```
 
 !!! note "Citation"
-    If you use this model cluster distribution in published research, cite the rotation measurement sources listed in Table 1 of Johnstone et al. (2021) [^johnstone2021] in addition to the MORS paper.
+    If you use this model cluster distribution in published research, cite the rotation measurement sources listed in Table 1 of Johnstone et al. (2021)[^cite-johnstone2021] in addition to the MORS paper.
 
 ---
 
@@ -149,4 +149,4 @@ cluster = mors.Cluster(Mstar=Mstar, Omega=Omega)
 
 ---
 
-[^johnstone2021]: Johnstone, C. P., Bartel, M., & Güdel, M. (2021). The active lives of stars: a complete description of the rotation and XUV evolution of F, G, K, and M dwarfs. *Astronomy & Astrophysics, 649*, A96. https://doi.org/10.1051/0004-6361/202038407
+[^cite-johnstone2021]: C. P. Johnstone, M. Bartel, M. Güdel, *[The active lives of stars: A complete description of the rotation and XUV evolution of F, G, K, and M dwarfs](https://doi.org/10.1051/0004-6361/202038407)*, Astronomy & Astrophysics, 649, A96, 2021. [SciX](https://scixplorer.org/abs/2021A%26A...649A..96J/abstract).

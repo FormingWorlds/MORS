@@ -15,7 +15,7 @@ mors download all
     `Age` is in **Myr**, `Prot` is in **days**, and `Omega` is in units of the **current solar rotation rate** ($\Omega_\odot = 2.67 \times 10^{-6}$ rad s$^{-1}$).
 
 !!! note "Citation"
-    If you use these HZ boundaries in published research, cite Kopparapu et al. (2013) [^kopparapu] for the HZ prescription and Spada et al. (2013) [^spada] for the stellar parameters used.
+    If you use these HZ boundaries in published research, cite Kopparapu et al. (2013)[^cite-kopparapu2013] for the HZ prescription and Spada et al. (2013)[^cite-spada2013] for the stellar parameters used.
 
 ---
 
@@ -97,6 +97,6 @@ print(star.aOrbHZ["MoistGreenhouse"])
 
 ---
 
-[^kopparapu]: Kopparapu, R. K., Ramirez, R., Kasting, J. F., et al. (2013). Habitable zones around main-sequence stars: new estimates. *The Astrophysical Journal, 765*(2), 131. https://doi.org/10.1088/0004-637X/765/2/131
+[^cite-kopparapu2013]: R. K. Kopparapu, R. Ramirez, J. F. Kasting, V. Eymet, T. D. Robinson, S. Mahadevan, R. C. Terrien, S. Domagal-Goldman, V. Meadows, R. Deshpande, *[Habitable Zones around Main-sequence Stars: New Estimates](https://doi.org/10.1088/0004-637X/765/2/131)*, The Astrophysical Journal, 765, 131, 2013. [SciX](https://scixplorer.org/abs/2013ApJ...765..131K/abstract).
 
-[^spada]: Spada, F., Demarque, P., Kim, Y.-C., & Sills, A. (2013). The radius discrepancy in low-mass stars: single versus binaries. *The Astrophysical Journal, 776*(2), 87. https://doi.org/10.1088/0004-637X/776/2/87
+[^cite-spada2013]: F. Spada, P. Demarque, Y.-C. Kim, A. Sills, *[The Radius Discrepancy in Low-mass Stars: Single versus Binaries](https://doi.org/10.1088/0004-637X/776/2/87)*, The Astrophysical Journal, 776, 87, 2013. [SciX](https://scixplorer.org/abs/2013ApJ...776...87S/abstract).

@@ -24,7 +24,7 @@ Each case below says why the check exists, what it tests, how we know the right 
 **How to read the plot.** The x-axis is the age in Myr on a log scale. The 3 panels show $L$ in $L_\odot$, $R$ in $R_\odot$ and $T_\mathrm{eff}$ in K. The line is the 1 Msun Spada et al. (2013) track and gives context. The test asserts the track values at 4.57 Gyr (circles) against the Sun (squares). The error bars are the tolerances: 0.15 $L_\odot$ (15 %), 0.05 $R_\odot$ (5 %) and 3 % of 5772 K. A pass means that each circle lies inside its error bar.
 
 ??? info "Test details"
-    - Reference: Spada et al. (2013) [^cite-spada2013] solar-calibrated tracks; solar effective temperature 5772 K
+    - Reference: Spada et al. (2013)[^cite-spada2013] solar-calibrated tracks; solar effective temperature 5772 K
     - Tolerance: `atol=0.15` Lsun on L, `atol=0.05` Rsun on R, `rtol=0.03` on Teff at 4.57 Gyr
     - Test id: `tests/test_stellarevo.py::test_stellarevo_solar_calibration`
     - Command: `pytest tests/test_stellarevo.py::test_stellarevo_solar_calibration` (needs `FWL_DATA` with the tracks)
@@ -47,7 +47,7 @@ Each case below says why the check exists, what it tests, how we know the right 
 **Known limit.** The test compares `Lbol` and `Rstar` with the solar reference, but checks `Teff` only against a second construction from the same code, so a `Teff` left in log units does not fail it. It also does not check that the second construction reads the cache file.
 
 ??? info "Test details"
-    - Reference: Spada et al. (2013) [^cite-spada2013] raw track files
+    - Reference: Spada et al. (2013)[^cite-spada2013] raw track files
     - Tolerance: `atol=0.2` Lsun on L and `atol=0.1` Rsun on R at 4.57 Gyr; `Lbol` and `Teff` at 1 Msun and 4.57 Gyr from a second construction agree with `rtol=1e-12` (the test does not check that this construction reads the cache file)
     - Test id: `tests/test_stellarevo.py::test_grid_compiled_from_raw_tracks_matches_saved_grid`
     - Command: `pytest tests/test_stellarevo.py::test_grid_compiled_from_raw_tracks_matches_saved_grid` (needs `FWL_DATA` with the tracks)
@@ -60,4 +60,4 @@ Each case below says why the check exists, what it tests, how we know the right 
 
 ## References
 
-[^cite-spada2013]: F. Spada, P. Demarque, Y.-C. Kim, A. Sills, *[The radius discrepancy in low-mass stars: single versus binaries](https://doi.org/10.1088/0004-637X/776/2/87)*, The Astrophysical Journal, 776(2), 87, 2013. [ADS](https://ui.adsabs.harvard.edu/abs/2013ApJ...776...87S/abstract).
+[^cite-spada2013]: F. Spada, P. Demarque, Y.-C. Kim, A. Sills, *[The Radius Discrepancy in Low-mass Stars: Single versus Binaries](https://doi.org/10.1088/0004-637X/776/2/87)*, The Astrophysical Journal, 776, 87, 2013. [SciX](https://scixplorer.org/abs/2013ApJ...776...87S/abstract).

@@ -75,7 +75,7 @@ MORS requires a set of pre-computed stellar evolution tracks. After installation
 mors download all
 ```
 
-This fetches both the [Spada](https://zenodo.org/records/15729101) and [Baraffe](https://zenodo.org/records/15729114) track sets. Both are fetched and hash-verified through fwl-io from their Zenodo records into `$FWL_DATA/star/tracks/`, with their DataverseNL mirrors ([Spada](https://doi.org/10.34894/WEMRPG), [Baraffe](https://doi.org/10.34894/FS9ZDM)) as the fallback for any file Zenodo does not serve with its registry checksum; the Spada grid is a single archive that fwl-io unpacks. If you only need one set, you can download them individually:
+This fetches both the [Spada](https://zenodo.org/records/15729101) and [Baraffe](https://zenodo.org/records/15729114) track sets. Both are fetched and hash-verified through fwl-io from their Zenodo records into `$FWL_DATA/star/tracks/`, with their DataverseNL mirrors (Spada: Soucasse & Nicholls 2026a[^cite-soucasse2026a]; Baraffe: Soucasse & Nicholls 2026b[^cite-soucasse2026b]) as the fallback for any file Zenodo does not serve with its registry checksum; the Spada grid is a single archive that fwl-io unpacks. If you only need one set, you can download them individually:
 
 ```sh
 mors download spada
@@ -131,3 +131,7 @@ print(f"Lx at 4.5 Gyr: {star.Lx(Age=4500.0):.3e} erg/s")
 ```
 
 You should see an X-ray luminosity value printed without errors. If you run into any issues, check the [troubleshooting](../How-to/troubleshooting.md) page or open an issue on [GitHub](https://github.com/FormingWorlds/MORS/issues).
+
+[^cite-soucasse2026a]: L. Soucasse, H. Nicholls, *[stellar_evolution_tracks/Spada](https://doi.org/10.34894/WEMRPG)*, DataverseNL, version 1.0, 2026.
+
+[^cite-soucasse2026b]: L. Soucasse, H. Nicholls, *[stellar_evolution_tracks/Baraffe](https://doi.org/10.34894/FS9ZDM)*, DataverseNL, version 1.1, 2026.

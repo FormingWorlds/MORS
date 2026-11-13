@@ -26,7 +26,7 @@ The case below says why the check exists, what it tests, how we know the right a
 **How to read the plot.** Both axes are logarithmic. The lines are `Star.Value(age, "Lbol")` at 30 ages for 1 Msun (solid) and 0.3 Msun (dashed) and give context. The test asserts the 1 Msun value at 4.57 Gyr (upper circle) against the solar luminosity 3.828e33 erg/s (square, error bar 15 %). The lower circle is the 0.3 Msun value, which must lie below 0.1 of the 1 Msun value (short line). A pass means that the upper circle lies inside the error bar and the lower circle below the short line.
 
 ??? info "Test details"
-    - Reference: Spada et al. (2013) [^cite-spada2013] tracks; IAU 2015 Resolution B3 nominal solar luminosity 3.828e33 erg/s
+    - Reference: Spada et al. (2013)[^cite-spada2013] tracks; IAU 2015 Resolution B3 nominal solar luminosity 3.828e33 erg/s
     - Tolerance: `rtol=0.15` on Lbol in erg/s; the Lbol of a 0.3 Msun star must be below 0.1 of the 1 Msun value
     - Test id: `tests/test_star.py::test_star_reproduces_solar_luminosity_at_solar_age`
     - Command: `pytest tests/test_star.py::test_star_reproduces_solar_luminosity_at_solar_age` (needs `FWL_DATA` with the tracks)
@@ -40,4 +40,4 @@ The case below says why the check exists, what it tests, how we know the right a
 
 ## References
 
-[^cite-spada2013]: F. Spada, P. Demarque, Y.-C. Kim, A. Sills, *[The radius discrepancy in low-mass stars: single versus binaries](https://doi.org/10.1088/0004-637X/776/2/87)*, The Astrophysical Journal, 776, 87, 2013. [ADS](https://ui.adsabs.harvard.edu/abs/2013ApJ...776...87S/abstract).
+[^cite-spada2013]: F. Spada, P. Demarque, Y.-C. Kim, A. Sills, *[The Radius Discrepancy in Low-mass Stars: Single versus Binaries](https://doi.org/10.1088/0004-637X/776/2/87)*, The Astrophysical Journal, 776, 87, 2013. [SciX](https://scixplorer.org/abs/2013ApJ...776...87S/abstract).

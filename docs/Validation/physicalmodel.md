@@ -14,7 +14,7 @@ Each case below says why the check exists, what it tests, how we know the right 
 
 **What it tests.** `Rx` is the ratio of the X-ray to the bolometric luminosity. The code uses the saturated branch `Rx = C1 * Ro**beta1` for `Ro < Ro_sat` and the unsaturated branch `C2 * Ro**beta2` otherwise. `C1`, `C2` are the branch constants and `beta1`, `beta2` the branch exponents. At the saturation Rossby number `Ro_sat` the 2 branches meet, and `Rx` equals `Rx_sat` there by construction, because the code derives `C1` and `C2` from it. The test evaluates the relation at `Ro = Ro_sat`, where the code takes the unsaturated branch, and checks `Rx_sat = 5.135e-4`. It also checks that `Rx` is positive and between 1e-4 and 1e-3, and that the X-ray surface flux equals the X-ray luminosity over the stellar surface area. A companion test, `test_fast_rotator_emits_more_xrays_than_slow_rotator`, checks that a star at 0.5 `Ro_sat` has more than 5 times the `Rx` of a star at 10 `Ro_sat`. Other tests of the module check that the emission quantities are positive, that `Lxuv = Lx + Leuv`, the antisymmetry of the torques, and the saturation of the dipole field and of the mass-loss rate (`test_dipole_field_saturates_below_threshold`, `test_mass_loss_rate_saturates_and_is_positive`).
 
-**How we know the right answer.** `Rx_sat = 5.135e-4` is the saturated ratio of Johnstone et al. (2021) [^cite-johnstone2021]; it is the value the rotation-activity model uses (see [High-energy emission and activity](../Explanations/activity.md)).
+**How we know the right answer.** `Rx_sat = 5.135e-4` is the saturated ratio of Johnstone et al. (2021)[^cite-johnstone2021]; it is the value the rotation-activity model uses (see [High-energy emission and activity](../Explanations/activity.md)).
 
 **Why it matters.** `_Xray` gives the X-ray luminosity along every rotation track (`ExtendedQuantities`, which `rotevo` calls). With the Spada tracks, PROTEUS reads `Lx` and `Leuv` through `Star.Value` to compute the XUV flux at the planet, `F_xuv`.
 
@@ -26,7 +26,7 @@ Each case below says why the check exists, what it tests, how we know the right 
 **Known limit.** The code derives `C1` and `C2` from `Rx_sat` and `Ro_sat`, and the test evaluates at `Ro_sat` itself, so a wrong threshold `Ro_sat`, or an exponent error that keeps the fast-to-slow ratio above 5, does not fail this test or its companion; only `Rx_sat` is checked directly.
 
 ??? info "Test details"
-    - Reference: Johnstone et al. (2021) [^cite-johnstone2021], saturated `Rx_sat = 5.135e-4`
+    - Reference: Johnstone et al. (2021)[^cite-johnstone2021], saturated `Rx_sat = 5.135e-4`
     - Tolerance: `rtol=1e-6`
     - Test id: `tests/test_physicalmodel.py::TestXrayRegimes::test_saturated_xray_ratio_matches_johnstone_value`
     - Command: `pytest tests/test_physicalmodel.py::TestXrayRegimes::test_saturated_xray_ratio_matches_johnstone_value`
@@ -47,7 +47,7 @@ Each case below says why the check exists, what it tests, how we know the right 
 **How to read the plot.** The line is the runaway greenhouse distance of `aOrbHZ` at 1 Lsun for effective temperatures from 2600 to 7200 K and gives context. The test asserts the code value at 5780 K (circle) against $(1/1.0385)^{0.5}$ = 0.981 AU (square) to a relative 1e-6, too small to see. A pass means that the circle sits in the square.
 
 ??? info "Test details"
-    - Reference: Kopparapu et al. (2013) [^cite-kopparapu2013], Table 3, `Seff = 1.0385`
+    - Reference: Kopparapu et al. (2013)[^cite-kopparapu2013], Table 3, `Seff = 1.0385`
     - Tolerance: `rtol=1e-6`
     - Test id: `tests/test_physicalmodel.py::TestHabitableZone::test_solar_runaway_greenhouse_limit`
     - Command: `pytest tests/test_physicalmodel.py::TestHabitableZone::test_solar_runaway_greenhouse_limit`
@@ -70,7 +70,7 @@ Each case below says why the check exists, what it tests, how we know the right 
 **Known limit.** Only the runaway-greenhouse polynomial is compared with Kopparapu et al. (2013). The coefficients of the Recent Venus, Moist, Maximum and Early Mars limits, and so the `HZ` distance (the mean of the Moist and Maximum limits) that `physicalmodel.py` uses for the XUV flux in the habitable zone, are checked only by the ordering test. Both tests replace `stellarevo.Lbol` and `Teff` with fixed values. The ordering test sets `Teff = 5780` K, so `T = 0` and it orders only the `Seff_sun` constants; the `a`, `b`, `c` and `d` coefficients of the other 4 limits are not tested.
 
 ??? info "Test details"
-    - Reference: Kopparapu et al. (2013) [^cite-kopparapu2013], Table 3 polynomial at Teff = 4000 K
+    - Reference: Kopparapu et al. (2013)[^cite-kopparapu2013], Table 3 polynomial at Teff = 4000 K
     - Tolerance: `rtol=1e-9`; the cubic term replaced by $3cT$ must miss by more than 2%
     - Test id: `tests/test_physicalmodel.py::TestHabitableZone::test_runaway_greenhouse_limit_for_a_cool_star`
     - Command: `pytest tests/test_physicalmodel.py::TestHabitableZone::test_runaway_greenhouse_limit_for_a_cool_star`
@@ -82,6 +82,6 @@ Each case below says why the check exists, what it tests, how we know the right 
 
 ## References
 
-[^cite-kopparapu2013]: R. K. Kopparapu, R. Ramirez, J. F. Kasting, et al., *[Habitable zones around main-sequence stars: new estimates](https://doi.org/10.1088/0004-637X/765/2/131)*, The Astrophysical Journal, 765(2), 131, 2013.
+[^cite-kopparapu2013]: R. K. Kopparapu, R. Ramirez, J. F. Kasting, V. Eymet, T. D. Robinson, S. Mahadevan, R. C. Terrien, S. Domagal-Goldman, V. Meadows, R. Deshpande, *[Habitable Zones around Main-sequence Stars: New Estimates](https://doi.org/10.1088/0004-637X/765/2/131)*, The Astrophysical Journal, 765, 131, 2013. [SciX](https://scixplorer.org/abs/2013ApJ...765..131K/abstract).
 
-[^cite-johnstone2021]: C. P. Johnstone, M. Bartel, M. Güdel, *[The active lives of stars: a complete description of the rotation and XUV evolution of F, G, K, and M dwarfs](https://doi.org/10.1051/0004-6361/202038407)*, Astronomy & Astrophysics, 649, A96, 2021.
+[^cite-johnstone2021]: C. P. Johnstone, M. Bartel, M. Güdel, *[The active lives of stars: A complete description of the rotation and XUV evolution of F, G, K, and M dwarfs](https://doi.org/10.1051/0004-6361/202038407)*, Astronomy & Astrophysics, 649, A96, 2021. [SciX](https://scixplorer.org/abs/2021A%26A...649A..96J/abstract).

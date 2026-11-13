@@ -27,8 +27,8 @@ star_name       = "sun"       # required for "solar" and "muscles"
 
 | Setting | Tracks | Mass range | Rotation model | XUV |
 |---|---|---|---|---|
-| `"spada"` | Spada et al. (2013) | 0.10 to 1.25 M_sun | Yes | Yes |
-| `"baraffe"` | Baraffe et al. (2015) | 0.01 to 1.40 M_sun | No | No |
+| `"spada"` | Spada et al. (2013)[^cite-spada2013] | 0.10 to 1.25 M_sun | Yes | Yes |
+| `"baraffe"` | Baraffe et al. (2015)[^cite-baraffe2015] | 0.01 to 1.40 M_sun | No | No |
 
 Use `"spada"` for a rotation-driven XUV history (the usual choice for escape studies). Use `"baraffe"` when you only need bolometric evolution over a wider mass range and do not need XUV or rotation.
 
@@ -66,3 +66,7 @@ For `"solar"` and `"muscles"`, set `star.mors.star_name` to the target star (for
 ## Next step
 
 See [Coupling to PROTEUS (explanation)](../Explanations/proteus.md) for the track model, the quantities MORS updates each iteration, and how the historical spectrum is synthesised.
+
+[^cite-spada2013]: F. Spada, P. Demarque, Y.-C. Kim, A. Sills, *[The Radius Discrepancy in Low-mass Stars: Single versus Binaries](https://doi.org/10.1088/0004-637X/776/2/87)*, The Astrophysical Journal, 776, 87, 2013. [SciX](https://scixplorer.org/abs/2013ApJ...776...87S/abstract).
+
+[^cite-baraffe2015]: I. Baraffe, D. Homeier, F. Allard, G. Chabrier, *[New evolutionary models for pre-main sequence and main sequence low-mass stars down to the hydrogen-burning limit](https://doi.org/10.1051/0004-6361/201425481)*, Astronomy & Astrophysics, 577, A42, 2015. [SciX](https://scixplorer.org/abs/2015A%26A...577A..42B/abstract).
