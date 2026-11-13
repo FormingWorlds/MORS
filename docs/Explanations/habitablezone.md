@@ -21,7 +21,7 @@ Each boundary distance is computed from the stellar flux factor $S_\mathrm{eff}$
 
 $$a = \left(\frac{L_\mathrm{bol}}{L_\odot \cdot S_\mathrm{eff}}\right)^{1/2} \quad (\mathrm{AU})$$
 
-where $S_\mathrm{eff}$ depends on the stellar effective temperature $T_\mathrm{eff}$ via a fourth-order polynomial anchored to solar values, with the coefficients of Table 3 in the erratum of Kopparapu et al. (2013b)[^cite-kopparapu2013b].
+where $S_\mathrm{eff}$ depends on the stellar effective temperature $T_\mathrm{eff}$ via a fourth-order polynomial anchored to solar values, with the coefficients of the corrected Table 3 in Kopparapu et al. (2013b)[^cite-kopparapu2013b], the erratum to Kopparapu et al. (2013a).
 
 ## Fluxes in the habitable zone
 

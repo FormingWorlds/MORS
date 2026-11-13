@@ -35,9 +35,9 @@ Each case below says why the check exists, what it tests, how we know the right 
 
 **Why this check exists.** The habitable-zone distance comes from a polynomial in the stellar temperature. A wrong solar coefficient or a wrong form of the distance law moves the boundary without an error message.
 
-**What it tests.** The runaway-greenhouse boundary distance is `aOrb = (Lbol / Seff)**0.5`. Effective stellar flux follows `Seff = Seff_sun + a*T + b*T**2 + c*T**3 + d*T**4` with `T = Teff - 5780` and `a`, `b`, `c`, `d` the coefficients of Table 3 in the erratum of Kopparapu et al. (2013b)[^cite-kopparapu2013b] for each limit. For a solar analogue with `T = 0`, `Seff = Seff_sun = 1.0385`. Here `Seff` is the effective stellar flux in units of the solar flux at the Earth, `Teff` the effective temperature in K and `Lbol` the bolometric luminosity in solar units. At one solar luminosity this places the boundary at `(1 / 1.0385)**0.5`, about 0.98 AU. A companion test checks the ordering of the 5 boundaries from Recent Venus (innermost) to Early Mars (outermost).
+**What it tests.** The runaway-greenhouse boundary distance is `aOrb = (Lbol / Seff)**0.5`. Effective stellar flux follows `Seff = Seff_sun + a*T + b*T**2 + c*T**3 + d*T**4` with `T = Teff - 5780` and `a`, `b`, `c`, `d` the coefficients of each limit in the corrected Table 3 of Kopparapu et al. (2013b)[^cite-kopparapu2013b]. For a solar analogue with `T = 0`, `Seff = Seff_sun = 1.0385`. Here `Seff` is the effective stellar flux in units of the solar flux at the Earth, `Teff` the effective temperature in K and `Lbol` the bolometric luminosity in solar units. At one solar luminosity this places the boundary at `(1 / 1.0385)**0.5`, about 0.98 AU. A companion test checks the ordering of the 5 boundaries from Recent Venus (innermost) to Early Mars (outermost).
 
-**How we know the right answer.** Kopparapu et al. (2013b), Table 3, gives `Seff = 1.0385` for the solar runaway-greenhouse limit.
+**How we know the right answer.** Kopparapu et al. (2013b), the erratum that updates the Table 3 coefficients of the original paper, gives `Seff = 1.0385` for the solar runaway-greenhouse limit.
 
 **Why it matters.** `aOrbHZ` gives the habitable-zone distances that `Star` and `Cluster` store, and `mors` exports it for direct use. PROTEUS does not read it.
 

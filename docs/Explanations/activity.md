@@ -77,7 +77,7 @@ which gives
 
 $$\frac{F_\mathrm{EUV,2}}{F_\mathrm{EUV,1}} = 0.924\,F_\mathrm{EUV,1}^{-0.0798} \tag{22}$$
 
-Johnstone et al. (2021)[^cite-johnstone2021] print the constant of Eq. 21 as $-0.341$; their Eq. 22 and the code use $-0.0341$, since $10^{-0.0341} = 0.924$. This relation is less reliable than the $F_X$–$F_\mathrm{EUV,1}$ relation since it is derived from the Sun alone, which samples only a small fraction of the parameter space. Implementation: `physicalmodel._EUV2`.
+This relation is less reliable than the $F_X$–$F_\mathrm{EUV,1}$ relation since it is derived from the Sun alone, which samples only a small fraction of the parameter space. Johnstone et al. (2021) print the constant of their Eq. 21 as $-0.341$; their Eq. 22 has the factor $0.924 = 10^{-0.0341}$, so Eq. 21 above shows $-0.0341$, the constant that the code uses. Implementation: `physicalmodel._EUV2`.
 
 ### Total EUV
 
@@ -99,7 +99,7 @@ which gives
 
 $$\frac{F_\mathrm{Ly\alpha}}{F_X} = 9.33 \times 10^3\,F_X^{-0.625} \tag{24}$$
 
-where both fluxes are in erg s$^{-1}$ cm$^{-2}$. Johnstone et al. (2021)[^cite-johnstone2021] print Eq. 24 as $1.96 \times 10^4\,F_X^{-0.681}$, which does not follow from Eq. 23; the code uses Eq. 23. Implementation: `physicalmodel._Lymanalpha`.
+where both fluxes are in erg s$^{-1}$ cm$^{-2}$. Eq. 24 is Eq. 23 divided by $F_X$, with the factor $10^{3.97} = 9.33 \times 10^3$ and the exponent $0.375 - 1 = -0.625$. Johnstone et al. (2021) print their Eq. 24 as $1.96 \times 10^4\,F_X^{-0.681}$, which does not follow from their Eq. 23; the code uses Eq. 23. Implementation: `physicalmodel._Lymanalpha`.
 
 ---
 
