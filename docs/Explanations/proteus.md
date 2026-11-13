@@ -27,8 +27,8 @@ PROTEUS supports two sets of stellar evolution tracks through MORS, selected via
 
 | Setting | Tracks | Mass range | Time unit | XUV |
 |---|---|---|---|---|
-| `'spada'` | Spada et al. (2013) | 0.10 to 1.25 Msun | Myr | Yes |
-| `'baraffe'` | Baraffe et al. (2015) | 0.01 to 1.40 Msun | yr | No |
+| `'spada'` | Spada et al. (2013)[^cite-spada2013] | 0.10 to 1.25 Msun | Myr | Yes |
+| `'baraffe'` | Baraffe et al. (2015)[^cite-baraffe2015] | 0.01 to 1.40 Msun | yr | No |
 
 !!! warning "Mass clipped outside valid range"
     If the configured stellar mass falls outside the valid range for the chosen tracks, PROTEUS clips it to the nearest limit and logs a warning. Note the difference from standalone MORS: called on its own, `mors.Star` raises for an out-of-range mass. The clipping happens in the PROTEUS star wrapper, before MORS is called.
@@ -75,3 +75,7 @@ For Spada tracks, historical spectra are computed by scaling the modern referenc
 
 - [Coupling to PROTEUS (how-to)](../How-to/proteus_coupling.md): the practical TOML recipe for configuring MORS inside a PROTEUS run.
 - [PROTEUS documentation](https://proteus-framework.org/PROTEUS): the coupled framework that MORS plugs into.
+
+[^cite-spada2013]: F. Spada, P. Demarque, Y.-C. Kim, A. Sills, *[The Radius Discrepancy in Low-mass Stars: Single versus Binaries](https://doi.org/10.1088/0004-637X/776/2/87)*, The Astrophysical Journal, 776, 87, 2013. [SciX](https://scixplorer.org/abs/2013ApJ...776...87S/abstract).
+
+[^cite-baraffe2015]: I. Baraffe, D. Homeier, F. Allard, G. Chabrier, *[New evolutionary models for pre-main sequence and main sequence low-mass stars down to the hydrogen-burning limit](https://doi.org/10.1051/0004-6361/201425481)*, Astronomy & Astrophysics, 577, A42, 2015. [SciX](https://scixplorer.org/abs/2015A%26A...577A..42B/abstract).

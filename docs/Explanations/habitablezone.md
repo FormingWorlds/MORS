@@ -1,6 +1,6 @@
 # Habitable zone boundaries
 
-Habitable zone boundaries are computed following Kopparapu et al. (2013) [^kopparapu] using stellar luminosities and effective temperatures from the Spada models [^spada] (`physicalmodel.aOrbHZ`). Six boundaries are returned:
+Habitable zone boundaries are computed following Kopparapu et al. (2013)[^cite-kopparapu2013] using stellar luminosities and effective temperatures from the Spada models [^cite-spada2013] (`physicalmodel.aOrbHZ`). Six boundaries are returned:
 
 | Boundary | Key |
 |---|---|
@@ -17,7 +17,7 @@ The `HZ` boundary is defined as the midpoint between the moist and maximum green
 
 $$a_\mathrm{HZ} = \frac{1}{2}\left(a_\mathrm{MoistGreenhouse} + a_\mathrm{MaximumGreenhouse}\right)$$
 
-Each boundary distance is computed from the stellar flux factor $S_\mathrm{eff}$ following Kopparapu et al. (2013), eq. 3 [^kopparapu]:
+Each boundary distance is computed from the stellar flux factor $S_\mathrm{eff}$ following Kopparapu et al. (2013), eq. 3 [^cite-kopparapu2013]:
 
 $$a = \left(\frac{L_\mathrm{bol}}{L_\odot \cdot S_\mathrm{eff}}\right)^{1/2} \quad (\mathrm{AU})$$
 
@@ -42,6 +42,6 @@ These are computed as $F = L / (4\pi a_\mathrm{HZ}^2)$ for each band.
 
 ---
 
-[^kopparapu]: Kopparapu, R. K., Ramirez, R., Kasting, J. F., et al. (2013). Habitable zones around main-sequence stars: new estimates. *The Astrophysical Journal, 765*(2), 131. https://doi.org/10.1088/0004-637X/765/2/131
+[^cite-kopparapu2013]: R. K. Kopparapu, R. Ramirez, J. F. Kasting, V. Eymet, T. D. Robinson, S. Mahadevan, R. C. Terrien, S. Domagal-Goldman, V. Meadows, R. Deshpande, *[Habitable Zones around Main-sequence Stars: New Estimates](https://doi.org/10.1088/0004-637X/765/2/131)*, The Astrophysical Journal, 765, 131, 2013. [SciX](https://scixplorer.org/abs/2013ApJ...765..131K/abstract).
 
-[^spada]: Spada, F., Demarque, P., Kim, Y.-C., & Sills, A. (2013). The radius discrepancy in low-mass stars: single versus binaries. *The Astrophysical Journal, 776*(2), 87. https://doi.org/10.1088/0004-637X/776/2/87
+[^cite-spada2013]: F. Spada, P. Demarque, Y.-C. Kim, A. Sills, *[The Radius Discrepancy in Low-mass Stars: Single versus Binaries](https://doi.org/10.1088/0004-637X/776/2/87)*, The Astrophysical Journal, 776, 87, 2013. [SciX](https://scixplorer.org/abs/2013ApJ...776...87S/abstract).
