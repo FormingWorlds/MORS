@@ -1185,11 +1185,12 @@ def aOrbHZ(Mstar=None,Age=None,params=params.paramsDefault):
     This function can be used to get the habitable zone boundary orbital distances as a function of stellar mass
     and age. The mass can be either a simple value or an array, in which case all HZ boundaries will be returned
     as arrays. The age does not need to be set and by default the value of the AgeHZ parameter (default 5000 Myr)
-    will be used. The habitable zone boundaries are calculated using the formulae of Kopparapu et al. (2013) and
-    the luminosities and effective temperatures from the stellar models of Spada et al. (2013). The dictionary that
+    will be used. The habitable zone boundaries are calculated using the formulae of Kopparapu et al. (2013a),
+    with the corrected Table 3 coefficients of the erratum Kopparapu et al. (2013b), and the luminosities and
+    effective temperatures from the stellar models of Spada et al. (2013). The dictionary that
     is returned contains the following elements: 'RecentVenus', 'RunawayGreenhouse', 'MoistGreenhouse',
     'MaximumGreenhouse', 'EarlyMars', and 'HZ'. While the first five are obvious and correspond to the boundaries
-    in Kopparapu et al. (2013), the final one is defined in Johnstone et al. (2020) as the average of the runaway
+    in Kopparapu et al. (2013a), the final one is defined in Johnstone et al. (2020) as the average of the runaway
     greenhouse and moist greenhouse orbital distances. All are calculated in AU.
 
     Parameters
