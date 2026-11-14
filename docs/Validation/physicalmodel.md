@@ -35,9 +35,9 @@ Each case below says why the check exists, what it tests, how we know the right 
 
 **Why this check exists.** The habitable-zone distance comes from a polynomial in the stellar temperature. A wrong solar coefficient or a wrong form of the distance law moves the boundary without an error message.
 
-**What it tests.** The runaway-greenhouse boundary distance is `aOrb = (Lbol / Seff)**0.5`. Effective stellar flux follows `Seff = Seff_sun + a*T + b*T**2 + c*T**3 + d*T**4` with `T = Teff - 5780` and `a`, `b`, `c`, `d` the coefficients of Kopparapu et al. (2013)[^cite-kopparapu2013] for each limit. For a solar analogue with `T = 0`, `Seff = Seff_sun = 1.0385`. Here `Seff` is the effective stellar flux in units of the solar flux at the Earth, `Teff` the effective temperature in K and `Lbol` the bolometric luminosity in solar units. At one solar luminosity this places the boundary at `(1 / 1.0385)**0.5`, about 0.98 AU. A companion test checks the ordering of the 5 boundaries from Recent Venus (innermost) to Early Mars (outermost).
+**What it tests.** The runaway-greenhouse boundary distance is `aOrb = (Lbol / Seff)**0.5`. Effective stellar flux follows `Seff = Seff_sun + a*T + b*T**2 + c*T**3 + d*T**4` with `T = Teff - 5780` and `a`, `b`, `c`, `d` the coefficients of each limit in the corrected Table 3 of Kopparapu et al. (2013b)[^cite-kopparapu2013b]. For a solar analogue with `T = 0`, `Seff = Seff_sun = 1.0385`. Here `Seff` is the effective stellar flux in units of the solar flux at the Earth, `Teff` the effective temperature in K and `Lbol` the bolometric luminosity in solar units. At one solar luminosity this places the boundary at `(1 / 1.0385)**0.5`, about 0.98 AU. A companion test checks the ordering of the 5 boundaries from Recent Venus (innermost) to Early Mars (outermost).
 
-**How we know the right answer.** Kopparapu et al. (2013), Table 3, gives `Seff = 1.0385` for the solar runaway-greenhouse limit.
+**How we know the right answer.** Kopparapu et al. (2013b), the erratum that updates the Table 3 coefficients of the original paper, gives `Seff = 1.0385` for the solar runaway-greenhouse limit.
 
 **Why it matters.** `aOrbHZ` gives the habitable-zone distances that `Star` and `Cluster` store, and `mors` exports it for direct use. PROTEUS does not read it.
 
@@ -47,7 +47,7 @@ Each case below says why the check exists, what it tests, how we know the right 
 **How to read the plot.** The line is the runaway greenhouse distance of `aOrbHZ` at 1 Lsun for effective temperatures from 2600 to 7200 K and gives context. The test asserts the code value at 5780 K (circle) against $(1/1.0385)^{0.5}$ = 0.981 AU (square) to a relative 1e-6, too small to see. A pass means that the circle sits in the square.
 
 ??? info "Test details"
-    - Reference: Kopparapu et al. (2013)[^cite-kopparapu2013], Table 3, `Seff = 1.0385`
+    - Reference: Kopparapu et al. (2013b)[^cite-kopparapu2013b], Table 3, `Seff = 1.0385`
     - Tolerance: `rtol=1e-6`
     - Test id: `tests/test_physicalmodel.py::TestHabitableZone::test_solar_runaway_greenhouse_limit`
     - Command: `pytest tests/test_physicalmodel.py::TestHabitableZone::test_solar_runaway_greenhouse_limit`
@@ -58,19 +58,19 @@ Each case below says why the check exists, what it tests, how we know the right 
 
 **What it tests.** At `Teff = 4000` K and `Lbol = 0.1` Lsun (solar luminosities), every temperature term of the `Seff` polynomial is non-zero. The test compares the boundary distance with the polynomial evaluated by hand. It also checks that the cubic term replaced by $3cT$ misses by more than 2 %.
 
-**How we know the right answer.** Kopparapu et al. (2013), Table 3, gives all coefficients of the polynomial.
+**How we know the right answer.** Kopparapu et al. (2013b), Table 3, gives all coefficients of the polynomial.
 
 **Why it matters.** `aOrbHZ` gives the runaway-greenhouse distance of every star that is not a solar analogue through these terms.
 
 ![Runaway greenhouse distance against effective temperature at 0.1 Lsun, with the value at 4000 K and the wrong-term value](../assets/validation/mors_physicalmodel_hz_cool.svg#only-light){ width="80%" }
 ![Runaway greenhouse distance against effective temperature at 0.1 Lsun, with the value at 4000 K and the wrong-term value](../assets/validation/mors_physicalmodel_hz_cool_dark.svg#only-dark){ width="80%" }
 
-**How to read the plot.** The line is the runaway greenhouse distance of `aOrbHZ` at 0.1 Lsun and gives context. The test asserts the code value at 4000 K (circle) against 0.3355 AU from the published coefficients (square). The tolerance, a relative 1e-9, is too small to see. The cross is the value when the cubic term $cT^3$ of the polynomial is replaced by $3cT$, 0.3439 AU. A pass means that the circle sits in the square and the cross lies more than 2 % away.
+**How to read the plot.** The line is the runaway greenhouse distance of `aOrbHZ` at 0.1 Lsun and gives context. The test asserts the code value at 4000 K (circle) against 0.3355 AU from the coefficients of the erratum (square). The tolerance, a relative 1e-9, is too small to see. The cross is the value when the cubic term $cT^3$ of the polynomial is replaced by $3cT$, 0.3439 AU. A pass means that the circle sits in the square and the cross lies more than 2 % away.
 
-**Known limit.** Only the runaway-greenhouse polynomial is compared with Kopparapu et al. (2013). The coefficients of the Recent Venus, Moist, Maximum and Early Mars limits, and so the `HZ` distance (the mean of the Moist and Maximum limits) that `physicalmodel.py` uses for the XUV flux in the habitable zone, are checked only by the ordering test. Both tests replace `stellarevo.Lbol` and `Teff` with fixed values. The ordering test sets `Teff = 5780` K, so `T = 0` and it orders only the `Seff_sun` constants; the `a`, `b`, `c` and `d` coefficients of the other 4 limits are not tested.
+**Known limit.** Only the runaway-greenhouse polynomial is compared with Kopparapu et al. (2013b). The coefficients of the Recent Venus, Moist, Maximum and Early Mars limits, and so the `HZ` distance (the mean of the Moist and Maximum limits) that `physicalmodel.py` uses for the XUV flux in the habitable zone, are checked only by the ordering test. Both tests replace `stellarevo.Lbol` and `Teff` with fixed values. The ordering test sets `Teff = 5780` K, so `T = 0` and it orders only the `Seff_sun` constants; the `a`, `b`, `c` and `d` coefficients of the other 4 limits are not tested.
 
 ??? info "Test details"
-    - Reference: Kopparapu et al. (2013)[^cite-kopparapu2013], Table 3 polynomial at Teff = 4000 K
+    - Reference: Kopparapu et al. (2013b)[^cite-kopparapu2013b], Table 3 polynomial at Teff = 4000 K
     - Tolerance: `rtol=1e-9`; the cubic term replaced by $3cT$ must miss by more than 2%
     - Test id: `tests/test_physicalmodel.py::TestHabitableZone::test_runaway_greenhouse_limit_for_a_cool_star`
     - Command: `pytest tests/test_physicalmodel.py::TestHabitableZone::test_runaway_greenhouse_limit_for_a_cool_star`
@@ -82,6 +82,6 @@ Each case below says why the check exists, what it tests, how we know the right 
 
 ## References
 
-[^cite-kopparapu2013]: R. K. Kopparapu, R. Ramirez, J. F. Kasting, V. Eymet, T. D. Robinson, S. Mahadevan, R. C. Terrien, S. Domagal-Goldman, V. Meadows, R. Deshpande, *[Habitable Zones around Main-sequence Stars: New Estimates](https://doi.org/10.1088/0004-637X/765/2/131)*, The Astrophysical Journal, 765, 131, 2013. [SciX](https://scixplorer.org/abs/2013ApJ...765..131K/abstract).
+[^cite-kopparapu2013b]: R. K. Kopparapu, R. Ramirez, J. F. Kasting, V. Eymet, T. D. Robinson, S. Mahadevan, R. C. Terrien, S. Domagal-Goldman, V. Meadows, R. Deshpande, *[Erratum: "Habitable Zones around Main-sequence Stars: New Estimates" (2013, ApJ, 765, 131)](https://doi.org/10.1088/0004-637X/770/1/82)*, The Astrophysical Journal, 770, 82, 2013. [SciX](https://scixplorer.org/abs/2013ApJ...770...82K/abstract).
 
 [^cite-johnstone2021]: C. P. Johnstone, M. Bartel, M. Güdel, *[The active lives of stars: A complete description of the rotation and XUV evolution of F, G, K, and M dwarfs](https://doi.org/10.1051/0004-6361/202038407)*, Astronomy & Astrophysics, 649, A96, 2021. [SciX](https://scixplorer.org/abs/2021A%26A...649A..96J/abstract).

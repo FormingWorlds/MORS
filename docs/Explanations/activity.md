@@ -71,13 +71,13 @@ Implementation: `physicalmodel._EUV1`.
 
 Constrained using solar spectra only, considering solar values with $L_X > 10^{27}$ erg s$^{-1}$ (Johnstone et al. 2021[^cite-johnstone2021] Eq. 21):
 
-$$\log F_\mathrm{EUV,2} = -0.341 + 0.920\,\log F_\mathrm{EUV,1} \tag{21}$$
+$$\log F_\mathrm{EUV,2} = -0.0341 + 0.920\,\log F_\mathrm{EUV,1} \tag{21}$$
 
 which gives
 
 $$\frac{F_\mathrm{EUV,2}}{F_\mathrm{EUV,1}} = 0.924\,F_\mathrm{EUV,1}^{-0.0798} \tag{22}$$
 
-This relation is less reliable than the $F_X$–$F_\mathrm{EUV,1}$ relation since it is derived from the Sun alone, which samples only a small fraction of the parameter space. Implementation: `physicalmodel._EUV2`.
+This relation is less reliable than the relation between $F_X$ and $F_\mathrm{EUV,1}$, because it is derived from the Sun alone. The Sun samples only a small fraction of the parameter space. Johnstone et al. (2021) print the constant of their Eq. 21 as $-0.341$. Their Eq. 22 has the factor $0.924 = 10^{-0.0341}$, so Eq. 21 above shows $-0.0341$, the constant that the code uses. Implementation: `physicalmodel._EUV2`.
 
 ### Total EUV
 
@@ -97,9 +97,9 @@ $$\log F_\mathrm{Ly\alpha} = 3.97 + 0.375\,\log F_X \tag{23}$$
 
 which gives
 
-$$\frac{F_\mathrm{Ly\alpha}}{F_X} = 1.96 \times 10^4\,F_X^{-0.681} \tag{24}$$
+$$\frac{F_\mathrm{Ly\alpha}}{F_X} = 9.33 \times 10^3\,F_X^{-0.625} \tag{24}$$
 
-where both fluxes are in erg s$^{-1}$ cm$^{-2}$. Implementation: `physicalmodel._Lymanalpha`.
+where both fluxes are in erg s$^{-1}$ cm$^{-2}$. In linear form, Eq. 23 reads $F_\mathrm{Ly\alpha} = 10^{3.97}\,F_X^{0.375}$; dividing by $F_X$ gives Eq. 24, with the factor $10^{3.97} = 9.33 \times 10^3$ and the exponent $0.375 - 1 = -0.625$. Johnstone et al. (2021) print their Eq. 24 as $1.96 \times 10^4\,F_X^{-0.681}$, which does not follow from their Eq. 23; the code uses Eq. 23. Implementation: `physicalmodel._Lymanalpha`.
 
 ---
 

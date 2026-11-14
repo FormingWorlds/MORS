@@ -1,6 +1,6 @@
 # Habitable zone boundaries
 
-Habitable zone boundaries are computed following Kopparapu et al. (2013)[^cite-kopparapu2013] using stellar luminosities and effective temperatures from the Spada et al. (2013)[^cite-spada2013] models (`physicalmodel.aOrbHZ`). Six boundaries are returned:
+Habitable zone boundaries are computed following Kopparapu et al. (2013a)[^cite-kopparapu2013a] using stellar luminosities and effective temperatures from the Spada et al. (2013)[^cite-spada2013] models (`physicalmodel.aOrbHZ`). Six boundaries are returned:
 
 | Boundary | Key |
 |---|---|
@@ -17,11 +17,11 @@ The `HZ` boundary is defined as the midpoint between the moist and maximum green
 
 $$a_\mathrm{HZ} = \frac{1}{2}\left(a_\mathrm{MoistGreenhouse} + a_\mathrm{MaximumGreenhouse}\right)$$
 
-Each boundary distance is computed from the stellar flux factor $S_\mathrm{eff}$ following Kopparapu et al. (2013)[^cite-kopparapu2013], eq. 3:
+Each boundary distance is computed from the stellar flux factor $S_\mathrm{eff}$ following Kopparapu et al. (2013a)[^cite-kopparapu2013a], eq. 3:
 
 $$a = \left(\frac{L_\mathrm{bol}}{L_\odot \cdot S_\mathrm{eff}}\right)^{1/2} \quad (\mathrm{AU})$$
 
-where $S_\mathrm{eff}$ depends on the stellar effective temperature $T_\mathrm{eff}$ via a fourth-order polynomial anchored to solar values.
+where $S_\mathrm{eff}$ depends on the stellar effective temperature $T_\mathrm{eff}$ via a fourth-order polynomial anchored to solar values, with the coefficients of the corrected Table 3 in Kopparapu et al. (2013b)[^cite-kopparapu2013b], the erratum to Kopparapu et al. (2013a).
 
 ## Fluxes in the habitable zone
 
@@ -42,6 +42,8 @@ These are computed as $F = L / (4\pi a_\mathrm{HZ}^2)$ for each band.
 
 ---
 
-[^cite-kopparapu2013]: R. K. Kopparapu, R. Ramirez, J. F. Kasting, V. Eymet, T. D. Robinson, S. Mahadevan, R. C. Terrien, S. Domagal-Goldman, V. Meadows, R. Deshpande, *[Habitable Zones around Main-sequence Stars: New Estimates](https://doi.org/10.1088/0004-637X/765/2/131)*, The Astrophysical Journal, 765, 131, 2013. [SciX](https://scixplorer.org/abs/2013ApJ...765..131K/abstract).
+[^cite-kopparapu2013a]: R. K. Kopparapu, R. Ramirez, J. F. Kasting, V. Eymet, T. D. Robinson, S. Mahadevan, R. C. Terrien, S. Domagal-Goldman, V. Meadows, R. Deshpande, *[Habitable Zones around Main-sequence Stars: New Estimates](https://doi.org/10.1088/0004-637X/765/2/131)*, The Astrophysical Journal, 765, 131, 2013. [SciX](https://scixplorer.org/abs/2013ApJ...765..131K/abstract).
+
+[^cite-kopparapu2013b]: R. K. Kopparapu, R. Ramirez, J. F. Kasting, V. Eymet, T. D. Robinson, S. Mahadevan, R. C. Terrien, S. Domagal-Goldman, V. Meadows, R. Deshpande, *[Erratum: "Habitable Zones around Main-sequence Stars: New Estimates" (2013, ApJ, 765, 131)](https://doi.org/10.1088/0004-637X/770/1/82)*, The Astrophysical Journal, 770, 82, 2013. [SciX](https://scixplorer.org/abs/2013ApJ...770...82K/abstract).
 
 [^cite-spada2013]: F. Spada, P. Demarque, Y.-C. Kim, A. Sills, *[The Radius Discrepancy in Low-mass Stars: Single versus Binaries](https://doi.org/10.1088/0004-637X/776/2/87)*, The Astrophysical Journal, 776, 87, 2013. [SciX](https://scixplorer.org/abs/2013ApJ...776...87S/abstract).
