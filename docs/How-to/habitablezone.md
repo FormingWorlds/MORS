@@ -15,7 +15,7 @@ mors download all
     `Age` is in **Myr**, `Prot` is in **days**, and `Omega` is in units of the **current solar rotation rate** ($\Omega_\odot = 2.67 \times 10^{-6}$ rad s$^{-1}$).
 
 !!! note "Citation"
-    If you use these HZ boundaries in published research, cite Kopparapu et al. (2013a)[^cite-kopparapu2013a] for the HZ prescription. Cite its erratum, Kopparapu et al. (2013b)[^cite-kopparapu2013b], for the corrected Table 3 coefficients that the code uses. Cite Spada et al. (2013)[^cite-spada2013] for the stellar parameters used.
+    If you use these HZ boundaries in published research, cite Kopparapu et al. (2013a)[^cite-kopparapu2013a] for the HZ prescription. Cite the erratum to that paper, Kopparapu et al. (2013b)[^cite-kopparapu2013b], for the corrected Table 3 coefficients that the code uses. Cite Spada et al. (2013)[^cite-spada2013] for the stellar parameters used.
 
 ---
 
