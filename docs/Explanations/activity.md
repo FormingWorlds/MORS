@@ -37,7 +37,7 @@ Implementation: `physicalmodel._Xray`.
 
 ### X-ray variability
 
-Real stellar X-ray emission varies around the average relation. The observed scatter in the $Ro$–$R_X$ distribution can be described as a log-normal centred on zero with standard deviation $\sigma = 0.359$ dex (`params['sigmaXray']`), meaning stars spend approximately 90% of their time within one standard deviation of the average (Johnstone et al. 2021[^cite-johnstone2021]). This scatter can be sampled with `physicalmodel.XrayScatter` or `physicalmodel.XUVScatter`, which apply correlated random offsets consistently across all XUV bands.
+Real stellar X-ray emission varies around the average relation. The observed scatter in the distribution of $R_X$ against $Ro$ can be described as a log-normal centred on zero with standard deviation $\sigma = 0.359$ dex (`params['sigmaXray']`), meaning stars spend approximately 90% of their time within one standard deviation of the average (Johnstone et al. 2021[^cite-johnstone2021]). This scatter can be sampled with `physicalmodel.XrayScatter` or `physicalmodel.XUVScatter`, which apply correlated random offsets consistently across all XUV bands.
 
 ---
 
@@ -73,11 +73,11 @@ Constrained using solar spectra only, considering solar values with $L_X > 10^{2
 
 $$\log F_\mathrm{EUV,2} = -0.0341 + 0.920\,\log F_\mathrm{EUV,1} \tag{21}$$
 
-which gives
+which Johnstone et al. (2021) print as
 
 $$\frac{F_\mathrm{EUV,2}}{F_\mathrm{EUV,1}} = 0.924\,F_\mathrm{EUV,1}^{-0.0798} \tag{22}$$
 
-This relation is less reliable than the relation between $F_X$ and $F_\mathrm{EUV,1}$, because it is derived from the Sun alone. The Sun samples only a small fraction of the parameter space. Johnstone et al. (2021) print the constant of their Eq. 21 as $-0.341$. Their Eq. 22 has the factor $0.924 = 10^{-0.0341}$, so Eq. 21 above shows $-0.0341$, the constant that the code uses. Their Eq. 22 prints the exponent $-0.0798$, as above. The slope $0.920$ of Eq. 21 gives the exponent $0.920 - 1 = -0.080$, which is the exponent that the code uses. Implementation: `physicalmodel._EUV2`.
+This relation is less reliable than the relation between $F_X$ and $F_\mathrm{EUV,1}$, because it is derived from the Sun alone. The Sun samples only a small fraction of the parameter space. Johnstone et al. (2021) print the constant of their Eq. 21 as $-0.341$. Their Eq. 22 has the factor $0.924 = 10^{-0.0341}$, so Eq. 21 above shows $-0.0341$, the constant that the code uses. The slope $0.920$ of Eq. 21 gives the exponent $0.920 - 1 = -0.080$, which is the exponent that the code uses. Implementation: `physicalmodel._EUV2`.
 
 ### Total EUV
 
