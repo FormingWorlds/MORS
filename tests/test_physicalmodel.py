@@ -4,7 +4,8 @@ Exercises the rotation-activity and high-energy emission model: the
 core-envelope rotation-rate derivatives, the saturated / unsaturated X-ray
 scaling, the EUV and Lyman-alpha band relations, the wind and core-envelope
 torque terms, the Rossby number, the breakup rotation rate, and the
-Kopparapu et al. (2013) habitable-zone boundaries.
+Kopparapu et al. (2013a) habitable-zone boundaries, with the Table 3
+coefficients of the erratum, Kopparapu et al. (2013b).
 
 The invariants asserted here are: positivity of luminosities, fluxes, radii,
 and Rossby numbers; band conservation (Lxuv = Lx + Leuv, Leuv = Leuv1 + Leuv2);
@@ -12,7 +13,7 @@ monotonicity of the saturation relation (a fast rotator emits more X-rays than
 a slow one at fixed bolometric luminosity); the habitable-zone ordering
 (inner boundary inside outer boundary); and a reference-pinned check against the
 saturated X-ray-to-bolometric ratio of Johnstone et al. (2020) and the runaway
-greenhouse limit of Kopparapu et al. (2013).
+greenhouse limit from the erratum coefficients of Kopparapu et al. (2013b).
 
 The real Spada track model is replaced by a stand-in returning plausible
 solar-type structural values so every test runs in the unit tier without the
@@ -961,15 +962,16 @@ class TestSaturationThresholds:
 
 
 class TestHabitableZone:
-    """Kopparapu et al. (2013) habitable-zone boundaries."""
+    """Kopparapu et al. (2013a) habitable-zone boundaries with the erratum coefficients (2013b)."""
 
     @pytest.mark.reference_pinned
     @pytest.mark.physics_invariant
     def test_solar_runaway_greenhouse_limit(self, monkeypatch, validation_plot):
-        """For a solar analogue the runaway greenhouse limit matches Kopparapu et al. (2013).
+        """For a solar analogue the runaway greenhouse limit matches Kopparapu et al. (2013b).
 
-        Reference: Kopparapu et al. (2013), Table 3, runaway greenhouse effective
-        stellar flux Seff = 1.0385 at solar effective temperature. With a solar
+        Reference: Kopparapu et al. (2013b), the erratum, Table 3: runaway greenhouse
+        effective stellar flux Seff = 1.0385 at solar effective temperature (the
+        corrected value of Table 3 of Kopparapu et al. 2013a). With a solar
         bolometric luminosity of 1 Lsun the boundary is (1 / 1.0385)^0.5 ~ 0.981
         AU, the classic inner edge of the conservative habitable zone.
         """
@@ -1006,17 +1008,19 @@ class TestHabitableZone:
     def test_runaway_greenhouse_limit_for_a_cool_star(self, monkeypatch, validation_plot):
         """For a cool star the runaway greenhouse limit follows the Kopparapu polynomial.
 
-        Reference: Kopparapu et al. (2013), Table 3. At Teff = 4000 K the shifted
+        Reference: Kopparapu et al. (2013b), the erratum, Table 3, for the
+        coefficients; Kopparapu et al. (2013a) for the polynomial and the distance
+        law. At Teff = 4000 K the shifted
         temperature Tstar = Teff - 5780 = -1780 K drives the full
         a*Tstar + b*Tstar**2 + c*Tstar**3 + d*Tstar**4 correction, unlike the
         solar case where every temperature term vanishes. The boundary distance
-        is (Lbol / Seff)**0.5 with Seff from the published coefficients.
+        is (Lbol / Seff)**0.5 with Seff from the erratum coefficients.
         """
         monkeypatch.setattr('mors.stellarevo.Lbol', lambda M, A: 0.1)
         teff = 4000.0
         monkeypatch.setattr('mors.stellarevo.Teff', lambda M, A: teff)
         hz = pm.aOrbHZ(Mstar=0.5, Age=1000.0)
-        # Kopparapu runaway-greenhouse coefficients at Tstar = -1780 K.
+        # Kopparapu et al. (2013b) runaway-greenhouse coefficients at Tstar = -1780 K.
         tstar = teff - 5780.0
         seff = (
             1.0385
