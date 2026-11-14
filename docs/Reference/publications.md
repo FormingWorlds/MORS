@@ -10,8 +10,8 @@ Additionally, MORS is part of all publications of the PROTEUS Framework, which c
 
 - Spada, F., Demarque, P., Kim, Y. C., & Sills, A. (2013). The radius discrepancy in low-mass stars: single versus binaries. *The Astrophysical Journal*, 776(2), 87. [https://doi.org/10.1088/0004-637X/776/2/87](https://doi.org/10.1088/0004-637X/776/2/87)
 
-- Kopparapu, R. K., Ramirez, R., Kasting, J. F., Eymet, V., Robinson, T. D., Mahadevan, S., ... & Deshpande, R. (2013). Habitable zones around main-sequence stars: new estimates. *The Astrophysical Journal*, 765(2), 131. [https://doi.org/10.1088/0004-637X/765/2/131](https://doi.org/10.1088/0004-637X/765/2/131)
+- Kopparapu, R. K., Ramirez, R., Kasting, J. F., Eymet, V., Robinson, T. D., Mahadevan, S., ... & Deshpande, R. (2013a). Habitable zones around main-sequence stars: new estimates. *The Astrophysical Journal*, 765(2), 131. [https://doi.org/10.1088/0004-637X/765/2/131](https://doi.org/10.1088/0004-637X/765/2/131)
 
-- Kopparapu, R. K., Ramirez, R., Kasting, J. F., Eymet, V., Robinson, T. D., Mahadevan, S., ... & Deshpande, R. (2013). Erratum: "Habitable zones around main-sequence stars: new estimates" (2013, ApJ, 765, 131). *The Astrophysical Journal*, 770(1), 82. [https://doi.org/10.1088/0004-637X/770/1/82](https://doi.org/10.1088/0004-637X/770/1/82)
+- Kopparapu, R. K., Ramirez, R., Kasting, J. F., Eymet, V., Robinson, T. D., Mahadevan, S., ... & Deshpande, R. (2013b). Erratum: "Habitable zones around main-sequence stars: new estimates" (2013, ApJ, 765, 131). *The Astrophysical Journal*, 770(1), 82. [https://doi.org/10.1088/0004-637X/770/1/82](https://doi.org/10.1088/0004-637X/770/1/82)
 
 - Baraffe, I., Chabrier, G., Allard, F., & Hauschildt, P. H. (2002). Evolutionary models for low-mass stars and brown dwarfs: Uncertainties and limits at very young ages. *Astronomy & Astrophysics*, 382(2), 563-572. [https://doi.org/10.1051/0004-6361:20011638](https://doi.org/10.1051/0004-6361:20011638)
