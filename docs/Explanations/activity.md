@@ -29,7 +29,7 @@ The constants $C_1$ and $C_2$ are derived from the requirement that the two powe
 | Saturated power-law index | $\beta_1$ | $-0.135$ |
 | Unsaturated power-law index | $\beta_2$ | $-1.889$ |
 
-The $R_X$ relation is shallower in the unsaturated regime than many previous estimates, consistent with the Sun being less X-ray active than other stars with similar parameters (Reinhold et al. 2020)[^cite-reinhold2020]. The X-ray luminosity and surface flux then follow as:
+The $R_X$ relation is shallower in the unsaturated regime than many previous estimates, consistent with the Sun being less X-ray active than other stars with similar parameters (Reinhold et al. 2020[^cite-reinhold2020]). The X-ray luminosity and surface flux then follow as:
 
 $$L_X = R_X \cdot L_\mathrm{bol}, \qquad F_X = \frac{L_X}{4\pi R_\star^2}$$
 
@@ -37,7 +37,7 @@ Implementation: `physicalmodel._Xray`.
 
 ### X-ray variability
 
-Real stellar X-ray emission varies around the average relation. The observed scatter in the $Ro$–$R_X$ distribution can be described as a log-normal centred on zero with standard deviation $\sigma = 0.359$ dex (`params['sigmaXray']`), meaning stars spend approximately 90% of their time within one standard deviation of the average (Johnstone et al. 2021)[^cite-johnstone2021]. This scatter can be sampled with `physicalmodel.XrayScatter` or `physicalmodel.XUVScatter`, which apply correlated random offsets consistently across all XUV bands.
+Real stellar X-ray emission varies around the average relation. The observed scatter in the $Ro$–$R_X$ distribution can be described as a log-normal centred on zero with standard deviation $\sigma = 0.359$ dex (`params['sigmaXray']`), meaning stars spend approximately 90% of their time within one standard deviation of the average (Johnstone et al. 2021[^cite-johnstone2021]). This scatter can be sampled with `physicalmodel.XrayScatter` or `physicalmodel.XUVScatter`, which apply correlated random offsets consistently across all XUV bands.
 
 ---
 
@@ -53,11 +53,11 @@ This relation is mass-independent when expressed in surface fluxes. Since corona
 
 ## 3. EUV emission
 
-EUV emission is empirically related to $F_X$ rather than to $L_X$ or $R_X$, since $F_X$ best captures the physical state of the emitting plasma (Johnstone & Güdel 2015)[^cite-johnstone2015]. The relations are derived from EUVE observations of nearby F, G, K, and M stars (Craig et al. 1997)[^cite-craig1997] and solar spectra.
+EUV emission is empirically related to $F_X$ rather than to $L_X$ or $R_X$, since $F_X$ best captures the physical state of the emitting plasma (Johnstone & Güdel 2015[^cite-johnstone2015]). The relations are derived from EUVE observations of nearby F, G, K, and M stars (Craig et al. 1997[^cite-craig1997]) and solar spectra.
 
 ### EUV band 1 (10–36 nm)
 
-Constrained from the EUVE stellar sample using the OLS Bisector method (Johnstone et al. 2021[^cite-johnstone2021] Eq. 19):
+Constrained from the EUVE stellar sample using the OLS Bisector method (Johnstone et al. 2021[^cite-johnstone2021], Eq. 19):
 
 $$\log F_\mathrm{EUV,1} = 2.04 + 0.681\,\log F_X \tag{19}$$
 
@@ -69,7 +69,7 @@ Implementation: `physicalmodel._EUV1`.
 
 ### EUV band 2 (36–92 nm)
 
-Constrained using solar spectra only, considering solar values with $L_X > 10^{27}$ erg s$^{-1}$ (Johnstone et al. 2021[^cite-johnstone2021] Eq. 21):
+Constrained using solar spectra only, considering solar values with $L_X > 10^{27}$ erg s$^{-1}$ (Johnstone et al. 2021[^cite-johnstone2021], Eq. 21):
 
 $$\log F_\mathrm{EUV,2} = -0.0341 + 0.920\,\log F_\mathrm{EUV,1} \tag{21}$$
 
@@ -89,9 +89,9 @@ Implementation: `physicalmodel._EUV`.
 
 ## 4. Ly-$\alpha$ emission
 
-The Ly-$\alpha$ line at 121.6 nm is formed in the transition region and upper chromosphere (Avrett & Loeser 2008)[^cite-avrett2008] and is often more luminous than the entire X-ray and EUV combined. Although most of the line is absorbed by the ISM, reconstructions of the intrinsic line flux are available for a large number of stars (Wood et al. 2005)[^cite-wood2005].
+The Ly-$\alpha$ line at 121.6 nm is formed in the transition region and upper chromosphere (Avrett & Loeser 2008[^cite-avrett2008]) and is often more luminous than the entire X-ray and EUV combined. Although most of the line is absorbed by the ISM, reconstructions of the intrinsic line flux are available for a large number of stars (Wood et al. 2005[^cite-wood2005]).
 
-The Ly-$\alpha$ surface flux is related to $F_X$ following Wood et al. (2005)[^cite-wood2005] and Linsky et al. (2013)[^cite-linsky2013]. When expressed in surface fluxes (rather than luminosities or 1 AU fluxes), the relation becomes mass-independent (Johnstone et al. 2021[^cite-johnstone2021] Eq. 23):
+The Ly-$\alpha$ surface flux is related to $F_X$ following Wood et al. (2005)[^cite-wood2005] and Linsky et al. (2013)[^cite-linsky2013]. When expressed in surface fluxes (rather than luminosities or 1 AU fluxes), the relation becomes mass-independent (Johnstone et al. 2021[^cite-johnstone2021], Eq. 23):
 
 $$\log F_\mathrm{Ly\alpha} = 3.97 + 0.375\,\log F_X \tag{23}$$
 
