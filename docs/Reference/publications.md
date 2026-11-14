@@ -4,7 +4,7 @@
 
 - Johnstone, C. P., Bartel, M., & Güdel, M. (2021). The active lives of stars: A complete description of the rotation and XUV evolution of F, G, K, and M dwarfs. *Astronomy & Astrophysics*, 649, A96. [https://doi.org/10.1051/0004-6361/202038407](https://doi.org/10.1051/0004-6361/202038407)
 
-Additionally, MORS is part of all publications of the PROTEUS Framework, which can be found [here](https://scixplorer.org/public-libraries/EVAJ1UgWTCy2Z7TRoSmjtQ). 
+Additionally, MORS is part of all publications of the PROTEUS Framework, which can be found [here](https://scixplorer.org/public-libraries/EVAJ1UgWTCy2Z7TRoSmjtQ).
 
 ## Bibliography
 
