@@ -1258,7 +1258,7 @@ z
      </g>
     </g>
     <g id="text_15">
-     <!-- Kopparapu et al. (2013) -->
+     <!-- Kopparapu et al. (2013b) -->
      <g style="fill: #10151b" transform="translate(330.612486 44.632026) scale(0.120785 -0.120785)">
       <defs>
        <path id="InstrumentSans-Regular-70" d="M 2125 -58 
@@ -1311,6 +1311,36 @@ Q 1651 -109 2278 -704
 L 1786 -704 
 z
 " transform="scale(0.015625)"/>
+       <path id="InstrumentSans-Regular-62" d="M 2125 -58 
+Q 1664 -58 1350 166 
+Q 1037 390 922 800 
+L 992 813 
+L 992 0 
+L 512 0 
+L 512 4608 
+L 1024 4608 
+L 1024 2502 
+L 954 2522 
+Q 1075 2899 1398 3113 
+Q 1722 3328 2170 3328 
+Q 2605 3328 2928 3117 
+Q 3251 2906 3430 2528 
+Q 3610 2150 3610 1645 
+Q 3610 1133 3424 749 
+Q 3238 365 2905 153 
+Q 2573 -58 2125 -58 
+z
+M 2048 390 
+Q 2534 390 2809 726 
+Q 3085 1062 3085 1645 
+Q 3085 2221 2809 2550 
+Q 2534 2880 2048 2880 
+Q 1562 2880 1280 2544 
+Q 998 2208 998 1626 
+Q 998 1056 1280 723 
+Q 1562 390 2048 390 
+z
+" transform="scale(0.015625)"/>
        <path id="InstrumentSans-Regular-29" d="M 813 4826 
 Q 1466 4230 1776 3520 
 Q 2086 2810 2086 2074 
@@ -1347,7 +1377,8 @@ z
       <use xlink:href="#InstrumentSans-Regular-30" transform="translate(864.39978 0)"/>
       <use xlink:href="#InstrumentSans-Regular-31" transform="translate(930.999771 0)"/>
       <use xlink:href="#InstrumentSans-Regular-33" transform="translate(970.099762 0)"/>
-      <use xlink:href="#InstrumentSans-Regular-29" transform="translate(1027.499756 0)"/>
+      <use xlink:href="#InstrumentSans-Regular-62" transform="translate(1027.499756 0)"/>
+      <use xlink:href="#InstrumentSans-Regular-29" transform="translate(1088.099747 0)"/>
      </g>
     </g>
     <g id="line2d_29">
@@ -1385,36 +1416,6 @@ z
      <!-- cubic term replaced by 3cT -->
      <g style="fill: #10151b" transform="translate(330.612486 79.176536) scale(0.120785 -0.120785)">
       <defs>
-       <path id="InstrumentSans-Regular-62" d="M 2125 -58 
-Q 1664 -58 1350 166 
-Q 1037 390 922 800 
-L 992 813 
-L 992 0 
-L 512 0 
-L 512 4608 
-L 1024 4608 
-L 1024 2502 
-L 954 2522 
-Q 1075 2899 1398 3113 
-Q 1722 3328 2170 3328 
-Q 2605 3328 2928 3117 
-Q 3251 2906 3430 2528 
-Q 3610 2150 3610 1645 
-Q 3610 1133 3424 749 
-Q 3238 365 2905 153 
-Q 2573 -58 2125 -58 
-z
-M 2048 390 
-Q 2534 390 2809 726 
-Q 3085 1062 3085 1645 
-Q 3085 2221 2809 2550 
-Q 2534 2880 2048 2880 
-Q 1562 2880 1280 2544 
-Q 998 2208 998 1626 
-Q 998 1056 1280 723 
-Q 1562 390 2048 390 
-z
-" transform="scale(0.015625)"/>
        <path id="InstrumentSans-Regular-6d" d="M 512 0 
 L 512 3264 
 L 992 3264 
